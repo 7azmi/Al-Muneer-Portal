@@ -55,7 +55,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **Frontend Interface:** HTML5, CSS3, JavaScript, Thymeleaf (Server-side rendering)
     
-- **Database:** PostgreSQL or MySQL (Relational) via Spring Data JPA
+- **Database:** PostgreSQL (Relational) via Spring Data JPA
     
 - **Security:** Spring Security (Hashed passwords, HTTPS)
     
