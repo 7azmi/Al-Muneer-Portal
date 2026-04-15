@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Gallery', 'gallery', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Manage Gallery</h1>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}">Success</div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}">Error</div>
+
+    <!-- Upload Image -->
+    <div class="admin-panel">
+        <h3 class="admin-panel-title">Upload Image</h3>
+        <form method="post" th:action="@{/admin/gallery/upload-image}" enctype="multipart/form-data" id="upload-image-form">
+            <div class="form-group">
+                <label class="form-label" for="gallery-file">Image File (JPG/PNG, Max 5MB)</label>
+                <input type="file" id="gallery-file" name="file" class="form-input" accept=".jpg,.jpeg,.png" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="img-caption">Caption</label>
+                    <input type="text" id="img-caption" name="caption" class="form-input" placeholder="Optional caption">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="img-category">Category</label>
+                    <select id="img-category" name="category" class="form-select">
+                        <option value="Weddings">Weddings</option>
+                        <option value="Hall Setup">Hall Setup</option>
+                        <option value="Decorations">Decorations</option>
+                        <option value="Exterior">Exterior</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="upload-image-btn">Upload Image</button>
+        </form>
+    </div>
+
+    <!-- Add YouTube Video -->
+    <div class="admin-panel">
+        <h3 class="admin-panel-title">Add YouTube Video</h3>
+        <form method="post" th:action="@{/admin/gallery/add-video}" id="add-video-form">
+            <div class="form-group">
+                <label class="form-label" for="youtube-url">YouTube URL</label>
+                <input type="url" id="youtube-url" name="youtubeUrl" class="form-input"
+                       placeholder="https://www.youtube.com/watch?v=..." required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="vid-caption">Caption</label>
+                    <input type="text" id="vid-caption" name="caption" class="form-input" placeholder="Optional caption">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="vid-category">Category</label>
+                    <select id="vid-category" name="category" class="form-select">
+                        <option value="Weddings">Weddings</option>
+                        <option value="Hall Setup">Hall Setup</option>
+                        <option value="Decorations">Decorations</option>
+                        <option value="Exterior">Exterior</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="add-video-btn">Add Video</button>
+        </form>
+    </div>
+
+    <!-- Existing Media -->
+    <div class="admin-panel">
+        <h3 class="admin-panel-title">Existing Media (<span th:text="${mediaItems.size()}">0</span> items)</h3>
+        <div class="admin-media-grid" th:if="${!mediaItems.isEmpty()}">
+            <div th:each="item : ${mediaItems}" class="admin-media-item">
+                <!-- Image thumbnail -->
+                <div th:if="${item.mediaType.name() == 'IMAGE'}">
+                    <img th:src="@{'/uploads/gallery/' + ${item.fileName}}" th:alt="${item.caption ?: 'Image'}">
+                </div>
+                <!-- YouTube thumbnail -->
+                <div th:if="${item.mediaType.name() == 'YOUTUBE'}" class="youtube-thumb">
+                    <img th:src="'https://img.youtube.com/vi/' + ${item.youtubeUrl != null ? item.youtubeUrl.replaceAll('.*(?:youtu\\.be/|v=)([^&?#]+).*', '$1') : ''} + '/hqdefault.jpg'"
+                         alt="YouTube thumbnail">
+                    <span class="play-icon">▶</span>
+                </div>
+                <div class="media-actions">
+                    <span class="media-caption">
+                        <span th:if="${item.mediaType.name() == 'YOUTUBE'}" class="badge badge-youtube">YouTube</span>
+                        <span th:text="${item.caption ?: item.category ?: ''}">Caption</span>
+                    </span>
+                    <form method="post" th:action="@{'/admin/gallery/delete/' + ${item.mediaId}}"
+                          onsubmit="return confirm('Delete this item?');" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div th:if="${mediaItems.isEmpty()}" class="empty-state">
+            <p class="text-muted">No media items yet. Upload images or add YouTube videos above.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

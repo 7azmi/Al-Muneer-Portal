@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Pricing</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="pricing-page">
+        <div class="section-container">
+            <div class="section-header">
+                <h1 class="section-title">Pricing Packages</h1>
+                <p class="section-subtitle">Choose the perfect package for your celebration</p>
+            </div>
+
+            <div class="pricing-grid" th:if="${!tiers.isEmpty()}">
+                <div th:each="tier : ${tiers}" class="pricing-card">
+                    <div class="pricing-name" th:text="${tier.tierName}">Package Name</div>
+                    <div class="pricing-price">
+                        <span th:text="${#numbers.formatDecimal(tier.basePrice, 0, 0)}">0</span>
+                        <span class="currency">YER</span>
+                    </div>
+                    <div class="pricing-description" th:text="${tier.description}">Package details</div>
+                    <a href="/calendar" class="btn btn-primary">Check Availability</a>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" th:if="${tiers.isEmpty()}">
+                <div class="empty-state-icon">💰</div>
+                <p class="empty-state-text">Pricing information coming soon. Contact us for details!</p>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

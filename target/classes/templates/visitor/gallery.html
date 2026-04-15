@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Gallery</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="gallery-page">
+        <div class="section-container">
+            <div class="section-header">
+                <h1 class="section-title">Gallery</h1>
+                <p class="section-subtitle">Explore our venue through photos and videos</p>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="gallery-filters" id="gallery-filters">
+                <a th:href="@{/gallery(category='all')}"
+                   th:classappend="${activeCategory == 'all'} ? 'active'" class="filter-btn">All</a>
+                <a th:href="@{/gallery(category='Weddings')}"
+                   th:classappend="${activeCategory == 'Weddings'} ? 'active'" class="filter-btn">Weddings</a>
+                <a th:href="@{/gallery(category='Hall Setup')}"
+                   th:classappend="${activeCategory == 'Hall Setup'} ? 'active'" class="filter-btn">Hall Setup</a>
+                <a th:href="@{/gallery(category='Decorations')}"
+                   th:classappend="${activeCategory == 'Decorations'} ? 'active'" class="filter-btn">Decorations</a>
+                <a th:href="@{/gallery(category='Exterior')}"
+                   th:classappend="${activeCategory == 'Exterior'} ? 'active'" class="filter-btn">Exterior</a>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="gallery-grid" th:if="${!mediaItems.isEmpty()}" id="gallery-grid">
+                <div th:each="item : ${mediaItems}" class="gallery-item"
+                     th:data-type="${item.mediaType}"
+                     th:data-src="${item.mediaType.name() == 'IMAGE' ? '/uploads/gallery/' + item.fileName : ''}"
+                     th:data-url="${item.youtubeUrl}"
+                     th:data-caption="${item.caption}">
+
+                    <!-- Image -->
+                    <div th:if="${item.mediaType.name() == 'IMAGE'}">
+                        <img th:src="@{'/uploads/gallery/' + ${item.fileName}}" th:alt="${item.caption ?: 'Gallery image'}">
+                    </div>
+
+                    <!-- YouTube -->
+                    <div th:if="${item.mediaType.name() == 'YOUTUBE'}" class="youtube-thumb">
+                        <img th:src="'https://img.youtube.com/vi/' + ${item.youtubeUrl != null ? item.youtubeUrl.replaceAll('.*(?:youtu\\.be/|v=)([^&?#]+).*', '$1') : ''} + '/hqdefault.jpg'"
+                             alt="Video thumbnail">
+                        <span class="play-icon">▶</span>
+                    </div>
+
+                    <div class="caption-overlay" th:if="${item.caption != null}" th:text="${item.caption}">Caption</div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" th:if="${mediaItems.isEmpty()}">
+                <div class="empty-state-icon">🖼️</div>
+                <p class="empty-state-text">No media items yet. Check back soon!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" aria-label="Close">&times;</button>
+        <div class="lightbox-content"></div>
+    </div>
+</main>
+</body>
+</html>

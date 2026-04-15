@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Calendar', 'calendar', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Manage Calendar</h1>
+    </div>
+
+    <div class="admin-panel">
+        <p class="text-muted mb-4">Click on a date to set its availability status.</p>
+        <div class="calendar-wrapper">
+            <div id="admin-calendar"></div>
+        </div>
+
+        <!-- Status Panel (hidden until date selected) -->
+        <div id="slot-status-panel" class="slot-status-panel" style="display:none;">
+            <h4 style="margin-bottom: 1rem;">
+                Set Status for: <strong id="selected-date-display"></strong>
+            </h4>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button onclick="setSlotStatus('AVAILABLE')" class="btn btn-outline btn-sm"
+                        style="border-color: var(--color-available); color: var(--color-available);">
+                    ● Available
+                </button>
+                <button onclick="setSlotStatus('PENDING')" class="btn btn-outline btn-sm"
+                        style="border-color: var(--color-pending); color: var(--color-pending);">
+                    ● Pending
+                </button>
+                <button onclick="setSlotStatus('BOOKED')" class="btn btn-outline btn-sm"
+                        style="border-color: var(--color-booked); color: var(--color-booked);">
+                    ● Booked
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            initCalendar('admin-calendar',
+                [[${currentYear}]], [[${currentMonth}]], true);
+        });
+
+        function setSlotStatus(status) {
+            const date = document.getElementById('slot-date-input')?.value
+                || document.getElementById('selected-date-display').textContent;
+
+            fetch('/admin/calendar/set-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `date=${date}&status=${status}`
+            })
+            .then(r => r.json())
+            .then(() => {
+                // Refresh the calendar
+                const calMonthLabel = document.querySelector('#admin-calendar .calendar-header h2');
+                if (calMonthLabel) {
+                    // Re-trigger calendar load
+                    location.reload();
+                }
+            })
+            .catch(err => alert('Error: ' + err.message));
+        }
+    </script>
+    <input type="hidden" id="slot-date-input" value="">
+</div>
+</body>
+</html>
