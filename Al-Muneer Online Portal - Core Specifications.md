@@ -8,7 +8,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 **The Problem:** Currently, bookings and inquiries are handled manually via phone calls and WhatsApp. This causes significant time drain on the owner, inconsistencies, limited availability for customer inquiries, and lack of a centralized visual platform (which is especially problematic for female stakeholders who prefer remote venue assessment due to local cultural norms). Tracking payments and feedback is disorganized.
 
-**The Solution:** A monolithic, responsive web application that centralizes venue information, an interactive availability calendar, pricing, and booking inquiries. It includes a specific workflow for users to upload offline payment proofs (screenshots) to confirm bookings, alongside an administrative dashboard for the owner to manage content, track inquiries, verify payments, and gather feedback.
+**The Solution:** A monolithic, responsive web application that centralizes venue information, an interactive availability calendar, pricing, and booking inquiries. It includes a specific workflow for visitors to upload offline payment proofs (screenshots) to confirm bookings, alongside an administrative dashboard for the owner to manage content, track inquiries, verify payments, and gather feedback.
 
 ## 2. Scope & Constraints
 
@@ -16,11 +16,11 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 - Responsive web portal (mobile-friendly browser access).
     
-- Two User Roles: Visitor (Client) and Administrator (Owner).
+- Two User Roles: Visitor and Administrator (Owner).
     
 - Core Features: Media gallery, interactive availability calendar, dynamic pricing, inquiry submission, payment proof upload, feedback form, basic admin reporting.
     
-- Notifications via SMS/WhatsApp gateway (or manual admin trigger).
+- Admin-triggered visitor notifications via WhatsApp deep links (`wa.me/{number}?text={template}`).
     
 
 **Out of Scope (Limitations):**
@@ -35,6 +35,8 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - No complex CRM or advanced event management features.
     
+- No email notifications or third-party SMS gateways.
+    
 
 **Project Constraints:**
 
@@ -42,7 +44,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **Local Infrastructure:** Must be optimized for potentially slower internet connections in Yemen (avoid overly heavy client-side frameworks; optimize images).
     
-- **Communication Preferences:** Must lean heavily on SMS/WhatsApp integration over Email, fitting local norms.
+- **Communication Preferences:** WhatsApp deep links are the sole notification channel. No email integration is required or in scope.
     
 
 ## 3. Technology Stack & Architecture
@@ -57,7 +59,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **Security:** Spring Security (Hashed passwords, HTTPS)
     
-- **External Interfaces:** HTTP/REST APIs (Internal), SMS Gateway API (Twilio/Vonage/Local), JavaMail API (SMTP fallback).
+- **External Interfaces:** HTTP/REST APIs (Internal). WhatsApp deep link generation (`wa.me` format) for admin-initiated visitor notifications — no third-party gateway required.
     
 - **Deployment:** Cloud VPS (Linux)
     
@@ -78,24 +80,24 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - `.util`: Helpers (FileUploadUtil, DateUtil, ReportGeneratorUtil).
     
-- `.security`: JWT/Session management, UserDetailsService implementation.
+- `.security`: JWT-based stateless authentication for the Admin Dashboard, UserDetailsService implementation.
     
 
 ## 4. Detailed System Use Cases (SRS)
 
-### Visitor (Client) Module
+### Visitor Module
 
 - **UC001: View Venue Info:** Retrieves and displays description, services, capacity, and location.
     
-- **UC002: View Media Gallery:** Grid display of image/video thumbnails; opens in full-size lightbox.
+- **UC002: View Media Gallery:** Grid display of image thumbnails and embedded YouTube video tiles (no native video uploads). Clicking an image opens a full-size lightbox; clicking a video tile plays it inline via YouTube embed.
     
 - **UC003: Check Availability:** Interactive calendar displaying "Available", "Booked", or "Pending" states.
     
 - **UC004: View Pricing Panel:** Displays pricing tiers and packages.
     
-- **UC005: Submit Booking Inquiry:** Form capture -> Validates -> Saves to DB -> Triggers Admin Notification.
+- **UC005: Submit Booking Inquiry:** Form capture (Name, WhatsApp Number, Event Date, etc.) -> Validates -> Saves to DB -> Sets linked `AvailabilitySlot` to `Pending` -> Displays Inquiry ID to visitor on confirmation screen -> Triggers Admin Notification deep link.
     
-- **UC011: Submit Payment Proof:** Form to upload JPG/PNG receipt screenshot (Max 5MB) -> Links to Inquiry ID -> Triggers Admin Notification.
+- **UC011: Submit Payment Proof:** Visitor enters their Inquiry ID (provided on the UC005 confirmation screen) and uploads a JPG/PNG receipt screenshot (Max 5MB). The proof is linked to the inquiry record. Multiple uploads are allowed (e.g., if a previous proof was rejected). Triggers Admin Notification deep link.
     
 - **UC012: Submit Feedback:** Form capture -> Saves to DB.
     
@@ -104,7 +106,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 - **UC006: Manage Hall Info:** CRUD operations for venue descriptions, contact details, and FAQs.
     
-- **UC007: Manage Media Gallery:** Upload new files (validates type/size) or delete existing media.
+- **UC007: Manage Media Gallery:** Upload new image files (JPG/PNG, Max 5MB) or add YouTube video URLs. Delete existing gallery items.
     
 - **UC008: Manage Pricing Panel:** Add, edit, or remove pricing tiers/packages.
     
@@ -118,7 +120,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **UC015: Manage Feedback:** Read visitor feedback, mark as "Reviewed", and add internal notes.
     
-- **UC016: Configure Notifications:** Enable/disable specific system alerts and edit message templates.
+- **UC016: Configure Notification Templates:** Admin edits pre-filled WhatsApp message templates for visitor-facing alerts (e.g., "Inquiry Received", "Payment Verified", "Payment Rejected"). Triggering a notification action generates a `wa.me` deep link with the visitor's WhatsApp number and the configured template text populated.
     
 
 ## 5. Performance & Security Attributes (NFRs)
@@ -157,9 +159,27 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 1. `Pending_Verification`: Uploaded, awaiting admin offline verification.
     
-2. `Verified`: Admin confirmed payment validity (Triggers Inquiry -> Confirmed).
+2. `Verified`: Admin confirmed payment validity (Triggers Inquiry -> `Confirmed` and Slot -> `Booked`).
     
-3. `Rejected`: Admin found proof invalid/insufficient.
+3. `Rejected`: Admin found proof invalid/insufficient. Visitor may re-upload a new proof.
+    
+
+**AvailabilitySlot States:**
+
+1. `Available`: No active inquiry exists for this date; open for new inquiries.
+    
+2. `Pending`: An active `BookingInquiry` has been submitted for this date. Automatically set on inquiry submission; blocks further inquiries for the same date until resolved.
+    
+3. `Booked`: Payment has been verified (`PaymentProof` -> `Verified`). Date is fully locked.
+    
+
+**State Synchronization Rules:**
+
+- On `BookingInquiry` submitted for a date → linked `AvailabilitySlot.status` = `Pending`
+    
+- On `PaymentProof` → `Verified` → `BookingInquiry.status` = `Confirmed` → `AvailabilitySlot.status` = `Booked`
+    
+- On `BookingInquiry` → `Cancelled_By_Admin` or `Cancelled_By_Visitor` → `AvailabilitySlot.status` = `Available`
     
 
 ### 6.2 Conceptual Database Schema (ERD)
@@ -179,6 +199,7 @@ entity "VenueInfo" as venue {
   --
   description : TEXT
   services : TEXT
+  capacity : INT
   location : VARCHAR
   contactInfo : VARCHAR
   faqJson : TEXT
@@ -187,9 +208,10 @@ entity "VenueInfo" as venue {
 entity "MediaItem" as media {
   * mediaId : BIGINT <<PK>>
   --
+  mediaType : VARCHAR(12)
   fileName : VARCHAR
   filePath : VARCHAR
-  mediaType : VARCHAR
+  youtubeUrl : VARCHAR
   caption : VARCHAR
   uploadDate : TIMESTAMP
 }
@@ -198,7 +220,7 @@ entity "AvailabilitySlot" as slot {
   * slotId : BIGINT <<PK>>
   --
   slotDate : DATE
-  status : VARCHAR
+  status : VARCHAR(20)
   notes : TEXT
   updatedAt : TIMESTAMP
 }
@@ -216,9 +238,9 @@ entity "BookingInquiry" as inquiry {
   * inquiryId : BIGINT <<PK>>
   --
   visitorName : VARCHAR
-  visitorContact : VARCHAR
-  visitorEmail : VARCHAR
-  eventDate : DATE
+  visitorWhatsApp : VARCHAR
+  slotId : BIGINT <<FK>>
+  pricingId : BIGINT <<FK, nullable>>
   numGuests : INT
   eventType : VARCHAR
   message : TEXT
@@ -234,7 +256,7 @@ entity "PaymentProof" as proof {
   fileName : VARCHAR
   filePath : VARCHAR
   uploadTimestamp : TIMESTAMP
-  verificationStatus : VARCHAR
+  verificationStatus : VARCHAR(25)
   adminNotes : TEXT
 }
 
@@ -242,20 +264,23 @@ entity "Feedback" as feedback {
   * feedbackId : BIGINT <<PK>>
   --
   visitorName : VARCHAR
-  visitorContact : VARCHAR
+  visitorWhatsApp : VARCHAR
   feedbackText : TEXT
   rating : INT
   submissionDate : TIMESTAMP
   isReviewed : BOOLEAN
+  adminNotes : TEXT
 }
 
-admin ||--o{ venue : manages
+admin ||--|| venue : manages
 admin ||--o{ media : manages
 admin ||--o{ slot : manages
 admin ||--o{ price : manages
 admin ||--o{ inquiry : manages
 admin ||--o{ feedback : manages
-inquiry ||--o| proof : has
+inquiry }o--|| slot : reserves
+inquiry }o--o| price : uses
+inquiry ||--o{ proof : has
 @enduml
 ```
 
@@ -263,13 +288,13 @@ inquiry ||--o| proof : has
 
 - **Homepage:** Logo/Nav bar at top. Main hero section with primary Call-to-Action (CTA). Sections below detailing venue introductory info and 3 key feature highlights.
     
-- **Gallery Page:** Filter tabs (Weddings, Hall Setup, Decorations, Exterior) over a grid of image thumbnails.
+- **Gallery Page:** Filter tabs (All, Weddings, Hall Setup, Decorations, Exterior) over a mixed grid of image thumbnails and YouTube video tiles. Clicking an image opens a lightbox; clicking a video tile expands an inline YouTube embed player.
     
 - **Availability Calendar:** Interactive monthly calendar view. Color-coded dates (e.g., Green = Available, Yellow = Pending, Red = Booked). "Make an Inquiry" button below.
     
 - **Pricing Page:** 3-column pricing tier cards (Package 1, 2, 3) with feature checklists and CTA buttons. Below, a section for individual a-la-carte service pricing.
     
-- **Inquiry Form:** Standard web form (Name, Contact, Date picker, Event type dropdown, special requests text area) with a side panel displaying direct contact info (Hotline/WhatsApp).
+- **Inquiry Form:** Standard web form (Name, WhatsApp Number, Date picker, Event type dropdown, Pricing Package dropdown (optional), special requests text area) with a side panel displaying direct contact info (Hotline/WhatsApp). On successful submission, a confirmation screen displays the visitor's Inquiry ID with instructions for submitting a payment proof.
     
 - **Admin Dashboard:** Secure login leading to a metrics overview (Bookings this month, Pending proofs, Recent inquiries). Sidebar navigation for CRUD operations on all entities.
     
@@ -280,12 +305,12 @@ _Note: This section summarizes the STD for practical development checks. Ensure 
 
 **Core Acceptance Criteria for Development:**
 
-1. **Form Validation (UC005, UC012):** The system MUST reject submissions with empty required fields or invalid data formats (e.g., malformed phone numbers/emails) and display clear error messages without crashing or losing valid input data.
+1. **Form Validation (UC005, UC012):** The system MUST reject submissions with empty required fields or invalid data formats (e.g., malformed WhatsApp numbers) and display clear error messages without crashing or losing valid input data.
     
-2. **File Upload Security (UC007, UC011):** The system MUST restrict uploads for Gallery and Payment Proofs to image types (JPG, PNG) and enforce a strict 5MB file size limit. Invalid uploads must trigger an immediate UI error.
+2. **File Upload Security (UC007, UC011):** The system MUST restrict Payment Proof uploads (UC011) to JPG/PNG image types with a strict 5MB limit. Gallery image uploads (UC007) are similarly restricted to JPG/PNG; videos are added via YouTube URL only (no file upload). Invalid uploads must trigger an immediate UI error.
     
 3. **State Management Synchronization (UC009, UC013):** When an Admin updates a `PaymentProof` status to "Verified", the associated `BookingInquiry` status MUST automatically update to "Confirmed", and the `AvailabilitySlot` for that date MUST reflect as "Booked".
     
 4. **Authentication (UC006-UC016):** The Admin Dashboard MUST be completely inaccessible to unauthenticated users. Unauthorized URL access attempts must redirect to the login page.
     
-5. **Notification Triggers (UC016):** Actions such as "New Inquiry Submitted" or "Payment Verified" MUST trigger the corresponding logging/notification mechanism reliably in the background without blocking the UI response for the user.
+5. **Notification Triggers (UC016):** Admin notification actions (e.g., "Payment Verified", "Payment Rejected") MUST generate a correctly formatted `wa.me` deep link using the visitor's WhatsApp number and the configured message template, presented immediately and without blocking the UI response for the visitor.
