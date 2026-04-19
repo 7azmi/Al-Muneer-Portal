@@ -76,7 +76,7 @@
                 </div>
                 <!-- YouTube thumbnail -->
                 <div th:if="${item.mediaType.name() == 'YOUTUBE'}" class="youtube-thumb">
-                    <img th:src="'https://img.youtube.com/vi/' + ${item.youtubeUrl != null ? item.youtubeUrl.replaceAll('.*(?:youtu\\.be/|v=)([^&?#]+).*', '$1') : ''} + '/hqdefault.jpg'"
+                    <img th:src="'https://img.youtube.com/vi/' + ${item.youtubeVideoId} + '/hqdefault.jpg'"
                          alt="YouTube thumbnail">
                     <span class="play-icon">▶</span>
                 </div>

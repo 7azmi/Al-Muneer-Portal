@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -35,7 +36,9 @@ public class MediaItemServiceImpl implements MediaItemService {
     @Override
     public MediaItem addImage(MultipartFile file, String caption, String category) throws IOException {
         String savedPath = fileUploadUtil.saveGalleryImage(file);
-        String fileName = file.getOriginalFilename();
+        // Use the UUID-based filename from the saved path, NOT the original filename.
+        // The original filename is never stored on disk, so using it as the URL would 404.
+        String fileName = Paths.get(savedPath).getFileName().toString();
 
         MediaItem item = MediaItem.builder()
                 .mediaType(MediaType.IMAGE)

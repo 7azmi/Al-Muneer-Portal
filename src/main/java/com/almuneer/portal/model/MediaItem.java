@@ -4,6 +4,8 @@ import com.almuneer.portal.model.enums.MediaType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "media_items")
@@ -35,5 +37,18 @@ public class MediaItem {
     @PrePersist
     protected void onCreate() {
         this.uploadDate = LocalDateTime.now();
+    }
+
+    /**
+     * Extracts the YouTube video ID from the stored URL.
+     * Handles both https://youtu.be/ID and https://www.youtube.com/watch?v=ID formats.
+     * Marked @Transient so it is never persisted.
+     */
+    @Transient
+    public String getYoutubeVideoId() {
+        if (youtubeUrl == null || youtubeUrl.isBlank()) return "";
+        Pattern p = Pattern.compile("(?:youtu\\.be/|[?&]v=)([^&?#]+)");
+        Matcher m = p.matcher(youtubeUrl);
+        return m.find() ? m.group(1) : "";
     }
 }
