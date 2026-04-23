@@ -1,6 +1,10 @@
 # Al-Muneer Online Portal - Core Specifications
 
-**Project Domain:** Event Venue Management System (Web-based) **Client:** Al-Muneer Hall for Weddings and Events (Ibb, Yemen) **Methodology:** Waterfall SDLC
+**Project Domain:** Event Venue Management System (Web-based)
+
+**Client:** Al-Muneer Hall for Weddings and Events (Ibb, Yemen)
+
+**Methodology:** Waterfall SDLC
 
 _Note: The project's end-user target language is Arabic (due to the local Yemeni context), but for the sake of development, testing, and presentation, the interface will temporarily be in English._
 
@@ -8,7 +12,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 **The Problem:** Currently, bookings and inquiries are handled manually via phone calls and WhatsApp. This causes significant time drain on the owner, inconsistencies, limited availability for customer inquiries, and lack of a centralized visual platform (which is especially problematic for female stakeholders who prefer remote venue assessment due to local cultural norms). Tracking payments and feedback is disorganized.
 
-**The Solution:** A monolithic, responsive web application that centralizes venue information, an interactive availability calendar, pricing, and booking inquiries. It includes a specific workflow for visitors to upload offline payment proofs (screenshots) to confirm bookings, alongside an administrative dashboard for the owner to manage content, track inquiries, verify payments, and gather feedback.
+**The Solution:** A monolithic, responsive web application that centralizes venue information, an interactive availability calendar, pricing, and booking inquiries. It includes a specific workflow for visitors to upload offline payment proofs (screenshots) to confirm bookings, alongside an administrative dashboard for the owner to manage content, track inquiries, verify payments, gather feedback, and streamline communication using pre-filled WhatsApp templates.
 
 ## 2. Scope & Constraints
 
@@ -35,7 +39,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - No complex CRM or advanced event management features.
     
-- No email notifications or third-party SMS gateways.
+- No automated email notifications or third-party SMS/WhatsApp API gateways.
     
 
 **Project Constraints:**
@@ -44,7 +48,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **Local Infrastructure:** Must be optimized for potentially slower internet connections in Yemen (avoid overly heavy client-side frameworks; optimize images).
     
-- **Communication Preferences:** WhatsApp deep links are the sole notification channel. No email integration is required or in scope.
+- **Communication Preferences:** Manual WhatsApp deep links are the sole notification channel to avoid API overhead. No email integration is required or in scope.
     
 
 ## 3. Technology Stack & Architecture
@@ -66,7 +70,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 **Backend Package Structure (`com.almuneer.portal`):**
 
-- `.config`: Security (WebSecurityConfig), MVC configurations, Notification configs.
+- `.config`: Security (WebSecurityConfig), MVC configurations.
     
 - `.controller`: REST APIs handling HTTP requests and returning views/DTOs.
     
@@ -74,11 +78,11 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - `.repository`: Spring Data JPA interfaces for database CRUD operations.
     
-- `.model`: JPA Domain Entities (POJOs mapped to DB).
+- `.model`: JPA Domain Entities (POJOs mapped to DB, including `NotificationTemplate`).
     
 - `.dto`: Data Transfer Objects for API request/response payloads.
     
-- `.util`: Helpers (FileUploadUtil, DateUtil, ReportGeneratorUtil).
+- `.util`: Helpers (FileUploadUtil, DateUtil, ReportGeneratorUtil, DeepLinkBuilderUtil).
     
 - `.security`: JWT-based stateless authentication for the Admin Dashboard, UserDetailsService implementation.
     
@@ -95,9 +99,9 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **UC004: View Pricing Panel:** Displays pricing tiers and packages.
     
-- **UC005: Submit Booking Inquiry:** Form capture (Name, WhatsApp Number, Event Date, etc.) -> Validates -> Saves to DB -> Sets linked `AvailabilitySlot` to `Pending` -> Displays Inquiry ID to visitor on confirmation screen -> Triggers Admin Notification deep link.
+- **UC005: Submit Booking Inquiry:** Form capture (Name, WhatsApp Number, Event Date, etc.) -> Validates -> Saves to DB -> Sets linked `AvailabilitySlot` to `Pending` -> Displays Inquiry ID to visitor on confirmation screen -> Flags inquiry in Admin Dashboard for follow-up.
     
-- **UC011: Submit Payment Proof:** Visitor enters their Inquiry ID (provided on the UC005 confirmation screen) and uploads a JPG/PNG receipt screenshot (Max 5MB). The proof is linked to the inquiry record. Multiple uploads are allowed (e.g., if a previous proof was rejected). Triggers Admin Notification deep link.
+- **UC011: Submit Payment Proof:** Visitor enters their Inquiry ID (provided on the UC005 confirmation screen) and uploads a JPG/PNG receipt screenshot (Max 5MB). The proof is linked to the inquiry record. Multiple uploads are allowed (e.g., if a previous proof was rejected). Flags payment for Admin review.
     
 - **UC012: Submit Feedback:** Form capture -> Saves to DB.
     
@@ -110,17 +114,17 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **UC008: Manage Pricing Panel:** Add, edit, or remove pricing tiers/packages.
     
-- **UC009: Manage Calendar & Inquiries:** Manually override calendar dates and read submitted inquiries.
+- **UC009: Manage Calendar & Inquiries:** Manually override calendar dates and read submitted inquiries. Admin can click to initiate a pre-filled WhatsApp chat with the inquirer.
     
 - **UC010: View Traffic Analytics:** View basic logged data (e.g., total page visits).
     
-- **UC013: Manage Payment Status:** View uploaded proof -> Verify offline -> Update status -> Add internal notes -> Triggers Visitor Notification.
+- **UC013: Manage Payment Status:** View uploaded proof -> Verify offline -> Update status -> Add internal notes -> Admin clicks a generated deep link to notify the visitor of the status via WhatsApp.
     
 - **UC014: View/Generate Reports:** Generate basic predefined summaries (Inquiry volume, Bookings, Feedback).
     
 - **UC015: Manage Feedback:** Read visitor feedback, mark as "Reviewed", and add internal notes.
     
-- **UC016: Configure Notification Templates:** Admin edits pre-filled WhatsApp message templates for visitor-facing alerts (e.g., "Inquiry Received", "Payment Verified", "Payment Rejected"). Triggering a notification action generates a `wa.me` deep link with the visitor's WhatsApp number and the configured template text populated.
+- **UC016: Configure Notification Templates:** Admin edits message templates (e.g., "Inquiry Received", "Payment Verified") containing placeholders. These templates populate the `wa.me` deep links generated across the dashboard.
     
 
 ## 5. Performance & Security Attributes (NFRs)
@@ -144,7 +148,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 2. `Viewed`: Admin has opened/viewed the inquiry details.
     
-3. `Contacted`: Admin has contacted the visitor.
+3. `Contacted`: Admin has initiated the WhatsApp deep link to contact the visitor.
     
 4. `Payment_Pending`: Tentative agreement made, awaiting payment proof.
     
@@ -171,15 +175,6 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 2. `Pending`: An active `BookingInquiry` has been submitted for this date. Automatically set on inquiry submission; blocks further inquiries for the same date until resolved.
     
 3. `Booked`: Payment has been verified (`PaymentProof` -> `Verified`). Date is fully locked.
-    
-
-**State Synchronization Rules:**
-
-- On `BookingInquiry` submitted for a date → linked `AvailabilitySlot.status` = `Pending`
-    
-- On `PaymentProof` → `Verified` → `BookingInquiry.status` = `Confirmed` → `AvailabilitySlot.status` = `Booked`
-    
-- On `BookingInquiry` → `Cancelled_By_Admin` or `Cancelled_By_Visitor` → `AvailabilitySlot.status` = `Available`
     
 
 ### 6.2 Conceptual Database Schema (ERD)
@@ -272,12 +267,21 @@ entity "Feedback" as feedback {
   adminNotes : TEXT
 }
 
+entity "NotificationTemplate" as template {
+  * templateId : BIGINT <<PK>>
+  --
+  eventName : VARCHAR(50)
+  templateText : TEXT
+  updatedAt : TIMESTAMP
+}
+
 admin ||--|| venue : manages
 admin ||--o{ media : manages
 admin ||--o{ slot : manages
 admin ||--o{ price : manages
 admin ||--o{ inquiry : manages
 admin ||--o{ feedback : manages
+admin ||--o{ template : manages
 inquiry }o--|| slot : reserves
 inquiry }o--o| price : uses
 inquiry ||--o{ proof : has
@@ -296,7 +300,7 @@ inquiry ||--o{ proof : has
     
 - **Inquiry Form:** Standard web form (Name, WhatsApp Number, Date picker, Event type dropdown, Pricing Package dropdown (optional), special requests text area) with a side panel displaying direct contact info (Hotline/WhatsApp). On successful submission, a confirmation screen displays the visitor's Inquiry ID with instructions for submitting a payment proof.
     
-- **Admin Dashboard:** Secure login leading to a metrics overview (Bookings this month, Pending proofs, Recent inquiries). Sidebar navigation for CRUD operations on all entities.
+- **Admin Dashboard:** Secure login leading to a metrics overview (Bookings this month, Pending proofs, Recent inquiries). Sidebar navigation for CRUD operations on all entities, including a dedicated "Message Templates" settings page.
     
 
 ## 8. Quality Assurance & Acceptance Criteria (Testing Reference)
@@ -313,4 +317,4 @@ _Note: This section summarizes the STD for practical development checks. Ensure 
     
 4. **Authentication (UC006-UC016):** The Admin Dashboard MUST be completely inaccessible to unauthenticated users. Unauthorized URL access attempts must redirect to the login page.
     
-5. **Notification Triggers (UC016):** Admin notification actions (e.g., "Payment Verified", "Payment Rejected") MUST generate a correctly formatted `wa.me` deep link using the visitor's WhatsApp number and the configured message template, presented immediately and without blocking the UI response for the visitor.
+5. **Notification Triggers (UC016):** Dashboard actions (e.g., clicking "Notify Visitor" on a payment verification) MUST dynamically generate a correctly formatted `wa.me` deep link URL using the visitor's WhatsApp number and the corresponding URL-encoded message template. This link must be presented to the Administrator as an actionable button to seamlessly initiate the chat in their WhatsApp client.
