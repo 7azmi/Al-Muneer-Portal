@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Payments', 'payments', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Payment Proofs</h1>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="admin-panel">
+        <h3 class="admin-panel-title">All Payment Proofs (<span th:text="${proofs.size()}">0</span>)</h3>
+        <table class="admin-table" th:if="${!proofs.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Inquiry ID</th>
+                    <th>Visitor</th>
+                    <th>Event Date</th>
+                    <th>Uploaded</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="proof : ${proofs}">
+                    <td th:text="${proof.proofId}">1</td>
+                    <td>
+                        <a th:href="@{'/admin/inquiries/' + ${proof.inquiry.inquiryId}}"
+                           th:text="'#' + ${proof.inquiry.inquiryId}"></a>
+                    </td>
+                    <td th:text="${proof.inquiry.visitorName}">Name</td>
+                    <td th:text="${proof.inquiry.slot?.slotDate}">Date</td>
+                    <td th:text="${#temporals.format(proof.uploadTimestamp, 'dd MMM yyyy HH:mm')}">Time</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${proof.verificationStatus.name() == 'VERIFIED'} ? 'badge-active' :
+                                             (${proof.verificationStatus.name() == 'REJECTED'} ? 'badge-inactive' : '')"
+                              th:text="${proof.verificationStatus}">Status</span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/payments/' + ${proof.proofId}}" class="btn btn-outline btn-sm">Review</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${proofs.isEmpty()}" class="empty-state">
+            <div class="empty-state-icon">💳</div>
+            <p class="empty-state-text">No payment proofs submitted yet.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

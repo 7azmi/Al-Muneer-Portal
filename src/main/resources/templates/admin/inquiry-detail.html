@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Inquiry Detail', 'inquiries', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Inquiry #<span th:text="${inquiry.inquiryId}"></span></h1>
+        <a href="/admin/inquiries" class="btn btn-outline btn-sm">← Back to Inquiries</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
+        <!-- Main Details -->
+        <div>
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Visitor Details</h3>
+                <div style="display: grid; gap: 0.75rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Name</span>
+                        <strong th:text="${inquiry.visitorName}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">WhatsApp</span>
+                        <strong th:text="${inquiry.visitorWhatsApp}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Date</span>
+                        <strong th:text="${inquiry.slot?.slotDate}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Type</span>
+                        <strong th:text="${inquiry.eventType ?: '—'}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Guests</span>
+                        <strong th:text="${inquiry.numGuests ?: '—'}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Package</span>
+                        <strong th:text="${inquiry.pricingTier?.tierName ?: 'None selected'}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Submitted</span>
+                        <strong th:text="${#temporals.format(inquiry.submissionDate, 'dd MMM yyyy HH:mm')}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Status</span>
+                        <span class="badge badge-active" th:text="${inquiry.status}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-panel" th:if="${inquiry.message}">
+                <h3 class="admin-panel-title">Visitor Message</h3>
+                <p class="text-muted" th:text="${inquiry.message}"></p>
+            </div>
+
+            <div class="admin-panel" th:if="${inquiry.adminNotes}">
+                <h3 class="admin-panel-title">Admin Notes</h3>
+                <p class="text-muted" th:text="${inquiry.adminNotes}"></p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div>
+            <!-- WhatsApp Notify -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">📱 Notify Visitor</h3>
+                <p class="text-muted" style="font-size:0.875rem; margin-bottom:1rem;">
+                    Opens a pre-filled WhatsApp chat using the "Inquiry Received" template.
+                </p>
+                <a th:href="${waLink}" target="_blank" class="btn btn-primary"
+                   style="width:100%; text-align:center; display:block; background:#25d366; border-color:#25d366;">
+                    💬 Open WhatsApp Chat
+                </a>
+            </div>
+
+            <!-- Update Status -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Update Status</h3>
+                <form method="post" th:action="@{'/admin/inquiries/' + ${inquiry.inquiryId} + '/update-status'}">
+                    <div class="form-group">
+                        <label class="form-label" for="inq-status">New Status</label>
+                        <select id="inq-status" name="status" class="form-input">
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                                    th:selected="${s == inquiry.status}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inq-notes">Admin Notes</label>
+                        <textarea id="inq-notes" name="adminNotes" class="form-textarea" rows="3"
+                                  th:text="${inquiry.adminNotes}"
+                                  placeholder="Internal notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Payment Proofs Link -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">💳 Payment Proofs</h3>
+                <a th:href="@{/admin/payments}" class="btn btn-outline" style="display:block; text-align:center;">
+                    View All Payment Proofs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

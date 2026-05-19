@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Upload Payment Proof</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="payment-proof-page">
+        <div class="section-container" style="max-width: 600px;">
+            <div class="section-header">
+                <h1 class="section-title">Upload Payment Proof</h1>
+                <p class="section-subtitle">Submit your transfer screenshot to confirm your booking</p>
+            </div>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div class="card" style="padding: 2rem;">
+                <form method="post" action="/payment/upload" enctype="multipart/form-data" id="proof-upload-form">
+                    <div class="form-group">
+                        <label class="form-label" for="proof-inquiry-id">Inquiry ID *</label>
+                        <input type="number" id="proof-inquiry-id" name="inquiryId" class="form-input"
+                               th:value="${inquiryId}"
+                               placeholder="Enter your Inquiry ID (e.g. 42)" required min="1">
+                        <small class="text-muted">This was shown on your confirmation screen after submitting an inquiry.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="proof-file">Payment Receipt Screenshot *</label>
+                        <input type="file" id="proof-file" name="proofFile" class="form-input"
+                               accept="image/jpeg,image/png" required>
+                        <small class="text-muted">Accepted formats: JPG, PNG. Maximum size: 5MB.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="upload-proof-btn"
+                            style="width: 100%; margin-top: 0.5rem;">
+                        Submit Payment Proof →
+                    </button>
+                </form>
+            </div>
+
+            <div class="card" style="padding: 1.5rem; margin-top: 1rem; background: var(--color-surface-2);">
+                <h3 style="margin-bottom: 0.5rem; font-size: 0.95rem;">📌 What happens after upload?</h3>
+                <ul style="color: var(--color-text-muted); font-size: 0.875rem; padding-left: 1.25rem; line-height: 1.8;">
+                    <li>Admin reviews your payment proof manually</li>
+                    <li>You'll be notified via WhatsApp with the result</li>
+                    <li>You may re-upload if your proof is rejected</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

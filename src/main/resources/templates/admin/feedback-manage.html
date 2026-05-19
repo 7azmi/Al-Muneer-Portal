@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Feedback', 'feedback', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Visitor Feedback</h1>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="admin-panel">
+        <h3 class="admin-panel-title">All Feedback (<span th:text="${feedbacks.size()}">0</span>)</h3>
+        <table class="admin-table" th:if="${!feedbacks.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Visitor</th>
+                    <th>Rating</th>
+                    <th>Feedback</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="fb : ${feedbacks}">
+                    <td th:text="${fb.feedbackId}">1</td>
+                    <td>
+                        <div th:text="${fb.visitorName}">Name</div>
+                        <small class="text-muted" th:text="${fb.visitorWhatsApp}">WA</small>
+                    </td>
+                    <td>
+                        <span th:each="i : ${#numbers.sequence(1,fb.rating)}">⭐</span>
+                    </td>
+                    <td>
+                        <span th:text="${#strings.abbreviate(fb.feedbackText, 80)}">Text...</span>
+                    </td>
+                    <td th:text="${#temporals.format(fb.submissionDate, 'dd MMM yyyy')}">Date</td>
+                    <td>
+                        <span th:if="${fb.isReviewed}" class="badge badge-active">Reviewed</span>
+                        <span th:unless="${fb.isReviewed}" class="badge badge-inactive">Unreviewed</span>
+                    </td>
+                    <td>
+                        <form method="post" th:action="@{'/admin/feedback/' + ${fb.feedbackId} + '/review'}"
+                              style="display:inline;">
+                            <input type="hidden" name="adminNotes" value="">
+                            <button type="submit" class="btn btn-outline btn-sm"
+                                    th:if="${!fb.isReviewed}">Mark Reviewed</button>
+                            <span th:if="${fb.isReviewed}" class="text-muted" style="font-size:0.8rem;">✓ Done</span>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${feedbacks.isEmpty()}" class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <p class="empty-state-text">No feedback submitted yet.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

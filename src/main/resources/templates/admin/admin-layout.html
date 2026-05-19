@@ -33,6 +33,24 @@
                 <li><a href="/admin/calendar" th:classappend="${activeNav == 'calendar'} ? 'active'">
                     <span class="nav-icon">📅</span> Calendar
                 </a></li>
+                <li><a href="/admin/inquiries" th:classappend="${activeNav == 'inquiries'} ? 'active'">
+                    <span class="nav-icon">📋</span> Inquiries
+                </a></li>
+                <li><a href="/admin/payments" th:classappend="${activeNav == 'payments'} ? 'active'">
+                    <span class="nav-icon">💳</span> Payments
+                </a></li>
+                <li><a href="/admin/feedback" th:classappend="${activeNav == 'feedback'} ? 'active'">
+                    <span class="nav-icon">💬</span> Feedback
+                </a></li>
+                <li><a href="/admin/reports" th:classappend="${activeNav == 'reports'} ? 'active'">
+                    <span class="nav-icon">📈</span> Reports
+                </a></li>
+                <li><a href="/admin/analytics" th:classappend="${activeNav == 'analytics'} ? 'active'">
+                    <span class="nav-icon">👁️</span> Analytics
+                </a></li>
+                <li><a href="/admin/templates" th:classappend="${activeNav == 'templates'} ? 'active'">
+                    <span class="nav-icon">💌</span> Templates
+                </a></li>
                 <li style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--color-border);">
                     <a href="/admin/logout">
                         <span class="nav-icon">🚪</span> Logout

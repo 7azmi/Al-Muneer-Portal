@@ -41,9 +41,20 @@ public class AvailabilitySlotServiceImpl implements AvailabilitySlotService {
     }
 
     @Override
+    public AvailabilitySlot getOrCreateSlot(LocalDate date) {
+        return slotRepository.findBySlotDate(date)
+                .orElseGet(() -> slotRepository.save(
+                        AvailabilitySlot.builder()
+                                .slotDate(date)
+                                .status(SlotStatus.AVAILABLE)
+                                .build()));
+    }
+
+    @Override
     public AvailabilitySlot saveSlot(AvailabilitySlot slot) {
         return slotRepository.save(slot);
     }
+
 
     @Override
     public void setSlotStatus(LocalDate date, SlotStatus status, String notes) {

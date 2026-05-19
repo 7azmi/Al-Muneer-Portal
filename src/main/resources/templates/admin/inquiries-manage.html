@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Inquiries', 'inquiries', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Booking Inquiries</h1>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="admin-panel">
+        <h3 class="admin-panel-title">All Inquiries (<span th:text="${inquiries.size()}">0</span>)</h3>
+        <table class="admin-table" th:if="${!inquiries.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>WhatsApp</th>
+                    <th>Event Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="inq : ${inquiries}">
+                    <td th:text="${inq.inquiryId}">1</td>
+                    <td th:text="${inq.visitorName}">Name</td>
+                    <td th:text="${inq.visitorWhatsApp}">WA</td>
+                    <td th:text="${inq.slot?.slotDate}">Date</td>
+                    <td th:text="${inq.eventType ?: '—'}">Type</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${inq.status.name() == 'NEW'} ? 'badge-new' :
+                                             (${inq.status.name() == 'CONFIRMED'} ? 'badge-active' : 'badge-inactive')"
+                              th:text="${inq.status}">Status</span>
+                    </td>
+                    <td th:text="${#temporals.format(inq.submissionDate, 'dd MMM yyyy')}">Date</td>
+                    <td>
+                        <a th:href="@{'/admin/inquiries/' + ${inq.inquiryId}}" class="btn btn-outline btn-sm">View</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${inquiries.isEmpty()}" class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p class="empty-state-text">No inquiries yet.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

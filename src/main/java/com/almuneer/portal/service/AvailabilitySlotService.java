@@ -11,6 +11,7 @@ public interface AvailabilitySlotService {
     List<AvailabilitySlot> getSlotsForMonth(int year, int month);
     Map<String, String> getSlotStatusMap(int year, int month);
     AvailabilitySlot getSlotByDate(LocalDate date);
+    AvailabilitySlot getOrCreateSlot(LocalDate date);
     AvailabilitySlot saveSlot(AvailabilitySlot slot);
     void setSlotStatus(LocalDate date, SlotStatus status, String notes);
 }

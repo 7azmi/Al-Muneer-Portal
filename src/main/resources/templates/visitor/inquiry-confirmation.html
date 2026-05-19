@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Inquiry Confirmed</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="inquiry-confirmation-page">
+        <div class="section-container" style="max-width: 600px; text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+            <h1 class="section-title">Inquiry Submitted!</h1>
+            <p class="section-subtitle">Thank you, <strong th:text="${inquiry.visitorName}">Visitor</strong>. We've received your inquiry.</p>
+
+            <div class="card" style="padding: 2rem; margin: 2rem 0; text-align: left;">
+                <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border);">
+                        <span class="text-muted">Inquiry ID</span>
+                        <strong style="font-size: 1.25rem; color: var(--color-primary);"
+                                th:text="'#' + ${inquiry.inquiryId}"></strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="text-muted">Event Date</span>
+                        <strong th:text="${inquiry.slot?.slotDate}"></strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="text-muted">Status</span>
+                        <span class="badge badge-active">New — Pending Review</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="text-muted">WhatsApp</span>
+                        <strong th:text="${inquiry.visitorWhatsApp}"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.5rem; background: var(--color-surface-2); margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 0.75rem;">📋 Save Your Inquiry ID</h3>
+                <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1rem;">
+                    You will need your Inquiry ID (<strong th:text="'#' + ${inquiry.inquiryId}"></strong>)
+                    to upload your payment proof once the admin contacts you.
+                </p>
+                <a th:href="@{'/payment/upload?inquiryId=' + ${inquiry.inquiryId}}"
+                   class="btn btn-outline" style="margin-right: 0.5rem;">
+                    Upload Payment Proof
+                </a>
+                <a href="/" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

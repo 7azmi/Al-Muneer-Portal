@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Reports', 'reports', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Reports & Analytics Summary</h1>
+    </div>
+
+    <div class="admin-stats">
+        <!-- Inquiry Stats -->
+        <div class="stat-card">
+            <div class="stat-label">Total Inquiries</div>
+            <div class="stat-value" th:text="${report['totalInquiries']}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Confirmed Bookings</div>
+            <div class="stat-value" th:text="${report['confirmedBookings']}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Completed Events</div>
+            <div class="stat-value" th:text="${report['completedEvents']}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">New (Unread)</div>
+            <div class="stat-value" th:text="${report['newInquiries']}">0</div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+        <!-- Bookings -->
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">📋 Inquiry Breakdown</h3>
+            <table class="admin-table">
+                <tr><td>New / Unread</td><td><strong th:text="${report['newInquiries']}">0</strong></td></tr>
+                <tr><td>Confirmed</td><td><strong th:text="${report['confirmedBookings']}">0</strong></td></tr>
+                <tr><td>Completed</td><td><strong th:text="${report['completedEvents']}">0</strong></td></tr>
+                <tr><td>Cancelled</td><td><strong th:text="${report['cancelledInquiries']}">0</strong></td></tr>
+                <tr><td><strong>Total</strong></td><td><strong th:text="${report['totalInquiries']}">0</strong></td></tr>
+            </table>
+        </div>
+
+        <!-- Payments -->
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">💳 Payment Proofs</h3>
+            <table class="admin-table">
+                <tr><td>Pending Review</td><td><strong th:text="${report['proofsPending']}">0</strong></td></tr>
+                <tr><td>Verified</td><td><strong th:text="${report['proofsVerified']}">0</strong></td></tr>
+                <tr><td>Rejected</td><td><strong th:text="${report['proofsRejected']}">0</strong></td></tr>
+            </table>
+        </div>
+
+        <!-- Feedback -->
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">💬 Feedback Summary</h3>
+            <table class="admin-table">
+                <tr><td>Total Submissions</td><td><strong th:text="${report['totalFeedback']}">0</strong></td></tr>
+                <tr><td>Unreviewed</td><td><strong th:text="${report['unreviewed']}">0</strong></td></tr>
+                <tr><td>Average Rating</td>
+                    <td><strong th:text="${report['averageRating']} + ' / 5'">0</strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
