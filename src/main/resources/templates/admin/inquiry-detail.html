@@ -10,6 +10,15 @@
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
+    <!-- Embed visitor context for JS -->
+    <script th:inline="javascript">
+        const WA_NUMBER = /*[[${visitorWa}]]*/ '';
+        const VISITOR_NAME = /*[[${visitorName}]]*/ '';
+        const INQUIRY_ID = /*[[${inquiryId}]]*/ '';
+        const EVENT_DATE = /*[[${eventDate}]]*/ '';
+        const INQUIRY_STATUS = /*[[${inquiryStatus}]]*/ '';
+    </script>
+
     <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
         <!-- Main Details -->
         <div>
@@ -64,16 +73,31 @@
 
         <!-- Actions -->
         <div>
-            <!-- WhatsApp Notify -->
+            <!-- WhatsApp Notify with template chooser -->
             <div class="admin-panel">
-                <h3 class="admin-panel-title">📱 Notify Visitor</h3>
-                <p class="text-muted" style="font-size:0.875rem; margin-bottom:1rem;">
-                    Opens a pre-filled WhatsApp chat using the "Inquiry Received" template.
-                </p>
-                <a th:href="${waLink}" target="_blank" class="btn btn-primary"
-                   style="width:100%; text-align:center; display:block; background:#25d366; border-color:#25d366;">
+                <h3 class="admin-panel-title">📱 Notify Visitor via WhatsApp</h3>
+                <div class="form-group">
+                    <label class="form-label" for="wa-template-select">Choose Message Template</label>
+                    <select id="wa-template-select" class="form-input" onchange="buildWaLink()">
+                        <option value="">-- Select a template --</option>
+                        <option th:each="tmpl : ${templates}"
+                                th:value="${tmpl.templateText}"
+                                th:text="${tmpl.label}">Template</option>
+                    </select>
+                </div>
+                <div id="wa-preview"
+                     style="display:none; margin-bottom:0.75rem; background:var(--color-surface-2);
+                            border-radius:8px; padding:0.75rem; font-size:0.8rem;
+                            color:var(--color-text-muted); white-space:pre-wrap; line-height:1.5;"></div>
+                <a id="wa-send-btn" href="#" target="_blank"
+                   style="display:none; width:100%; text-align:center; background:#25d366;
+                          border-color:#25d366; margin-bottom:0.5rem;"
+                   class="btn btn-primary">
                     💬 Open WhatsApp Chat
                 </a>
+                <p id="wa-hint" class="text-muted" style="font-size:0.8rem; margin-top:0.25rem;">
+                    Select a template above to generate the WhatsApp deep-link.
+                </p>
             </div>
 
             <!-- Update Status -->
@@ -100,12 +124,46 @@
             <!-- Payment Proofs Link -->
             <div class="admin-panel">
                 <h3 class="admin-panel-title">💳 Payment Proofs</h3>
-                <a th:href="@{/admin/payments}" class="btn btn-outline" style="display:block; text-align:center;">
+                <a href="/admin/payments" class="btn btn-outline" style="display:block; text-align:center;">
                     View All Payment Proofs
                 </a>
             </div>
         </div>
     </div>
+
+    <script>
+        function resolvePlaceholders(text) {
+            return text
+                .replace(/\{visitorName\}/g, VISITOR_NAME)
+                .replace(/\{inquiryId\}/g, INQUIRY_ID)
+                .replace(/\{eventDate\}/g, EVENT_DATE)
+                .replace(/\{status\}/g, INQUIRY_STATUS);
+        }
+
+        function buildWaLink() {
+            const sel = document.getElementById('wa-template-select');
+            const raw = sel.value;
+            const preview = document.getElementById('wa-preview');
+            const btn = document.getElementById('wa-send-btn');
+            const hint = document.getElementById('wa-hint');
+
+            if (!raw) {
+                preview.style.display = 'none';
+                btn.style.display = 'none';
+                hint.style.display = 'block';
+                return;
+            }
+
+            const resolved = resolvePlaceholders(raw);
+            preview.textContent = resolved;
+            preview.style.display = 'block';
+            hint.style.display = 'none';
+
+            const encoded = encodeURIComponent(resolved);
+            btn.href = `https://wa.me/${WA_NUMBER}?text=${encoded}`;
+            btn.style.display = 'block';
+        }
+    </script>
 </div>
 </body>
 </html>

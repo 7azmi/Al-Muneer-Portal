@@ -66,6 +66,8 @@ public class FileUploadUtil {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        return filePath.toString();
+        // Return only the filename — callers construct the full URL via the
+        // /uploads/** resource handler; the absolute path is not needed by callers.
+        return uniqueName;
     }
 }

@@ -40,11 +40,15 @@ public class AdminPaymentController {
     public String viewProof(@PathVariable Long id, Model model) {
         PaymentProof proof = paymentProofService.getById(id);
         model.addAttribute("proof", proof);
-
-        // Pre-generate both notification deep-links
+        model.addAttribute("templates", templateService.getAll());
+        // Visitor context for JS deep-link builder
         BookingInquiry inquiry = proof.getInquiry();
-        model.addAttribute("waVerifiedLink", buildLink(inquiry, "PAYMENT_VERIFIED", proof));
-        model.addAttribute("waRejectedLink", buildLink(inquiry, "PAYMENT_REJECTED", proof));
+        model.addAttribute("visitorWa", inquiry.getVisitorWhatsApp().replaceAll("[^\\d]", ""));
+        model.addAttribute("visitorName", inquiry.getVisitorName());
+        model.addAttribute("inquiryId", inquiry.getInquiryId());
+        model.addAttribute("eventDate",
+                inquiry.getSlot() != null ? inquiry.getSlot().getSlotDate().toString() : "");
+        model.addAttribute("proofStatus", proof.getVerificationStatus().name());
         return "admin/payment-detail";
     }
 

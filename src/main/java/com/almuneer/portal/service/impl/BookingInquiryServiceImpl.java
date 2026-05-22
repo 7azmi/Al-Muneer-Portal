@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +24,7 @@ public class BookingInquiryServiceImpl implements BookingInquiryService {
     @Override
     @Transactional
     public BookingInquiry submitInquiry(BookingInquiry inquiry) {
-        // Persist the inquiry first
         BookingInquiry saved = inquiryRepository.save(inquiry);
-        // Set the linked slot to PENDING
         AvailabilitySlot slot = saved.getSlot();
         if (slot != null) {
             slot.setStatus(SlotStatus.PENDING);
@@ -41,8 +40,18 @@ public class BookingInquiryServiceImpl implements BookingInquiryService {
     }
 
     @Override
+    public Optional<BookingInquiry> findByReferenceCode(Long referenceCode) {
+        return inquiryRepository.findByReferenceCode(referenceCode);
+    }
+
+    @Override
     public List<BookingInquiry> getAll() {
-        return inquiryRepository.findAll();
+        return inquiryRepository.findAllByOrderBySubmissionDateDesc();
+    }
+
+    @Override
+    public List<BookingInquiry> getFiltered(List<InquiryStatus> excludeStatuses) {
+        return inquiryRepository.findByStatusNotInOrderBySubmissionDateDesc(excludeStatuses);
     }
 
     @Override
@@ -70,4 +79,35 @@ public class BookingInquiryServiceImpl implements BookingInquiryService {
             inquiryRepository.save(inquiry);
         }
     }
+
+    @Override
+    @Transactional
+    public void cancelByVisitor(Long referenceCode) {
+        BookingInquiry inquiry = inquiryRepository.findByReferenceCode(referenceCode)
+                .orElseThrow(() -> new IllegalArgumentException("Inquiry not found for reference: " + referenceCode));
+
+        // Block cancellation if already cancelled or completed
+        if (inquiry.getStatus() == InquiryStatus.CANCELLED_BY_VISITOR
+                || inquiry.getStatus() == InquiryStatus.CANCELLED_BY_ADMIN
+                || inquiry.getStatus() == InquiryStatus.COMPLETED) {
+            throw new IllegalStateException("This inquiry cannot be cancelled.");
+        }
+
+        // Block cancellation if a payment proof is attached — admin must handle it
+        if (inquiryRepository.hasPaymentProof(inquiry.getInquiryId())) {
+            throw new IllegalStateException(
+                    "Your inquiry has a payment proof attached. Please contact us via WhatsApp to cancel.");
+        }
+
+        // Free the slot back to AVAILABLE
+        AvailabilitySlot slot = inquiry.getSlot();
+        if (slot != null) {
+            slot.setStatus(SlotStatus.AVAILABLE);
+            slotRepository.save(slot);
+        }
+
+        inquiry.setStatus(InquiryStatus.CANCELLED_BY_VISITOR);
+        inquiryRepository.save(inquiry);
+    }
 }
+
