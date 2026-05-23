@@ -27,6 +27,12 @@ public class GlobalModelAdvice {
     @Value("${app.country.code:+967}")
     private String rawCode;
 
+    @Value("${app.maps.share-url:https://maps.google.com}")
+    private String mapsShareUrl;
+
+    @Value("${app.maps.embed-url:https://www.google.com/maps?q=Ibb+Yemen&output=embed}")
+    private String mapsEmbedUrl;
+
     @ModelAttribute("countryCode")
     public String countryCode() {
         return countryCode;
@@ -36,6 +42,16 @@ public class GlobalModelAdvice {
     @ModelAttribute("countryCodeDigits")
     public String countryCodeDigits() {
         return rawCode.replaceAll("[^\\d]", "");
+    }
+
+    @ModelAttribute("mapsShareUrl")
+    public String mapsShareUrl() {
+        return mapsShareUrl;
+    }
+
+    @ModelAttribute("mapsEmbedUrl")
+    public String mapsEmbedUrl() {
+        return mapsEmbedUrl;
     }
 
     /** Gallery labels ordered by sortOrder — used in the visitor gallery filter bar. */

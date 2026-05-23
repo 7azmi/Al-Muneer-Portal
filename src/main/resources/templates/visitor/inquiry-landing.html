@@ -18,6 +18,20 @@
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
+    <div th:if="${selectedDate != null or selectedTier != null}" class="inquiry-context-banner">
+        <div class="inquiry-context-banner-body">
+            <p th:if="${selectedDate != null}">
+                <strong>Date:</strong>
+                <span th:text="${#temporals.format(selectedDate, 'EEEE, d MMMM yyyy')}">Date</span>
+            </p>
+            <p th:if="${selectedTier != null}">
+                <strong>Package:</strong>
+                <span th:text="${selectedTier.tierName}">Package</span>
+            </p>
+        </div>
+        <a href="/#availability" class="btn btn-outline btn-sm">← Change on calendar</a>
+    </div>
+
     <!-- ── Two-panel layout ─────────────────────────────── -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
 
@@ -47,11 +61,14 @@
                     <small class="text-muted">9-digit local number, e.g. 772629404</small>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" th:classappend="${selectedDate != null} ? 'form-group-highlight'">
                     <label class="form-label" for="inq-date">Event Date *</label>
                     <input type="date" id="inq-date" name="eventDate" class="form-input"
                            th:value="${selectedDate}" required
                            th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                    <small th:if="${selectedDate != null}" class="text-muted">
+                        Pre-filled from the availability calendar — you can still change it if needed.
+                    </small>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
@@ -73,15 +90,19 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="inq-package">Pricing Package (optional)</label>
+                <div class="form-group" th:classappend="${selectedTier != null} ? 'form-group-highlight'">
+                    <label class="form-label" for="inq-package">Pricing Package</label>
                     <select id="inq-package" name="pricingId" class="form-input">
                         <option value="">— No preference —</option>
                         <option th:each="tier : ${tiers}"
                                 th:value="${tier.pricingId}"
+                                th:selected="${selectedPricingId != null and selectedPricingId == tier.pricingId}"
                                 th:text="${tier.tierName} + ' — ' + ${#numbers.formatDecimal(tier.basePrice,0,0)} + ' YER'">
                         </option>
                     </select>
+                    <small th:if="${selectedTier != null}" class="text-muted">
+                        Pre-selected from pricing — change if you prefer another package.
+                    </small>
                 </div>
 
                 <div class="form-group">
@@ -140,7 +161,7 @@
             </div>
 
             <!-- Lookup form card -->
-            <div class="card" style="padding: 2rem;" id="lookup-panel">
+            <div class="card" style="padding: 2rem;" id="lookup">
                 <h2 style="font-size: 1.2rem; margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
                     <span>🔍</span> Look Up Existing Inquiry
                 </h2>
@@ -174,5 +195,29 @@
 </div>
 </section>
 </main>
+
+<style>
+    .inquiry-context-banner {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        background: rgba(201, 168, 76, 0.1);
+        border: 1px solid rgba(201, 168, 76, 0.35);
+        border-radius: 12px;
+    }
+    .inquiry-context-banner-body {
+        flex: 1;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    .inquiry-context-banner-body p { margin: 0.25rem 0; }
+    .form-group-highlight .form-input {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+    }
+</style>
 </body>
 </html>

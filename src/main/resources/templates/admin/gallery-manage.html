@@ -5,7 +5,7 @@
 <div th:fragment="adminContent">
     <div class="admin-page-header" style="display:flex; justify-content:space-between; align-items:center;">
         <h1 class="admin-page-title">Manage Gallery</h1>
-        <a href="/admin/gallery/labels" class="btn btn-outline btn-sm" id="manage-labels-btn">🏷️ Manage Labels</a>
+        <a href="/admin/gallery/labels" class="btn btn-primary btn-sm" id="manage-labels-btn">🏷️ Manage Labels</a>
     </div>
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}">Success</div>

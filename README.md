@@ -9,11 +9,12 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 ## 🚀 Key Features
 
 ### 🌍 Visitor Module
-- **Venue Showcase:** Detailed information about venue services, capacity, and location.
-- **Media Gallery:** Interactive grid with image lightboxes and embedded YouTube videos.
-- **Availability Calendar:** Real-time calendar displaying "Available", "Pending", or "Booked" status.
-- **Pricing & Packages:** Dynamic display of event packages and à-la-carte services.
-- **Booking Inquiry Landing Page:** Unified page to either submit a new inquiry or look up an existing one by reference code.
+- **Single-Page Home:** One scrollable landing page (hero → venue → gallery → booking calendar → pricing → feedback) with anchor navigation; legacy routes (`/gallery`, `/calendar`, `/pricing`, `/venue`) redirect to the matching section.
+- **Venue Showcase:** Services, capacity, contact details, and an embedded **Google Maps** iframe (configurable share + embed URLs).
+- **Media Gallery:** Packed masonry layout (variable-height images/videos), category filters from admin-defined labels, and a full-screen lightbox.
+- **Interactive Booking Calendar:** Future dates default to **Available**; past dates are dimmed. Tap an available day to reveal a single **Submit inquiry** action; inquiry opens with the date pre-filled (`/inquiry?date=YYYY-MM-DD`).
+- **Pricing Packages:** Each package has a **Book [name]** button that opens the inquiry form with that tier pre-selected (`/inquiry?pricingId=…`); if a date was chosen on the home calendar, both parameters are passed.
+- **Booking Inquiry Landing Page:** Unified page to submit a new inquiry or look up an existing one by reference code; shows context banner when date/package arrived from the home page.
 - **9-Digit Reference Codes:** Every inquiry is assigned a random 9-digit visitor-facing reference code stored in a 150-day cookie for seamless retrieval.
 - **Visitor Self-Cancellation:** Visitors can cancel their own inquiry (if no payment proof is attached) directly from the confirmation page.
 - **Payment Proof Upload:** Security-verified upload system for offline payment receipts.
@@ -21,7 +22,7 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 
 ### 🛠️ Administrator Module
 - **Dashboard Overview:** Real-time metrics for bookings, pending proofs, and inquiries.
-- **Content Management:** Full CRUD for venue info, gallery items, and pricing tiers.
+- **Content Management:** Full CRUD for venue info, gallery items, **gallery labels** (filter categories), and pricing tiers.
 - **Inquiry Management:** Rich filter bar with per-status counts; active inquiries shown by default; completed/cancelled hidden. Client-side search. Reference code displayed per row.
 - **Payment Verification:** Review uploaded payment receipts with image display. Cascades status to inquiry and slot on verification.
 - **Dynamic WhatsApp Notifications:** Select any notification template from a dropdown on the inquiry/payment detail page; message preview with placeholder resolution; deep-link generated client-side.
@@ -100,6 +101,8 @@ Default admin account created on first run (`DataSeeder`):
 | `app.upload.gallery-dir` | `uploads/gallery` | Relative path for gallery image uploads. |
 | `app.upload.proofs-dir` | `uploads/proofs` | Relative path for payment proof uploads. |
 | `app.jwt.secret` | *(see file)* | JWT signing secret — **must** be changed in production. |
+| `app.maps.share-url` | Google share link | “Open in Google Maps” buttons |
+| `app.maps.embed-url` | Maps embed URL | iframe `src` on the home venue section |
 
 ---
 
@@ -116,15 +119,40 @@ src/main/java/com/almuneer/portal/
 └── util/           # FileUploadUtil, DeepLinkBuilderUtil
 
 src/main/resources/
-├── static/         # CSS, JS, and Image assets
+├── static/
+│   ├── css/main.css
+│   └── js/
+│       ├── main.js              # Nav, scroll-spy, admin calendar, lightbox helpers
+│       ├── visitor-calendar.js  # Interactive visitor availability calendar
+│       ├── booking-flow.js      # Syncs inquiry URLs with selected date/package
+│       ├── masonry-layout.js    # Packed gallery layout
+│       └── gallery.js           # Gallery filters + lightbox
 └── templates/
     ├── admin/      # Admin panel Thymeleaf templates
-    └── visitor/    # Visitor-facing Thymeleaf templates
+    └── visitor/    # Visitor-facing Thymeleaf templates (home.html is the main landing page)
+```
+
+### Visitor booking flow (home page)
+
+```text
+1. Scroll to #availability (or use nav “Book”)
+2. Tap an available calendar day
+3. Click “Submit inquiry →”  →  /inquiry?date=…
+   — or from Pricing: “Book [Package]”  →  /inquiry?pricingId=…  (adds date if already selected)
+4. Complete the inquiry form (date/package pre-filled when provided)
 ```
 
 ---
 
 ## 🔄 Changelog
+
+### v0.4 — 2026-05-24
+- **Feature:** Single-page scroll home with anchor nav and scroll-spy; consolidated visitor journey on `/`.
+- **Feature:** Google Maps embed + configurable `app.maps.share-url` / `app.maps.embed-url`.
+- **Feature:** Masonry gallery (`masonry-layout.js`, `gallery.js`) with label-based filters; admin **Gallery Labels** CRUD in sidebar (`/admin/gallery/labels`).
+- **Feature:** Interactive visitor calendar (`visitor-calendar.js`) — large month nav, future dates default Available, past dates dimmed, click-to-select with one **Submit inquiry** CTA (`booking-flow.js`).
+- **Feature:** Pricing **Book [package]** buttons pre-select tier on inquiry; `InquiryController` accepts `?date=` and `?pricingId=`.
+- **UX:** Removed redundant booking buttons (duplicate step path, extra CTAs, separate `#book` section); nav simplified to **Book** → `#availability`.
 
 ### v0.3 — 2026-05-22
 - **Fix:** Payment proof images now display correctly — `FileUploadUtil` returns the UUID filename (not the full path), which is what the `/uploads/proofs/**` resource handler serves.

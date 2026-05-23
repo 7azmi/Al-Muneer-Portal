@@ -25,7 +25,10 @@
                     <span class="nav-icon">🏛️</span> Venue Info
                 </a></li>
                 <li><a href="/admin/gallery" th:classappend="${activeNav == 'gallery'} ? 'active'">
-                    <span class="nav-icon">🖼️</span> Gallery
+                    <span class="nav-icon">🖼️</span> Gallery Media
+                </a></li>
+                <li><a href="/admin/gallery/labels" th:classappend="${activeNav == 'gallery-labels'} ? 'active'">
+                    <span class="nav-icon">🏷️</span> Gallery Labels
                 </a></li>
                 <li><a href="/admin/pricing" th:classappend="${activeNav == 'pricing'} ? 'active'">
                     <span class="nav-icon">💰</span> Pricing

@@ -83,6 +83,7 @@ public class InquiryController {
     @GetMapping
     public String landing(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Long pricingId,
             HttpServletRequest request,
             Model model) {
 
@@ -92,9 +93,20 @@ public class InquiryController {
             existing = inquiryService.findByReferenceCode(savedRef).orElse(null);
         }
 
+        PricingTier selectedTier = null;
+        if (pricingId != null) {
+            try {
+                selectedTier = pricingTierService.getTierById(pricingId);
+            } catch (IllegalArgumentException ignored) {
+                // Unknown package id — ignore
+            }
+        }
+
         model.addAttribute("existingInquiry", existing);
         model.addAttribute("tiers", pricingTierService.getActiveTiers());
         model.addAttribute("selectedDate", date);
+        model.addAttribute("selectedPricingId", pricingId);
+        model.addAttribute("selectedTier", selectedTier);
         return "visitor/inquiry-landing";
     }
 

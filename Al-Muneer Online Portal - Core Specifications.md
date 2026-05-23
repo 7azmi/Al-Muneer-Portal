@@ -91,13 +91,13 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 ### Visitor Module
 
-- **UC001: View Venue Info:** Retrieves and displays description, services, capacity, and location.
+- **UC001: View Venue Info:** Retrieves and displays description, services, capacity, and an embedded Google Maps location (home page scroll section; `/venue` redirects to `/#venue`).
     
-- **UC002: View Media Gallery:** Grid display of image thumbnails and embedded YouTube video tiles (no native video uploads). Clicking an image opens a full-size lightbox; clicking a video tile plays it inline via YouTube embed.
+- **UC002: View Media Gallery:** Packed masonry display of images and YouTube tiles with admin-defined category filters and lightbox; full gallery on home (`/#gallery`); `/gallery` redirects to home.
     
-- **UC003: Check Availability:** Interactive calendar displaying "Available", "Booked", or "Pending" states.
+- **UC003: Check Availability:** Interactive calendar on the home page — future dates without a DB record show as Available; past dates are dimmed; available days are selectable and link to inquiry with `?date=` pre-filled. Pending/Booked states from the database override defaults. `/calendar` redirects to `/#availability`.
     
-- **UC004: View Pricing Panel:** Displays pricing tiers and packages.
+- **UC004: View Pricing Panel:** Displays pricing tiers on the home page; each tier offers **Book [name]** linking to `/inquiry?pricingId=` (optionally combined with a calendar-selected date).
     
 - **UC005: Submit Booking Inquiry:** Form capture (Name, WhatsApp Number, Event Date, etc.) -> Validates -> Saves to DB -> Sets linked `AvailabilitySlot` to `Pending` -> Displays Inquiry ID to visitor on confirmation screen -> Flags inquiry in Admin Dashboard for follow-up.
     
@@ -110,7 +110,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 - **UC006: Manage Hall Info:** CRUD operations for venue descriptions, contact details, and FAQs.
     
-- **UC007: Manage Media Gallery:** Upload new image files (JPG/PNG, Max 5MB) or add YouTube video URLs. Delete existing gallery items.
+- **UC007: Manage Media Gallery:** Upload new image files (JPG/PNG, Max 5MB) or add YouTube video URLs; assign a gallery label (category) per item; delete existing media. **Gallery Labels** CRUD at `/admin/gallery/labels` drives visitor filter chips.
     
 - **UC008: Manage Pricing Panel:** Add, edit, or remove pricing tiers/packages.
     

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDate;
+
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
@@ -20,17 +22,18 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("venue", venueInfoService.getVenueInfo());
-        // Show up to 8 gallery preview items
-        var allMedia = mediaItemService.getAllMedia();
-        model.addAttribute("previewMedia", allMedia.stream().limit(8).toList());
+        model.addAttribute("mediaItems", mediaItemService.getAllMedia());
         model.addAttribute("tiers", pricingTierService.getActiveTiers());
+        LocalDate now = LocalDate.now();
+        model.addAttribute("currentYear", now.getYear());
+        model.addAttribute("currentMonth", now.getMonthValue());
         return "visitor/home";
     }
 
+    /** Legacy /venue URL → home venue section */
     @GetMapping("/venue")
-    public String venueInfo(Model model) {
-        model.addAttribute("venue", venueInfoService.getVenueInfo());
-        return "visitor/venue";
+    public String venueInfo() {
+        return "redirect:/#venue";
     }
 }
 
