@@ -23,20 +23,13 @@
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="nav-links">
-                <li><a href="/#hero" id="nav-home"
-                       th:classappend="${#strings.equals(#request.requestURI, '/')} ? 'active'">Home</a></li>
-                <li><a href="/venue" id="nav-venue"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/venue')} ? 'active'">Venue</a></li>
-                <li><a href="/gallery" id="nav-gallery"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/gallery')} ? 'active'">Gallery</a></li>
-                <li><a href="/calendar" id="nav-calendar"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/calendar')} ? 'active'">Availability</a></li>
-                <li><a href="/pricing" id="nav-pricing"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/pricing')} ? 'active'">Pricing</a></li>
-                <li><a href="/inquiry" id="nav-inquiry"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/inquiry')} ? 'active'">Book Now</a></li>
-                <li><a href="/feedback" id="nav-feedback"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/feedback')} ? 'active'">Feedback</a></li>
+                <li><a href="/" id="nav-home">Home</a></li>
+                <li><a href="/venue" id="nav-venue">Venue</a></li>
+                <li><a href="/gallery" id="nav-gallery">Gallery</a></li>
+                <li><a href="/calendar" id="nav-calendar">Availability</a></li>
+                <li><a href="/pricing" id="nav-pricing">Pricing</a></li>
+                <li><a href="/inquiry" id="nav-inquiry">Book Now</a></li>
+                <li><a href="/feedback" id="nav-feedback">Feedback</a></li>
             </ul>
         </div>
     </nav>

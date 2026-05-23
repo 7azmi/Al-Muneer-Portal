@@ -28,13 +28,11 @@
                         <div class="form-group">
                             <label class="form-label" for="fb-wa">WhatsApp Number *</label>
                             <div style="display:flex; align-items:center; gap:0.5rem;">
-                                <span style="background:var(--color-surface-2); border:1px solid var(--color-border);
-                                             border-radius:6px; padding:0.6rem 0.75rem; font-weight:600;
-                                             white-space:nowrap; color:var(--color-text-muted);"
-                                      th:text="${countryCode}">+967</span>
+                                <span style="background:var(--color-surface-2); border:1px solid var(--color-border); border-radius:6px; padding:0.6rem 0.75rem; font-weight:600; white-space:nowrap; color:var(--color-text-muted);" th:text="${countryCode}">+967</span>
                                 <input type="tel" id="fb-wa" name="visitorWhatsApp" class="form-input"
                                        placeholder="772629404" maxlength="9" pattern="[0-9]{9}"
-                                       title="Enter 9 digits without country code" required style="flex:1;">
+                                       title="Enter 9 digits without country code" required
+                                       style="flex:1;">
                             </div>
                             <small class="text-muted">Enter your 9-digit local number — e.g. 772629404</small>
                         </div>
@@ -44,7 +42,8 @@
                         <label class="form-label">Overall Rating *</label>
                         <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;" id="star-rating">
                             <label th:each="i : ${#numbers.sequence(1,5)}" style="cursor: pointer; font-size: 2rem;">
-                                <input type="radio" name="rating" th:value="${i}" style="display:none;"
+                                <input type="radio" name="rating" th:value="${i}"
+                                       style="display:none;"
                                        th:checked="${i == 5}">
                                 <span class="star" th:data-value="${i}">⭐</span>
                             </label>
@@ -68,6 +67,7 @@
 </main>
 <th:block layout:fragment="scripts">
 <script>
+    // Simple star rating UX
     document.querySelectorAll('.star').forEach(star => {
         star.addEventListener('mouseenter', () => {
             const val = parseInt(star.dataset.value);

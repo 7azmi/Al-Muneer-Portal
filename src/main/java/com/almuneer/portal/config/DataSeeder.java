@@ -1,11 +1,9 @@
 package com.almuneer.portal.config;
 
 import com.almuneer.portal.model.AdminUser;
-import com.almuneer.portal.model.GalleryLabel;
 import com.almuneer.portal.model.NotificationTemplate;
 import com.almuneer.portal.model.VenueInfo;
 import com.almuneer.portal.repository.AdminUserRepository;
-import com.almuneer.portal.repository.GalleryLabelRepository;
 import com.almuneer.portal.repository.NotificationTemplateRepository;
 import com.almuneer.portal.repository.VenueInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +22,6 @@ public class DataSeeder implements CommandLineRunner {
     private final AdminUserRepository adminUserRepository;
     private final VenueInfoRepository venueInfoRepository;
     private final NotificationTemplateRepository templateRepository;
-    private final GalleryLabelRepository galleryLabelRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -85,19 +82,6 @@ public class DataSeeder implements CommandLineRunner {
             );
             templateRepository.saveAll(templates);
             log.info("Default notification templates seeded (4 templates)");
-        }
-
-        // Seed default gallery labels
-        if (galleryLabelRepository.count() == 0) {
-            java.util.List<GalleryLabel> defaultLabels = java.util.List.of(
-                GalleryLabel.builder().name("Weddings").icon("💍").sortOrder(0).build(),
-                GalleryLabel.builder().name("Hall Setup").icon("🏛️").sortOrder(1).build(),
-                GalleryLabel.builder().name("Decorations").icon("🌸").sortOrder(2).build(),
-                GalleryLabel.builder().name("Exterior").icon("🏡").sortOrder(3).build(),
-                GalleryLabel.builder().name("Events").icon("🎉").sortOrder(4).build()
-            );
-            galleryLabelRepository.saveAll(defaultLabels);
-            log.info("Default gallery labels seeded (5 labels)");
         }
     }
 }

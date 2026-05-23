@@ -7,323 +7,82 @@
 </head>
 <body>
 <main layout:fragment="content">
-
-<!-- ═══════════════════════════════════════════════════════
-     1. HERO
-══════════════════════════════════════════════════════════ -->
-<section class="hero" id="hero">
-    <div class="hero-content">
-        <div class="hero-badge"><span>✦</span> Premier Events Venue in Ibb, Yemen</div>
-        <h1 class="hero-title">
-            Create <span class="highlight">Unforgettable</span> Moments
-        </h1>
-        <p class="hero-description">
-            Al-Muneer Hall offers an elegant space for weddings, engagements, and special events.
-            Explore our venue, check availability, and book your dream celebration.
-        </p>
-        <div class="hero-actions">
-            <a href="#book" class="btn btn-primary" id="hero-cta-book">Book Your Date</a>
-            <a href="#gallery-preview" class="btn btn-outline" id="hero-cta-gallery">View Gallery</a>
-        </div>
-        <!-- Scroll indicator -->
-        <div class="scroll-hint" aria-hidden="true">
-            <span class="scroll-arrow">↓</span>
-            <span style="font-size:0.75rem; opacity:0.5; letter-spacing:0.1em; text-transform:uppercase;">Scroll to explore</span>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     2. WHY CHOOSE US
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="features">
-    <div class="section-container">
-        <div class="section-header">
-            <h2 class="section-title">Why Choose Al-Muneer?</h2>
-            <p class="section-subtitle">Everything you need for a perfect celebration, all in one place.</p>
-        </div>
-        <div class="features-grid">
-            <div class="card">
-                <div class="card-icon">🏛️</div>
-                <h3 class="card-title">Elegant Venue</h3>
-                <p class="card-text">A beautifully designed hall with modern interiors and versatile layouts to suit any event style.</p>
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>✦</span> Premier Events Venue in Ibb, Yemen
             </div>
-            <div class="card">
-                <div class="card-icon">📅</div>
-                <h3 class="card-title">Easy Booking</h3>
-                <p class="card-text">Check real-time availability, submit your inquiry, and confirm your booking — all online.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">💎</div>
-                <h3 class="card-title">Premium Service</h3>
-                <p class="card-text">Dedicated support from inquiry to event day. We ensure every detail is handled with care.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     3. VENUE SNAPSHOT + MAP
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="venue-snapshot" th:if="${venue != null}"
-         style="background: radial-gradient(ellipse at center, rgba(201,168,76,0.05) 0%, transparent 70%);">
-    <div class="section-container">
-        <div class="section-header">
-            <h2 class="section-title">Our Venue</h2>
-            <p class="section-subtitle" th:text="${venue.description}">Al-Muneer Hall — where memories are made.</p>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:start;">
-            <!-- Detail cards -->
-            <div>
-                <div class="venue-details" style="margin-top:0;">
-                    <div class="venue-detail-card">
-                        <div class="venue-detail-icon">👥</div>
-                        <div class="venue-detail-label">Capacity</div>
-                        <div class="venue-detail-value" th:text="${venue.capacity != null ? venue.capacity + ' Guests' : 'Contact us'}">500 Guests</div>
-                    </div>
-                    <div class="venue-detail-card">
-                        <div class="venue-detail-icon">📞</div>
-                        <div class="venue-detail-label">Contact</div>
-                        <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Phone</div>
-                    </div>
-                    <div class="venue-detail-card">
-                        <div class="venue-detail-icon">📍</div>
-                        <div class="venue-detail-label">Location</div>
-                        <div class="venue-detail-value">Ibb, Yemen</div>
-                    </div>
-                </div>
-                <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
-                    <a href="/venue" class="btn btn-outline" id="learn-more-btn">Learn More →</a>
-                    <a href="#book" class="btn btn-primary" id="venue-book-btn">Book Now</a>
-                </div>
-            </div>
-
-            <!-- Google Maps embed -->
-            <div style="border-radius:16px; overflow:hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.3); height:280px;">
-                <iframe
-                    src="https://www.google.com/maps?q=إب+اليمن+قاعة+المنير&output=embed"
-                    width="100%" height="100%" style="border:0;" allowfullscreen=""
-                    loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                    title="Al-Muneer Hall Location Map">
-                </iframe>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     4. GALLERY PREVIEW
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="gallery-preview" th:if="${previewMedia != null and !previewMedia.isEmpty()}">
-    <div class="section-container">
-        <div class="section-header">
-            <h2 class="section-title">Gallery Highlights</h2>
-            <p class="section-subtitle">A glimpse of the magic that happens at Al-Muneer</p>
-        </div>
-
-        <div class="masonry-preview" id="preview-grid">
-            <div th:each="item : ${previewMedia}"
-                 class="preview-item"
-                 th:data-type="${item.mediaType}"
-                 th:data-src="${item.mediaType.name() == 'IMAGE' ? '/uploads/gallery/' + item.fileName : ''}"
-                 th:data-url="${item.youtubeUrl}"
-                 th:data-caption="${item.caption}">
-
-                <div th:if="${item.mediaType.name() == 'IMAGE'}" class="preview-media">
-                    <img th:src="@{'/uploads/gallery/' + ${item.fileName}}"
-                         th:alt="${item.caption ?: 'Gallery'}" loading="lazy">
-                </div>
-                <div th:if="${item.mediaType.name() == 'YOUTUBE'}" class="preview-media youtube-thumb">
-                    <img th:src="'https://img.youtube.com/vi/' + ${item.youtubeVideoId} + '/hqdefault.jpg'"
-                         alt="Video" loading="lazy">
-                    <span class="play-icon">▶</span>
-                </div>
-                <div class="caption-overlay" th:if="${item.caption}" th:text="${item.caption}"></div>
-            </div>
-        </div>
-
-        <div class="text-center" style="margin-top:2rem;">
-            <a href="/gallery" class="btn btn-outline" id="view-gallery-btn">View Full Gallery →</a>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     5. AVAILABILITY (link to calendar)
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="availability"
-         style="background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, transparent 60%);">
-    <div class="section-container" style="text-align:center;">
-        <div class="section-header">
-            <h2 class="section-title">Check Availability</h2>
-            <p class="section-subtitle">See which dates are open and plan your event</p>
-        </div>
-        <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center; align-items:center;">
-            <div class="card" style="padding:1.25rem 2rem; flex:1; min-width:200px; max-width:260px; text-align:center; cursor:default;">
-                <div style="font-size:2rem; margin-bottom:0.5rem;">✅</div>
-                <div style="font-weight:600; color:var(--color-available);">Available</div>
-                <div style="font-size:0.8rem; color:var(--color-text-muted);">Ready to book</div>
-            </div>
-            <div class="card" style="padding:1.25rem 2rem; flex:1; min-width:200px; max-width:260px; text-align:center; cursor:default;">
-                <div style="font-size:2rem; margin-bottom:0.5rem;">⏳</div>
-                <div style="font-weight:600; color:var(--color-pending);">Pending</div>
-                <div style="font-size:0.8rem; color:var(--color-text-muted);">Inquiry in progress</div>
-            </div>
-            <div class="card" style="padding:1.25rem 2rem; flex:1; min-width:200px; max-width:260px; text-align:center; cursor:default;">
-                <div style="font-size:2rem; margin-bottom:0.5rem;">🔒</div>
-                <div style="font-weight:600; color:var(--color-booked);">Booked</div>
-                <div style="font-size:0.8rem; color:var(--color-text-muted);">Date taken</div>
-            </div>
-        </div>
-        <a href="/calendar" class="btn btn-primary" id="open-calendar-btn" style="margin-top:2rem; font-size:1rem; padding:0.85rem 2.5rem;">
-            📅 Open Availability Calendar
-        </a>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     6. PRICING
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="pricing" th:if="${tiers != null and !tiers.isEmpty()}">
-    <div class="section-container">
-        <div class="section-header">
-            <h2 class="section-title">Pricing Packages</h2>
-            <p class="section-subtitle">Transparent packages tailored to every celebration</p>
-        </div>
-        <div class="pricing-grid">
-            <div th:each="tier : ${tiers}" class="pricing-card">
-                <div class="pricing-name" th:text="${tier.tierName}">Package</div>
-                <div class="pricing-price">
-                    <span th:text="${#numbers.formatDecimal(tier.basePrice,0,0)}">0</span>
-                    <span class="currency">YER</span>
-                </div>
-                <div class="pricing-description" th:text="${tier.description}">Details</div>
-                <a href="#book" class="btn btn-primary">Book This Package</a>
-            </div>
-        </div>
-        <div class="text-center" style="margin-top:1.5rem;">
-            <a href="/pricing" class="btn btn-outline" id="full-pricing-btn">View Full Pricing Details →</a>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     7. BOOK NOW (Inquiry CTA)
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="book"
-         style="background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.03) 100%);
-                border-top: 1px solid rgba(201,168,76,0.15); border-bottom: 1px solid rgba(201,168,76,0.15);">
-    <div class="section-container" style="text-align:center; max-width:700px;">
-        <div style="font-size:3rem; margin-bottom:1rem;">🎉</div>
-        <h2 class="section-title">Ready to Book Your Event?</h2>
-        <p class="section-subtitle" style="margin-bottom:2rem;">
-            Submit an inquiry today and our team will contact you via WhatsApp to confirm your date.
-        </p>
-        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-            <a href="/inquiry" class="btn btn-primary" id="go-inquiry-btn"
-               style="font-size:1rem; padding:0.9rem 2.5rem;">
-                📝 Submit a Booking Inquiry
-            </a>
-            <a href="/inquiry" class="btn btn-outline" id="lookup-inquiry-btn"
-               style="font-size:1rem; padding:0.9rem 2rem;">
-                🔍 Look Up My Inquiry
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════
-     8. TESTIMONIALS / FEEDBACK CTA
-══════════════════════════════════════════════════════════ -->
-<section class="section" id="feedback-cta">
-    <div class="section-container" style="text-align:center; max-width:700px;">
-        <div class="section-header">
-            <h2 class="section-title">Share Your Experience</h2>
-            <p class="section-subtitle">
-                Had your event at Al-Muneer? We'd love to hear how it went.
+            <h1 class="hero-title">
+                Create <span class="highlight">Unforgettable</span> Moments
+            </h1>
+            <p class="hero-description">
+                Al-Muneer Hall offers an elegant space for weddings, engagements, and special events.
+                Explore our venue, check availability, and book your dream celebration.
             </p>
+            <div class="hero-actions">
+                <a href="/calendar" class="btn btn-primary" id="hero-cta-calendar">Check Availability</a>
+                <a href="/gallery" class="btn btn-outline" id="hero-cta-gallery">View Gallery</a>
+            </div>
         </div>
-        <a href="/feedback" class="btn btn-outline" id="go-feedback-btn"
-           style="font-size:1rem; padding:0.85rem 2.5rem;">
-            ⭐ Leave Feedback
-        </a>
-    </div>
-</section>
+    </section>
 
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose Al-Muneer?</h2>
+                <p class="section-subtitle">Everything you need for a perfect celebration, all in one place.</p>
+            </div>
+            <div class="features-grid">
+                <div class="card">
+                    <div class="card-icon">🏛️</div>
+                    <h3 class="card-title">Elegant Venue</h3>
+                    <p class="card-text">A beautifully designed hall with modern interiors and versatile layouts to suit any event style.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📅</div>
+                    <h3 class="card-title">Easy Booking</h3>
+                    <p class="card-text">Check real-time availability, submit your inquiry, and confirm your booking — all online.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💎</div>
+                    <h3 class="card-title">Premium Service</h3>
+                    <p class="card-text">Dedicated support from inquiry to event day. We ensure every detail is handled with care.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venue Snapshot -->
+    <section class="section" id="venue-snapshot" th:if="${venue != null}">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">Our Venue</h2>
+                <p class="section-subtitle" th:text="${venue.description}">Venue description</p>
+            </div>
+            <div class="venue-details">
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">📍</div>
+                    <div class="venue-detail-label">Location</div>
+                    <div class="venue-detail-value" th:text="${venue.location ?: 'Ibb, Yemen'}">Ibb, Yemen</div>
+                </div>
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">👥</div>
+                    <div class="venue-detail-label">Capacity</div>
+                    <div class="venue-detail-value" th:text="${venue.capacity != null ? venue.capacity + ' Guests' : 'Contact us'}">500 Guests</div>
+                </div>
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">📞</div>
+                    <div class="venue-detail-label">Contact</div>
+                    <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Phone</div>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <a href="/venue" class="btn btn-outline">Learn More About Our Venue →</a>
+            </div>
+        </div>
+    </section>
 </main>
-
-<th:block layout:fragment="scripts">
-<style>
-/* Scroll hint animation */
-.scroll-hint {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    margin-top: 3rem;
-    animation: bounce 2s infinite;
-    color: rgba(255,255,255,0.5);
-}
-.scroll-arrow { font-size: 1.5rem; }
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(8px); }
-}
-
-/* Gallery preview on home — 4-col masonry */
-.masonry-preview {
-    column-count: 4;
-    column-gap: 12px;
-}
-@media (max-width:900px)  { .masonry-preview { column-count: 3; } }
-@media (max-width:600px)  { .masonry-preview { column-count: 2; } }
-
-.preview-item {
-    break-inside: avoid;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.preview-item:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0,0,0,0.4); }
-.preview-media img { width: 100%; height: auto; display: block; }
-.preview-item .youtube-thumb { position: relative; }
-.preview-item .youtube-thumb img { aspect-ratio:16/9; object-fit:cover; }
-.preview-item .play-icon {
-    position: absolute; inset: 0; display: flex; align-items: center;
-    justify-content: center; font-size: 2.5rem;
-    background: rgba(201,168,76,0.7);
-}
-.preview-item .caption-overlay {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 1.25rem 0.75rem 0.5rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-    color: #fff; font-size: 0.78rem; font-weight: 500;
-    opacity: 0; transition: opacity 0.25s ease;
-}
-.preview-item:hover .caption-overlay { opacity: 1; }
-</style>
-<script>
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    });
-});
-
-// Preview gallery → link to full gallery
-document.querySelectorAll('.preview-item').forEach(item => {
-    item.addEventListener('click', () => { window.location.href = '/gallery'; });
-});
-</script>
-</th:block>
 </body>
 </html>

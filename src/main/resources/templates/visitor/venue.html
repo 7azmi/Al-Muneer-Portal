@@ -11,61 +11,40 @@
         <div class="section-container">
             <div class="section-header">
                 <h1 class="section-title">Al-Muneer Hall</h1>
-                <p class="section-subtitle">Weddings &amp; Events Venue — Ibb, Yemen</p>
+                <p class="section-subtitle">Weddings &amp; Events Venue</p>
             </div>
 
-            <!-- About -->
-            <div class="admin-panel" th:if="${venue != null}" style="margin-bottom:2rem;">
+            <div class="admin-panel" th:if="${venue != null}">
                 <h3 class="admin-panel-title">About the Venue</h3>
-                <p th:text="${venue.description}" style="line-height:1.8; color:var(--color-text-muted);">Description</p>
+                <p th:text="${venue.description}" style="line-height: 1.8; color: var(--color-text-muted);">Description</p>
             </div>
 
-            <!-- Details + Map side by side -->
-            <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap:2rem; align-items:start; margin-bottom:2rem;">
-
-                <div>
-                    <div class="venue-details" th:if="${venue != null}" style="margin-top:0;">
-                        <div class="venue-detail-card">
-                            <div class="venue-detail-icon">👥</div>
-                            <div class="venue-detail-label">Capacity</div>
-                            <div class="venue-detail-value" th:text="${venue.capacity != null ? venue.capacity + ' Guests' : 'Contact us'}">500 Guests</div>
-                        </div>
-                        <div class="venue-detail-card">
-                            <div class="venue-detail-icon">📞</div>
-                            <div class="venue-detail-label">Contact</div>
-                            <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Contact</div>
-                        </div>
-                    </div>
-
-                    <!-- Services -->
-                    <div class="admin-panel" th:if="${venue != null and venue.services != null}" style="margin-top:1.5rem;">
-                        <h3 class="admin-panel-title">Services We Offer</h3>
-                        <p th:text="${venue.services}" style="line-height:1.8; color:var(--color-text-muted);">Services</p>
-                    </div>
+            <div class="venue-details" th:if="${venue != null}">
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">📍</div>
+                    <div class="venue-detail-label">Location</div>
+                    <div class="venue-detail-value" th:text="${venue.location ?: 'Ibb, Yemen'}">Location</div>
                 </div>
-
-                <!-- Google Maps Embed -->
-                <div style="border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.35); height:360px;">
-                    <iframe
-                        src="https://www.google.com/maps?q=إب+اليمن+قاعة+المنير&output=embed"
-                        width="100%" height="100%" style="border:0;" allowfullscreen=""
-                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                        title="Al-Muneer Hall on Google Maps">
-                    </iframe>
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">👥</div>
+                    <div class="venue-detail-label">Capacity</div>
+                    <div class="venue-detail-value" th:text="${venue.capacity != null ? venue.capacity + ' Guests' : 'Contact us'}">Capacity</div>
+                </div>
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">📞</div>
+                    <div class="venue-detail-label">Contact</div>
+                    <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Contact</div>
                 </div>
             </div>
 
-            <!-- Open in Google Maps link -->
-            <div style="text-align:center; margin-bottom:2rem;">
-                <a href="https://share.google/gGyZPRG6CbJQz0eVc" target="_blank" rel="noopener"
-                   class="btn btn-outline" id="open-maps-btn">
-                    📍 Open in Google Maps
-                </a>
+            <div class="admin-panel mt-8" th:if="${venue != null and venue.services != null}">
+                <h3 class="admin-panel-title">Services We Offer</h3>
+                <p th:text="${venue.services}" style="line-height: 1.8; color: var(--color-text-muted);">Services</p>
             </div>
 
             <div class="text-center mt-8">
-                <a href="/calendar" class="btn btn-primary" id="venue-calendar-btn">Check Availability</a>
-                <a href="/pricing" class="btn btn-outline" style="margin-left:1rem;" id="venue-pricing-btn">View Pricing</a>
+                <a href="/calendar" class="btn btn-primary">Check Availability</a>
+                <a href="/pricing" class="btn btn-outline" style="margin-left: 1rem;">View Pricing</a>
             </div>
         </div>
     </section>
