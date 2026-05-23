@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Gallery Labels', 'gallery', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+
+    <div class="admin-page-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h1 class="admin-page-title">Gallery Labels</h1>
+        <a href="/admin/gallery" class="btn btn-outline btn-sm">← Back to Gallery</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; align-items:start;">
+
+        <!-- Create new label -->
+        <div class="admin-panel" style="padding:1.5rem;">
+            <h3 class="admin-panel-title">Add New Label</h3>
+            <form method="post" action="/admin/gallery/labels/create" id="create-label-form">
+                <div class="form-group">
+                    <label class="form-label" for="new-name">Label Name *</label>
+                    <input type="text" id="new-name" name="name" class="form-input"
+                           placeholder="e.g. Hall Setup" required maxlength="60">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-icon">Icon (emoji, optional)</label>
+                    <input type="text" id="new-icon" name="icon" class="form-input"
+                           placeholder="e.g. 🏛️" maxlength="8">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-sort">Sort Order</label>
+                    <input type="number" id="new-sort" name="sortOrder" class="form-input"
+                           value="0" min="0" max="999">
+                    <small class="text-muted">Lower numbers appear first</small>
+                </div>
+                <button type="submit" class="btn btn-primary" id="create-label-btn" style="width:100%;">
+                    Create Label
+                </button>
+            </form>
+        </div>
+
+        <!-- Existing labels list -->
+        <div class="admin-panel" style="padding:0; overflow:hidden;">
+            <div style="padding:1rem 1.5rem; border-bottom:1px solid var(--color-border);">
+                <h3 class="admin-panel-title" style="margin:0;">
+                    Existing Labels (<span th:text="${labels.size()}">0</span>)
+                </h3>
+            </div>
+
+            <div th:if="${labels.isEmpty()}" class="empty-state" style="padding:2rem;">
+                <div class="empty-state-icon">🏷️</div>
+                <p class="empty-state-text">No labels yet. Create your first label above.</p>
+            </div>
+
+            <div th:each="label : ${labels}"
+                 style="border-bottom:1px solid var(--color-border); padding:1rem 1.5rem;"
+                 th:id="'label-' + ${label.labelId}">
+
+                <form th:action="@{'/admin/gallery/labels/' + ${label.labelId} + '/update'}"
+                      method="post" style="display:grid; gap:0.5rem;">
+
+                    <div style="display:grid; grid-template-columns: 3fr 1fr 1fr; gap:0.5rem; align-items:center;">
+                        <input type="text" name="name" class="form-input form-input-sm"
+                               th:value="${label.name}" required maxlength="60">
+                        <input type="text" name="icon" class="form-input form-input-sm"
+                               th:value="${label.icon}" maxlength="8" placeholder="🏷️">
+                        <input type="number" name="sortOrder" class="form-input form-input-sm"
+                               th:value="${label.sortOrder}" min="0" max="999">
+                    </div>
+
+                    <div style="display:flex; gap:0.5rem;">
+                        <button type="submit" class="btn btn-outline btn-sm" style="flex:1;">Save</button>
+                        <form th:action="@{'/admin/gallery/labels/' + ${label.labelId} + '/delete'}"
+                              method="post" style="display:inline;"
+                              onsubmit="return confirm('Delete this label? Gallery items using it won\'t be deleted, just uncategorized.')">
+                            <button type="submit" class="btn btn-sm"
+                                    style="background:#ef4444; color:#fff; border:none;">Delete</button>
+                        </form>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage tip -->
+    <div class="admin-panel" style="margin-top:1.5rem; padding:1rem 1.5rem; background:rgba(201,168,76,0.05);">
+        <p style="font-size:0.875rem; color:var(--color-text-muted); margin:0;">
+            💡 <strong>Tip:</strong> Labels created here automatically appear as filter tabs on the public
+            <a href="/gallery" target="_blank">/gallery</a> page. Assign a label when uploading media in the
+            <a href="/admin/gallery">gallery manager</a>.
+        </p>
+    </div>
+</div>
+
+<style>
+    .form-input-sm { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+</style>
+</body>
+</html>
