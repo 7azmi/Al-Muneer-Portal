@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Inquiry Confirmed</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="inquiry-confirmation-page">
+        <div class="section-container" style="max-width: 620px; text-align: center;">
+
+            <!-- Status-sensitive icon -->
+            <div style="font-size: 3.5rem; margin-bottom: 0.5rem;"
+                 th:text="${inquiry.status.name() == 'CANCELLED_BY_VISITOR' or inquiry.status.name() == 'CANCELLED_BY_ADMIN'} ? '❌' :
+                           (${inquiry.status.name() == 'CONFIRMED'} ? '🎉' : '✅')">✅</div>
+
+            <h1 class="section-title"
+                th:text="${inquiry.status.name() == 'CANCELLED_BY_VISITOR'} ? 'Inquiry Cancelled' :
+                          (${inquiry.status.name() == 'CONFIRMED'} ? 'Booking Confirmed!' : 'Inquiry Submitted')">
+                Inquiry Submitted!
+            </h1>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <!-- ── Big reference code callout ─────────────────────────── -->
+            <div style="background: linear-gradient(135deg, var(--color-primary) 0%, #5b21b6 100%);
+                        border-radius: 16px; padding: 2rem; margin: 1.5rem 0; color:#fff;"
+                 th:if="${inquiry.status.name() != 'CANCELLED_BY_VISITOR' and inquiry.status.name() != 'CANCELLED_BY_ADMIN'}">
+                <p style="margin:0 0 0.35rem; opacity:0.75; font-size:0.8rem;
+                           letter-spacing:0.1em; text-transform:uppercase;">Reference Code</p>
+                <div id="ref-code-display"
+                     style="font-size: 2.75rem; font-weight: 700; letter-spacing: 0.12em; font-variant-numeric: tabular-nums;"
+                     th:text="${inquiry.referenceCode}">000000000</div>
+                <p style="margin:0.75rem 0 0; opacity:0.85; font-size:0.85rem; line-height:1.5;">
+                    📸 <strong>Screenshot or note this number.</strong><br>
+                    You need it to upload your payment proof or look up this inquiry later.
+                </p>
+                <button onclick="copyRefCode()" id="copy-btn"
+                        style="margin-top:1rem; background:rgba(255,255,255,0.2);
+                               border:1px solid rgba(255,255,255,0.4); color:#fff;
+                               padding:0.4rem 1.25rem; border-radius:6px; cursor:pointer; font-size:0.85rem;">
+                    📋 Copy Code
+                </button>
+            </div>
+
+            <!-- ── Details card ───────────────────────────────────────── -->
+            <div class="card" style="padding: 1.5rem; margin-bottom: 1rem; text-align: left;">
+                <div style="display:grid; gap:0.65rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Visitor Name</span>
+                        <strong th:text="${inquiry.visitorName}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Date</span>
+                        <strong th:text="${inquiry.slot?.slotDate}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">WhatsApp</span>
+                        <strong th:text="${inquiry.visitorWhatsApp}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Status</span>
+                        <span class="badge badge-active" th:text="${inquiry.status}"></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;" th:if="${inquiry.adminNotes}">
+                        <span class="text-muted">Note from Admin</span>
+                        <span th:text="${inquiry.adminNotes}" style="max-width:60%; text-align:right;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Action buttons ─────────────────────────────────────── -->
+            <div style="display:grid; gap:0.65rem; margin-bottom:1.5rem;"
+                 th:if="${inquiry.status.name() != 'CANCELLED_BY_VISITOR' and inquiry.status.name() != 'CANCELLED_BY_ADMIN'}">
+
+                <a th:href="@{'/payment/upload?referenceCode=' + ${inquiry.referenceCode}}"
+                   class="btn btn-primary" id="go-upload-btn"
+                   th:if="${inquiry.status.name() != 'CONFIRMED' and inquiry.status.name() != 'COMPLETED'}">
+                    💳 Upload Payment Proof
+                </a>
+
+                <!-- Self-cancel (only if not CONFIRMED/COMPLETED) -->
+                <div th:if="${inquiry.status.name() != 'CONFIRMED' and inquiry.status.name() != 'COMPLETED'}">
+                    <button onclick="toggleCancelForm()" id="toggle-cancel-btn"
+                            class="btn btn-outline"
+                            style="width:100%; color: var(--color-danger, #ef4444); border-color: var(--color-danger, #ef4444);">
+                        Cancel This Inquiry
+                    </button>
+                    <div id="cancel-form-panel"
+                         style="display:none; margin-top:0.75rem; padding:1rem;
+                                background:var(--color-surface-2); border-radius:8px; text-align:left;">
+                        <p style="font-size:0.875rem; margin-bottom:0.75rem; color:var(--color-text-muted);">
+                            ⚠️ This will free the date and cannot be undone. If you have already submitted a payment proof,
+                            please contact us via WhatsApp instead.
+                        </p>
+                        <form method="post" action="/inquiry/cancel" id="cancel-form">
+                            <input type="hidden" name="referenceCode" th:value="${inquiry.referenceCode}">
+                            <button type="submit" class="btn btn-sm"
+                                    style="background:#ef4444; color:#fff; border:none; width:100%;"
+                                    id="confirm-cancel-btn">
+                                Yes, Cancel My Inquiry
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <a href="/inquiry" class="btn btn-outline" id="back-to-inquiry-btn">← Back to Inquiry Page</a>
+            </div>
+
+            <!-- Cancelled state actions -->
+            <div th:if="${inquiry.status.name() == 'CANCELLED_BY_VISITOR' or inquiry.status.name() == 'CANCELLED_BY_ADMIN'}"
+                 style="margin-bottom:1.5rem;">
+                <a href="/inquiry" class="btn btn-primary" style="display:block; text-align:center;">
+                    Make a New Inquiry
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+<th:block layout:fragment="scripts">
+<script th:inline="javascript">
+    const refCode = /*[[${inquiry.referenceCode}]]*/ 0;
+
+    function copyRefCode() {
+        navigator.clipboard.writeText(String(refCode)).then(() => {
+            const btn = document.getElementById('copy-btn');
+            if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Code', 2000); }
+        });
+    }
+
+    function toggleCancelForm() {
+        const panel = document.getElementById('cancel-form-panel');
+        if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+</th:block>
+</body>
+</html>

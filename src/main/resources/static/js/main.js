@@ -4,19 +4,70 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initNavToggle();
+    initSmoothScroll();
+    initScrollSpy();
     initActiveNav();
     initLightbox();
 });
 
-// ── Active Nav Highlighting ──
+// ── Smooth scroll for in-page anchors ──
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"], a[href^="/#"]').forEach((a) => {
+        a.addEventListener('click', (e) => {
+            const raw = a.getAttribute('href');
+            const hash = raw.includes('#') ? raw.substring(raw.indexOf('#')) : null;
+            if (!hash || hash === '#') return;
+
+            const target = document.querySelector(hash);
+            if (!target) return;
+
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            const links = document.getElementById('nav-links');
+            if (links) links.classList.remove('open');
+
+            if (raw.startsWith('/#') && window.location.pathname !== '/') {
+                window.location.href = '/' + hash;
+            } else {
+                history.replaceState(null, '', hash);
+            }
+        });
+    });
+}
+
+// ── Highlight nav tab for section in view (home page) ──
+function initScrollSpy() {
+    const sections = document.querySelectorAll('main section[id]');
+    const navLinks = document.querySelectorAll('#nav-links a[data-section]');
+    if (!sections.length || !navLinks.length) return;
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                const id = entry.target.id;
+                navLinks.forEach((link) => {
+                    link.classList.toggle('active', link.dataset.section === id);
+                });
+            });
+        },
+        { rootMargin: '-40% 0px -50% 0px', threshold: 0 }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+}
+
+// ── Active Nav Highlighting (non-home routes) ──
 function initActiveNav() {
+    if (document.querySelector('main section[id]')) return;
     const path = window.location.pathname;
-    const links = document.querySelectorAll('#nav-links a');
-    links.forEach(link => {
+    document.querySelectorAll('#nav-links a').forEach((link) => {
         const href = link.getAttribute('href');
+        if (!href) return;
         if (href === '/' && path === '/') {
             link.classList.add('active');
-        } else if (href !== '/' && path.startsWith(href)) {
+        } else if (href !== '/' && !href.startsWith('/#') && path.startsWith(href)) {
             link.classList.add('active');
         }
     });
@@ -204,9 +255,13 @@ function initCalendar(elementId, year, month, isAdmin = false) {
 
         let html = `
             <div class="calendar-header">
-                <button id="cal-prev" onclick="calNav(-1)">‹</button>
-                <h2>${monthNames[currentMonth - 1]} ${currentYear}</h2>
-                <button id="cal-next" onclick="calNav(1)">›</button>
+                <button type="button" class="cal-nav-btn" id="cal-prev" aria-label="Previous month">
+                    <span class="cal-nav-icon" aria-hidden="true">‹</span>
+                </button>
+                <h2 class="calendar-month-title">${monthNames[currentMonth - 1]} ${currentYear}</h2>
+                <button type="button" class="cal-nav-btn" id="cal-next" aria-label="Next month">
+                    <span class="cal-nav-icon" aria-hidden="true">›</span>
+                </button>
             </div>
             <div class="calendar-grid ${isAdmin ? 'admin-calendar' : ''}">
         `;
@@ -251,6 +306,11 @@ function initCalendar(elementId, year, month, isAdmin = false) {
         `;
 
         container.innerHTML = html;
+
+        const prev = container.querySelector('#cal-prev');
+        const next = container.querySelector('#cal-next');
+        if (prev) prev.addEventListener('click', () => window.calNav(-1));
+        if (next) next.addEventListener('click', () => window.calNav(1));
     }
 
     function loadSlots() {
@@ -277,6 +337,10 @@ function initCalendar(elementId, year, month, isAdmin = false) {
         }
         loadSlots();
     };
+
+    if (isAdmin) {
+        window.adminCalRefresh = () => loadSlots();
+    }
 
     loadSlots();
 }

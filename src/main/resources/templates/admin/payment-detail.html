@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Payment Detail', 'payments', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Payment Proof #<span th:text="${proof.proofId}"></span></h1>
+        <a href="/admin/payments" class="btn btn-outline btn-sm">← Back to Payments</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <!-- Embed visitor context for JS -->
+    <script th:inline="javascript">
+        const WA_NUMBER = /*[[${visitorWa}]]*/ '';
+        const VISITOR_NAME = /*[[${visitorName}]]*/ '';
+        const INQUIRY_ID = /*[[${inquiryId}]]*/ '';
+        const EVENT_DATE = /*[[${eventDate}]]*/ '';
+        const PROOF_STATUS = /*[[${proofStatus}]]*/ '';
+    </script>
+
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
+        <!-- Proof Image + Info -->
+        <div>
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Proof Image</h3>
+                <img th:src="@{'/uploads/proofs/' + ${proof.fileName}}"
+                     alt="Payment Proof"
+                     style="max-width: 100%; border-radius: 8px; border: 1px solid var(--color-border);"
+                     onerror="this.style.display='none'; document.getElementById('no-image').style.display='block';">
+                <div id="no-image" style="display:none; text-align:center; padding:2rem; color:var(--color-text-muted);">
+                    ⚠️ Image could not be displayed. File: <code th:text="${proof.fileName}"></code>
+                </div>
+            </div>
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Inquiry Details</h3>
+                <div style="display:grid; gap:0.75rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Visitor</span>
+                        <strong th:text="${proof.inquiry.visitorName}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">WhatsApp</span>
+                        <strong th:text="${proof.inquiry.visitorWhatsApp}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Date</span>
+                        <strong th:text="${proof.inquiry.slot?.slotDate}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Uploaded</span>
+                        <strong th:text="${#temporals.format(proof.uploadTimestamp,'dd MMM yyyy HH:mm')}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Current Status</span>
+                        <span class="badge badge-active" th:text="${proof.verificationStatus}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div>
+            <!-- Update Status -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Verification Decision</h3>
+                <form method="post" th:action="@{'/admin/payments/' + ${proof.proofId} + '/update-status'}">
+                    <div class="form-group">
+                        <label class="form-label" for="proof-status">Set Status</label>
+                        <select id="proof-status" name="status" class="form-input">
+                            <option value="PENDING_VERIFICATION"
+                                    th:selected="${proof.verificationStatus.name() == 'PENDING_VERIFICATION'}">
+                                Pending Verification
+                            </option>
+                            <option value="VERIFIED"
+                                    th:selected="${proof.verificationStatus.name() == 'VERIFIED'}">
+                                ✅ Verified
+                            </option>
+                            <option value="REJECTED"
+                                    th:selected="${proof.verificationStatus.name() == 'REJECTED'}">
+                                ❌ Rejected
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="proof-notes">Admin Notes</label>
+                        <textarea id="proof-notes" name="adminNotes" class="form-textarea" rows="3"
+                                  th:text="${proof.adminNotes}"
+                                  placeholder="Reason for rejection, or verification notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Save Decision</button>
+                </form>
+            </div>
+
+            <!-- WhatsApp Notify with template chooser -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">📱 Notify Visitor via WhatsApp</h3>
+                <div class="form-group">
+                    <label class="form-label" for="wa-template-select">Choose Message Template</label>
+                    <select id="wa-template-select" class="form-input" onchange="buildWaLink()">
+                        <option value="">-- Select a template --</option>
+                        <option th:each="tmpl : ${templates}"
+                                th:value="${tmpl.templateText}"
+                                th:text="${tmpl.label}">Template</option>
+                    </select>
+                </div>
+                <div id="wa-preview"
+                     style="display:none; margin-bottom:0.75rem; background:var(--color-surface-2);
+                            border-radius:8px; padding:0.75rem; font-size:0.8rem;
+                            color:var(--color-text-muted); white-space:pre-wrap; line-height:1.5;"></div>
+                <a id="wa-send-btn" href="#" target="_blank"
+                   style="display:none; width:100%; text-align:center; background:#25d366;
+                          border-color:#25d366; margin-bottom:0.5rem;"
+                   class="btn btn-primary">
+                    💬 Open WhatsApp Chat
+                </a>
+                <p id="wa-hint" class="text-muted" style="font-size:0.8rem; margin-top:0.25rem;">
+                    Select a template above to generate the WhatsApp deep-link.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function resolvePlaceholders(text) {
+            return text
+                .replace(/\{visitorName\}/g, VISITOR_NAME)
+                .replace(/\{inquiryId\}/g, INQUIRY_ID)
+                .replace(/\{eventDate\}/g, EVENT_DATE)
+                .replace(/\{status\}/g, PROOF_STATUS);
+        }
+
+        function buildWaLink() {
+            const sel = document.getElementById('wa-template-select');
+            const raw = sel.value;
+            const preview = document.getElementById('wa-preview');
+            const btn = document.getElementById('wa-send-btn');
+            const hint = document.getElementById('wa-hint');
+
+            if (!raw) {
+                preview.style.display = 'none';
+                btn.style.display = 'none';
+                hint.style.display = 'block';
+                return;
+            }
+
+            const resolved = resolvePlaceholders(raw);
+            preview.textContent = resolved;
+            preview.style.display = 'block';
+            hint.style.display = 'none';
+
+            const encoded = encodeURIComponent(resolved);
+            btn.href = `https://wa.me/${WA_NUMBER}?text=${encoded}`;
+            btn.style.display = 'block';
+        }
+    </script>
+</div>
+</body>
+</html>

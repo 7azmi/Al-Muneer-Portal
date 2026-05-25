@@ -4,12 +4,10 @@ import com.almuneer.portal.service.AvailabilitySlotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 @Controller
@@ -19,11 +17,8 @@ public class CalendarController {
     private final AvailabilitySlotService slotService;
 
     @GetMapping("/calendar")
-    public String calendar(Model model) {
-        LocalDate now = LocalDate.now();
-        model.addAttribute("currentYear", now.getYear());
-        model.addAttribute("currentMonth", now.getMonthValue());
-        return "visitor/calendar";
+    public String calendar() {
+        return "redirect:/#availability";
     }
 
     @GetMapping(value = "/api/calendar/slots", produces = "application/json")

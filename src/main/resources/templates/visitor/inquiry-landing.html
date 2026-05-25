@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Booking Inquiry</title>
+</head>
+<body>
+<main layout:fragment="content">
+<section class="section" id="inquiry-landing-page">
+<div class="section-container" style="max-width: 860px;">
+
+    <div class="section-header">
+        <h1 class="section-title">Book Al-Muneer Hall</h1>
+        <p class="section-subtitle">Submit a new inquiry or look up an existing booking</p>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div th:if="${selectedDate != null or selectedTier != null}" class="inquiry-context-banner">
+        <div class="inquiry-context-banner-body">
+            <p th:if="${selectedDate != null}">
+                <strong>Date:</strong>
+                <span th:text="${#temporals.format(selectedDate, 'EEEE, d MMMM yyyy')}">Date</span>
+            </p>
+            <p th:if="${selectedTier != null}">
+                <strong>Package:</strong>
+                <span th:text="${selectedTier.tierName}">Package</span>
+            </p>
+        </div>
+        <a href="/#availability" class="btn btn-outline btn-sm">← Change on calendar</a>
+    </div>
+
+    <!-- ── Two-panel layout ─────────────────────────────── -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+
+        <!-- LEFT: New inquiry form -->
+        <div class="card" style="padding: 2rem;" id="new-inquiry-panel">
+            <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; display:flex; align-items:center; gap:0.5rem;">
+                <span>📝</span> New Booking Inquiry
+            </h2>
+
+            <form method="post" action="/inquiry/submit" id="inquiry-submit-form">
+                <div class="form-group">
+                    <label class="form-label" for="inq-name">Full Name *</label>
+                    <input type="text" id="inq-name" name="visitorName" class="form-input"
+                           placeholder="Your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="inq-wa">WhatsApp Number *</label>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <span style="background:var(--color-surface-2); border:1px solid var(--color-border);
+                                     border-radius:6px; padding:0.6rem 0.75rem; font-weight:600;
+                                     white-space:nowrap; color:var(--color-text-muted);" th:text="${countryCode}">+967</span>
+                        <input type="tel" id="inq-wa" name="visitorWhatsApp" class="form-input"
+                               placeholder="772629404" maxlength="9" pattern="[0-9]{9}"
+                               title="Enter 9 digits" required style="flex:1;">
+                    </div>
+                    <small class="text-muted">9-digit local number, e.g. 772629404</small>
+                </div>
+
+                <div class="form-group" th:classappend="${selectedDate != null} ? 'form-group-highlight'">
+                    <label class="form-label" for="inq-date">Event Date *</label>
+                    <input type="date" id="inq-date" name="eventDate" class="form-input"
+                           th:value="${selectedDate}" required
+                           th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                    <small th:if="${selectedDate != null}" class="text-muted">
+                        Pre-filled from the availability calendar — you can still change it if needed.
+                    </small>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="inq-type">Event Type</label>
+                        <select id="inq-type" name="eventType" class="form-input">
+                            <option value="">— Select —</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Engagement">Engagement</option>
+                            <option value="Corporate">Corporate Event</option>
+                            <option value="Birthday">Birthday Party</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inq-guests">Guests</label>
+                        <input type="number" id="inq-guests" name="numGuests" class="form-input"
+                               placeholder="e.g. 200" min="1" max="1000">
+                    </div>
+                </div>
+
+                <div class="form-group" th:classappend="${selectedTier != null} ? 'form-group-highlight'">
+                    <label class="form-label" for="inq-package">Pricing Package</label>
+                    <select id="inq-package" name="pricingId" class="form-input">
+                        <option value="">— No preference —</option>
+                        <option th:each="tier : ${tiers}"
+                                th:value="${tier.pricingId}"
+                                th:selected="${selectedPricingId != null and selectedPricingId == tier.pricingId}"
+                                th:text="${tier.tierName} + ' — ' + ${#numbers.formatDecimal(tier.basePrice,0,0)} + ' YER'">
+                        </option>
+                    </select>
+                    <small th:if="${selectedTier != null}" class="text-muted">
+                        Pre-selected from pricing — change if you prefer another package.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="inq-msg">Special Requests</label>
+                    <textarea id="inq-msg" name="message" class="form-textarea" rows="2"
+                              placeholder="Any special requirements..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submit-inquiry-btn" style="width: 100%;">
+                    Submit Inquiry →
+                </button>
+            </form>
+        </div>
+
+        <!-- RIGHT: Look up existing inquiry -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- If cookie is present, show the existing inquiry card -->
+            <div th:if="${existingInquiry != null}"
+                 style="border: 2px solid var(--color-primary); border-radius: 12px; padding: 1.5rem; background: var(--color-surface);"
+                 id="existing-inquiry-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+                    <div>
+                        <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em;
+                                  color:var(--color-primary); font-weight:600; margin:0 0 0.25rem;">
+                            Your Saved Inquiry
+                        </p>
+                        <h3 style="margin:0; font-size:1.4rem; color:var(--color-primary);"
+                            th:text="${existingInquiry.referenceCode}">000000000</h3>
+                    </div>
+                    <span class="badge"
+                          th:classappend="${existingInquiry.status.name() == 'NEW' or existingInquiry.status.name() == 'VIEWED'} ? 'badge-new' :
+                                          (${existingInquiry.status.name() == 'CONFIRMED'} ? 'badge-active' : '')"
+                          th:text="${existingInquiry.status}">Status</span>
+                </div>
+                <div style="display:grid; gap:0.5rem; font-size:0.875rem; margin-bottom:1rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Date</span>
+                        <strong th:text="${existingInquiry.slot?.slotDate}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Submitted</span>
+                        <strong th:text="${#temporals.format(existingInquiry.submissionDate,'dd MMM yyyy')}"></strong>
+                    </div>
+                </div>
+                <div style="display:grid; gap:0.5rem;">
+                    <a th:href="@{'/inquiry/confirmation/' + ${existingInquiry.referenceCode}}"
+                       class="btn btn-primary btn-sm" style="text-align:center;">
+                        View Inquiry Details
+                    </a>
+                    <a th:href="@{'/payment/upload?referenceCode=' + ${existingInquiry.referenceCode}}"
+                       class="btn btn-outline btn-sm" style="text-align:center;">
+                        💳 Upload Payment Proof
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lookup form card -->
+            <div class="card" style="padding: 2rem;" id="lookup">
+                <h2 style="font-size: 1.2rem; margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                    <span>🔍</span> Look Up Existing Inquiry
+                </h2>
+                <p class="text-muted" style="font-size:0.875rem; margin-bottom:1.25rem;">
+                    Enter the 9-digit reference code from your confirmation.
+                </p>
+                <form method="post" action="/inquiry/lookup" id="lookup-form">
+                    <div class="form-group">
+                        <label class="form-label" for="lookup-ref">Reference Code *</label>
+                        <input type="number" id="lookup-ref" name="referenceCode" class="form-input"
+                               placeholder="e.g. 472918305" min="100000000" max="999999999" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline" id="lookup-btn" style="width:100%;">
+                        Find My Inquiry →
+                    </button>
+                </form>
+            </div>
+
+            <!-- Info box -->
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="font-size:0.95rem; margin-bottom:0.75rem;">ℹ️ Booking Process</h3>
+                <ol style="padding-left: 1.25rem; color: var(--color-text-muted); font-size: 0.875rem; line-height: 2;">
+                    <li>Submit your inquiry below</li>
+                    <li>We review &amp; contact you via WhatsApp</li>
+                    <li>Upload your payment proof</li>
+                    <li>We confirm your booking! 🎉</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+</main>
+
+<style>
+    .inquiry-context-banner {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        background: rgba(201, 168, 76, 0.1);
+        border: 1px solid rgba(201, 168, 76, 0.35);
+        border-radius: 12px;
+    }
+    .inquiry-context-banner-body {
+        flex: 1;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    .inquiry-context-banner-body p { margin: 0.25rem 0; }
+    .form-group-highlight .form-input {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+    }
+</style>
+</body>
+</html>

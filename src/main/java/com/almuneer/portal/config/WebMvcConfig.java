@@ -1,7 +1,9 @@
 package com.almuneer.portal.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -9,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Value("${app.upload.gallery-dir}")
@@ -16,6 +19,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Value("${app.upload.proofs-dir}")
     private String proofsDir;
+
+    private final PageVisitInterceptor pageVisitInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(pageVisitInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/admin/**", "/css/**", "/js/**", "/images/**", "/uploads/**");
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -42,3 +54,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
         return "file:" + path.toAbsolutePath().toString() + "/";
     }
 }
+

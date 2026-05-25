@@ -37,7 +37,8 @@ public class WebSecurityConfig {
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
                 // Admin login page
                 .requestMatchers("/admin/login").permitAll()
-                // All admin pages require authentication
+                // Admin root + all sub-pages require authentication
+                .requestMatchers("/admin", "/admin/").authenticated()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // Everything else
                 .anyRequest().permitAll()

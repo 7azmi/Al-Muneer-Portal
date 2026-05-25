@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Gallery Labels', 'gallery-labels', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+
+    <div class="admin-page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <h1 class="admin-page-title">Gallery Labels</h1>
+        <div style="display:flex; gap:0.5rem;">
+            <a href="/admin/gallery" class="btn btn-outline btn-sm">← Gallery Media</a>
+            <a href="/#gallery" target="_blank" class="btn btn-outline btn-sm">View on Site</a>
+        </div>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="labels-admin-grid">
+
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">Add New Label</h3>
+            <p class="text-muted" style="font-size:0.875rem; margin-bottom:1rem;">
+                Labels appear as filter tabs on the public gallery (e.g. Exterior, Hall Setup).
+            </p>
+            <form method="post" th:action="@{/admin/gallery/labels/create}" id="create-label-form">
+                <div class="form-group">
+                    <label class="form-label" for="new-name">Label Name *</label>
+                    <input type="text" id="new-name" name="name" class="form-input"
+                           placeholder="e.g. Hall Setup" required maxlength="60">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-icon">Icon (emoji, optional)</label>
+                    <input type="text" id="new-icon" name="icon" class="form-input"
+                           placeholder="e.g. 🏛️" maxlength="8">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="new-sort">Sort Order</label>
+                    <input type="number" id="new-sort" name="sortOrder" class="form-input"
+                           value="0" min="0" max="999">
+                    <small class="text-muted">Lower numbers appear first in filters</small>
+                </div>
+                <button type="submit" class="btn btn-primary" id="create-label-btn" style="width:100%;">
+                    Create Label
+                </button>
+            </form>
+        </div>
+
+        <div class="admin-panel" style="padding:0; overflow:hidden;">
+            <div style="padding:1rem 1.5rem; border-bottom:1px solid var(--color-border);">
+                <h3 class="admin-panel-title" style="margin:0;">
+                    Existing Labels (<span th:text="${labels.size()}">0</span>)
+                </h3>
+            </div>
+
+            <div th:if="${labels.isEmpty()}" class="empty-state" style="padding:2rem;">
+                <div class="empty-state-icon">🏷️</div>
+                <p class="empty-state-text">No labels yet. Create your first label.</p>
+            </div>
+
+            <div th:each="label : ${labels}" class="label-row" th:id="'label-' + ${label.labelId}">
+                <form th:action="@{'/admin/gallery/labels/' + ${label.labelId} + '/update'}"
+                      method="post" class="label-update-form">
+                    <div class="label-fields">
+                        <input type="text" name="name" class="form-input form-input-sm"
+                               th:value="${label.name}" required maxlength="60"
+                               th:attr="aria-label=${'Name for ' + label.name}">
+                        <input type="text" name="icon" class="form-input form-input-sm"
+                               th:value="${label.icon}" maxlength="8" placeholder="🏷️"
+                               aria-label="Icon">
+                        <input type="number" name="sortOrder" class="form-input form-input-sm"
+                               th:value="${label.sortOrder}" min="0" max="999"
+                               aria-label="Sort order">
+                    </div>
+                    <button type="submit" class="btn btn-outline btn-sm">Save</button>
+                </form>
+                <form th:action="@{'/admin/gallery/labels/' + ${label.labelId} + '/delete'}"
+                      method="post" class="label-delete-form label-delete-form-js"
+                      th:attr="data-label-name=${label.name}">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.label-delete-form-js').forEach((form) => {
+            form.addEventListener('submit', (e) => {
+                const name = form.dataset.labelName || 'this label';
+                const msg = 'Delete “' + name + '”? Media items keep their category text but will no longer match a filter.';
+                if (!confirm(msg)) e.preventDefault();
+            });
+        });
+    </script>
+</div>
+
+<style>
+    .labels-admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+    @media (max-width: 900px) {
+        .labels-admin-grid { grid-template-columns: 1fr; }
+    }
+    .form-input-sm { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+    .label-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid var(--color-border);
+        flex-wrap: wrap;
+    }
+    .label-update-form {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 200px;
+    }
+    .label-fields {
+        display: grid;
+        grid-template-columns: 2fr 0.7fr 0.6fr;
+        gap: 0.5rem;
+        flex: 1;
+    }
+    @media (max-width: 600px) {
+        .label-fields { grid-template-columns: 1fr; }
+        .label-update-form { flex-direction: column; align-items: stretch; }
+    }
+</style>
+</body>
+</html>

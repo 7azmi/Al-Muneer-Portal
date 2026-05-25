@@ -7,82 +7,267 @@
 </head>
 <body>
 <main layout:fragment="content">
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span>✦</span> Premier Events Venue in Ibb, Yemen
+
+<section class="hero" id="hero">
+    <div class="hero-content">
+        <div class="hero-badge"><span>✦</span> Premier Events Venue in Ibb, Yemen</div>
+        <h1 class="hero-title">
+            Create <span class="highlight">Unforgettable</span> Moments
+        </h1>
+        <p class="hero-description">
+            Al-Muneer Hall offers an elegant space for weddings, engagements, and special events.
+            Scroll down to explore the venue, gallery, availability, and pricing — then book your date.
+        </p>
+        <div class="hero-actions">
+            <a href="#availability" class="btn btn-primary" id="hero-cta-book">Book a Date</a>
+            <a href="#gallery" class="btn btn-outline" id="hero-cta-gallery">View Gallery</a>
+        </div>
+        <div class="scroll-hint" aria-hidden="true">
+            <span class="scroll-arrow">↓</span>
+            <span class="scroll-hint-text">Scroll to explore</span>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="features">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose Al-Muneer?</h2>
+            <p class="section-subtitle">Everything you need for a perfect celebration, all in one place.</p>
+        </div>
+        <div class="features-grid">
+            <div class="card">
+                <div class="card-icon">🏛️</div>
+                <h3 class="card-title">Elegant Venue</h3>
+                <p class="card-text">A beautifully designed hall with modern interiors and versatile layouts to suit any event style.</p>
             </div>
-            <h1 class="hero-title">
-                Create <span class="highlight">Unforgettable</span> Moments
-            </h1>
-            <p class="hero-description">
-                Al-Muneer Hall offers an elegant space for weddings, engagements, and special events.
-                Explore our venue, check availability, and book your dream celebration.
+            <div class="card">
+                <div class="card-icon">📅</div>
+                <h3 class="card-title">Easy Booking</h3>
+                <p class="card-text">Check real-time availability, submit your inquiry, and confirm your booking — all online.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">💎</div>
+                <h3 class="card-title">Premium Service</h3>
+                <p class="card-text">Dedicated support from inquiry to event day. We ensure every detail is handled with care.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section section-venue" id="venue" th:if="${venue != null}">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">Our Venue</h2>
+            <p class="section-subtitle" th:text="${venue.description}">Al-Muneer Hall — where memories are made.</p>
+        </div>
+
+        <div class="venue-layout">
+            <div class="venue-layout-details">
+                <div class="venue-info-row">
+                    <div class="venue-detail-card">
+                        <div class="venue-detail-icon">👥</div>
+                        <div class="venue-detail-label">Capacity</div>
+                        <div class="venue-detail-value" th:text="${venue.capacity != null ? venue.capacity + ' Guests' : 'Contact us'}">500 Guests</div>
+                    </div>
+                    <div class="venue-detail-card">
+                        <div class="venue-detail-icon">📞</div>
+                        <div class="venue-detail-label">Contact</div>
+                        <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Phone</div>
+                    </div>
+                    <div class="venue-detail-card" th:if="${venue.location != null and !venue.location.isBlank()}">
+                        <div class="venue-detail-icon">📍</div>
+                        <div class="venue-detail-label">Location</div>
+                        <div class="venue-detail-value" th:text="${venue.location}">Ibb, Yemen</div>
+                    </div>
+                </div>
+
+                <div class="venue-services-card" th:if="${venue.services != null and !venue.services.isBlank()}">
+                    <h3 class="venue-services-title">Services We Offer</h3>
+                    <p class="venue-services-text" th:text="${venue.services}">Services</p>
+                </div>
+            </div>
+
+            <div class="venue-layout-map">
+                <div class="map-embed-wrap">
+                    <iframe class="map-embed"
+                            th:src="${mapsEmbedUrl}"
+                            loading="lazy"
+                            allowfullscreen=""
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Al-Muneer Hall on Google Maps">
+                    </iframe>
+                </div>
+                <a th:href="${mapsShareUrl}" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-outline venue-maps-btn" id="open-maps-btn">
+                    📍 Open in Google Maps
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="gallery" th:if="${mediaItems != null and !mediaItems.isEmpty()}">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">Gallery</h2>
+            <p class="section-subtitle">Photos and videos from Al-Muneer Hall — tap any item to view full size</p>
+        </div>
+
+        <div class="gallery-filters" id="gallery-filters" data-gallery-filters data-gallery-grid="visitor-gallery">
+            <button type="button" class="filter-btn active" data-filter="all">All</button>
+            <button type="button" th:each="lbl : ${galleryLabels}"
+                    class="filter-btn"
+                    th:data-filter="${lbl.name}"
+                    th:text="${lbl.icon != null and !lbl.icon.isBlank() ? lbl.icon + ' ' : ''} + ${lbl.name}">
+            </button>
+        </div>
+
+        <div class="masonry-packed" id="visitor-gallery" data-masonry data-masonry-gap="14" data-masonry-min-col="260">
+            <div th:each="item,iterStat : ${mediaItems}"
+                 class="masonry-item"
+                 th:data-index="${iterStat.index}"
+                 th:data-type="${item.mediaType}"
+                 th:data-category="${item.category != null ? item.category : ''}"
+                 th:data-src="${item.mediaType.name() == 'IMAGE' ? '/uploads/gallery/' + item.fileName : ''}"
+                 th:data-url="${item.youtubeUrl}"
+                 th:data-caption="${item.caption}">
+
+                <div th:if="${item.mediaType.name() == 'IMAGE'}" class="masonry-media">
+                    <img th:src="@{'/uploads/gallery/' + ${item.fileName}}"
+                         th:alt="${item.caption ?: 'Gallery image'}"
+                         loading="lazy">
+                </div>
+                <div th:if="${item.mediaType.name() == 'YOUTUBE'}" class="masonry-media youtube-thumb">
+                    <img th:src="'https://img.youtube.com/vi/' + ${item.youtubeVideoId} + '/hqdefault.jpg'"
+                         alt="Video thumbnail" loading="lazy">
+                    <span class="play-icon">▶</span>
+                </div>
+
+                <span th:if="${item.category != null and !item.category.isBlank()}"
+                      class="masonry-label" th:text="${item.category}"></span>
+                <div class="caption-overlay" th:if="${item.caption != null}" th:text="${item.caption}"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="gallery" th:if="${mediaItems == null or mediaItems.isEmpty()}">
+    <div class="section-container empty-state">
+        <div class="empty-state-icon">🖼️</div>
+        <p class="empty-state-text">Gallery coming soon — check back for photos of our hall and events.</p>
+    </div>
+</section>
+
+<section class="section section-calendar" id="availability">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">Book Your Date</h2>
+            <p class="section-subtitle">Tap an available day on the calendar, then submit your inquiry</p>
+        </div>
+
+        <div class="calendar-wrapper" id="visitor-calendar-wrap">
+            <div id="visitor-calendar"></div>
+        </div>
+
+        <div class="calendar-action-panel" id="calendar-selection-panel" aria-hidden="false">
+            <p class="calendar-idle-message" id="calendar-idle-message">
+                Select an available date above to continue.
             </p>
-            <div class="hero-actions">
-                <a href="/calendar" class="btn btn-primary" id="hero-cta-calendar">Check Availability</a>
-                <a href="/gallery" class="btn btn-outline" id="hero-cta-gallery">View Gallery</a>
+            <div class="calendar-selected-block" id="calendar-selected-block" hidden>
+                <div class="calendar-selected-info">
+                    <span class="calendar-selection-label">Your date</span>
+                    <p class="calendar-selection-date" id="calendar-selected-display">—</p>
+                    <button type="button" class="text-link-btn" id="calendar-clear-date">Choose a different date</button>
+                </div>
+                <a href="/inquiry" class="btn btn-primary btn-lg js-inquiry-link" id="booking-submit-btn">
+                    Submit inquiry →
+                </a>
             </div>
         </div>
-    </section>
 
-    <!-- Features Section -->
-    <section class="section" id="features">
-        <div class="section-container">
-            <div class="section-header">
-                <h2 class="section-title">Why Choose Al-Muneer?</h2>
-                <p class="section-subtitle">Everything you need for a perfect celebration, all in one place.</p>
-            </div>
-            <div class="features-grid">
-                <div class="card">
-                    <div class="card-icon">🏛️</div>
-                    <h3 class="card-title">Elegant Venue</h3>
-                    <p class="card-text">A beautifully designed hall with modern interiors and versatile layouts to suit any event style.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">📅</div>
-                    <h3 class="card-title">Easy Booking</h3>
-                    <p class="card-text">Check real-time availability, submit your inquiry, and confirm your booking — all online.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon">💎</div>
-                    <h3 class="card-title">Premium Service</h3>
-                    <p class="card-text">Dedicated support from inquiry to event day. We ensure every detail is handled with care.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        <p class="calendar-footer-note">
+            Already have a reference code?
+            <a href="/inquiry#lookup">Look up your inquiry</a>
+        </p>
+    </div>
+</section>
 
-    <!-- Venue Snapshot -->
-    <section class="section" id="venue-snapshot" th:if="${venue != null}">
-        <div class="section-container">
-            <div class="section-header">
-                <h2 class="section-title">Our Venue</h2>
-                <p class="section-subtitle" th:text="${venue.description}">Venue description</p>
-            </div>
-            <div class="venue-details">
-                <div class="venue-detail-card">
-                    <div class="venue-detail-icon">📍</div>
-                    <div class="venue-detail-label">Location</div>
-                    <div class="venue-detail-value" th:text="${venue.location ?: 'Ibb, Yemen'}">Ibb, Yemen</div>
+<section class="section" id="pricing" th:if="${tiers != null and !tiers.isEmpty()}">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">Pricing Packages</h2>
+            <p class="section-subtitle">Choose a package — your selection is applied on the inquiry form</p>
+        </div>
+        <div class="pricing-grid">
+            <div th:each="tier : ${tiers}" class="pricing-card">
+                <div class="pricing-name" th:text="${tier.tierName}">Package</div>
+                <div class="pricing-price">
+                    <span th:text="${#numbers.formatDecimal(tier.basePrice,0,0)}">0</span>
+                    <span class="currency">YER</span>
                 </div>
-                <div class="venue-detail-card">
-                    <div class="venue-detail-icon">👥</div>
-                    <div class="venue-detail-label">Capacity</div>
-                    <div class="venue-detail-value" th:text="${venue.capacity != null ? venue.capacity + ' Guests' : 'Contact us'}">500 Guests</div>
-                </div>
-                <div class="venue-detail-card">
-                    <div class="venue-detail-icon">📞</div>
-                    <div class="venue-detail-label">Contact</div>
-                    <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Phone</div>
-                </div>
-            </div>
-            <div class="text-center mt-8">
-                <a href="/venue" class="btn btn-outline">Learn More About Our Venue →</a>
+                <div class="pricing-description" th:text="${tier.description}">Details</div>
+                <a th:href="@{/inquiry(pricingId=${tier.pricingId})}"
+                   class="btn btn-primary js-inquiry-link"
+                   th:data-pricing-id="${tier.pricingId}"
+                   th:text="|Book ${tier.tierName}|">
+                    Book package
+                </a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<section class="section" id="feedback-cta">
+    <div class="section-container book-cta">
+        <div class="section-header">
+            <h2 class="section-title">Share Your Experience</h2>
+            <p class="section-subtitle">Had your event at Al-Muneer? We'd love to hear how it went.</p>
+        </div>
+        <a href="/feedback" class="btn btn-outline" id="go-feedback-btn">⭐ Leave Feedback</a>
+    </div>
+</section>
+
+<!-- Lightbox (shared by gallery section) -->
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" aria-label="Close" id="lightbox-close">&times;</button>
+    <div class="lightbox-main">
+        <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous">&lsaquo;</button>
+        <div class="lightbox-content-wrapper">
+            <div class="lightbox-content" id="lightbox-content"></div>
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+        <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next">&rsaquo;</button>
+    </div>
+    <div class="lightbox-thumbnails-container">
+        <div class="lightbox-thumbnails" id="lightbox-thumbnails"></div>
+    </div>
+</div>
+
 </main>
+
+<th:block layout:fragment="scripts">
+<script th:src="@{/js/masonry-layout.js}"></script>
+<script th:src="@{/js/gallery.js}"></script>
+<script th:src="@{/js/visitor-calendar.js}"></script>
+<script th:src="@{/js/booking-flow.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const preselect = params.get('date');
+        initVisitorCalendar('visitor-calendar', [[${currentYear}]], [[${currentMonth}]], preselect);
+
+        document.getElementById('calendar-clear-date')?.addEventListener('click', () => {
+            clearSelectedEventDate();
+        });
+
+        const hash = window.location.hash;
+        if (hash && hash.length > 1) {
+            const el = document.querySelector(hash);
+            if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+    });
+</script>
+</th:block>
 </body>
 </html>

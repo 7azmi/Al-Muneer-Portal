@@ -3,8 +3,9 @@
       th:replace="~{admin/admin-layout :: admin-layout('Gallery', 'gallery', ~{::adminContent})}">
 <body>
 <div th:fragment="adminContent">
-    <div class="admin-page-header">
+    <div class="admin-page-header" style="display:flex; justify-content:space-between; align-items:center;">
         <h1 class="admin-page-title">Manage Gallery</h1>
+        <a href="/admin/gallery/labels" class="btn btn-primary btn-sm" id="manage-labels-btn">🏷️ Manage Labels</a>
     </div>
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}">Success</div>
@@ -26,11 +27,13 @@
                 <div class="form-group">
                     <label class="form-label" for="img-category">Category</label>
                     <select id="img-category" name="category" class="form-select">
-                        <option value="Weddings">Weddings</option>
-                        <option value="Hall Setup">Hall Setup</option>
-                        <option value="Decorations">Decorations</option>
-                        <option value="Exterior">Exterior</option>
+                        <option value="">— No category —</option>
+                        <option th:each="lbl : ${galleryLabels}"
+                                th:value="${lbl.name}"
+                                th:text="${lbl.icon != null and !lbl.icon.isBlank() ? lbl.icon + ' ' : ''} + ${lbl.name}">
+                        </option>
                     </select>
+                    <small class="text-muted">Manage labels at <a href="/admin/gallery/labels">Gallery Labels</a></small>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary" id="upload-image-btn">Upload Image</button>
@@ -54,10 +57,11 @@
                 <div class="form-group">
                     <label class="form-label" for="vid-category">Category</label>
                     <select id="vid-category" name="category" class="form-select">
-                        <option value="Weddings">Weddings</option>
-                        <option value="Hall Setup">Hall Setup</option>
-                        <option value="Decorations">Decorations</option>
-                        <option value="Exterior">Exterior</option>
+                        <option value="">— No category —</option>
+                        <option th:each="lbl : ${galleryLabels}"
+                                th:value="${lbl.name}"
+                                th:text="${lbl.icon != null and !lbl.icon.isBlank() ? lbl.icon + ' ' : ''} + ${lbl.name}">
+                        </option>
                     </select>
                 </div>
             </div>

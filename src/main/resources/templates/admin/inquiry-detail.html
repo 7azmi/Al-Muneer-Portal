@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Inquiry Detail', 'inquiries', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Inquiry #<span th:text="${inquiry.inquiryId}"></span></h1>
+        <a href="/admin/inquiries" class="btn btn-outline btn-sm">← Back to Inquiries</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <!-- Embed visitor context for JS -->
+    <script th:inline="javascript">
+        const WA_NUMBER = /*[[${visitorWa}]]*/ '';
+        const VISITOR_NAME = /*[[${visitorName}]]*/ '';
+        const INQUIRY_ID = /*[[${inquiryId}]]*/ '';
+        const EVENT_DATE = /*[[${eventDate}]]*/ '';
+        const INQUIRY_STATUS = /*[[${inquiryStatus}]]*/ '';
+    </script>
+
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
+        <!-- Main Details -->
+        <div>
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Visitor Details</h3>
+                <div style="display: grid; gap: 0.75rem;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Name</span>
+                        <strong th:text="${inquiry.visitorName}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">WhatsApp</span>
+                        <strong th:text="${inquiry.visitorWhatsApp}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Date</span>
+                        <strong th:text="${inquiry.slot?.slotDate}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Event Type</span>
+                        <strong th:text="${inquiry.eventType ?: '—'}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Guests</span>
+                        <strong th:text="${inquiry.numGuests ?: '—'}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Package</span>
+                        <strong th:text="${inquiry.pricingTier?.tierName ?: 'None selected'}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Submitted</span>
+                        <strong th:text="${#temporals.format(inquiry.submissionDate, 'dd MMM yyyy HH:mm')}"></strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="text-muted">Status</span>
+                        <span class="badge badge-active" th:text="${inquiry.status}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-panel" th:if="${inquiry.message}">
+                <h3 class="admin-panel-title">Visitor Message</h3>
+                <p class="text-muted" th:text="${inquiry.message}"></p>
+            </div>
+
+            <div class="admin-panel" th:if="${inquiry.adminNotes}">
+                <h3 class="admin-panel-title">Admin Notes</h3>
+                <p class="text-muted" th:text="${inquiry.adminNotes}"></p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div>
+            <!-- WhatsApp Notify with template chooser -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">📱 Notify Visitor via WhatsApp</h3>
+                <div class="form-group">
+                    <label class="form-label" for="wa-template-select">Choose Message Template</label>
+                    <select id="wa-template-select" class="form-input" onchange="buildWaLink()">
+                        <option value="">-- Select a template --</option>
+                        <option th:each="tmpl : ${templates}"
+                                th:value="${tmpl.templateText}"
+                                th:text="${tmpl.label}">Template</option>
+                    </select>
+                </div>
+                <div id="wa-preview"
+                     style="display:none; margin-bottom:0.75rem; background:var(--color-surface-2);
+                            border-radius:8px; padding:0.75rem; font-size:0.8rem;
+                            color:var(--color-text-muted); white-space:pre-wrap; line-height:1.5;"></div>
+                <a id="wa-send-btn" href="#" target="_blank"
+                   style="display:none; width:100%; text-align:center; background:#25d366;
+                          border-color:#25d366; margin-bottom:0.5rem;"
+                   class="btn btn-primary">
+                    💬 Open WhatsApp Chat
+                </a>
+                <p id="wa-hint" class="text-muted" style="font-size:0.8rem; margin-top:0.25rem;">
+                    Select a template above to generate the WhatsApp deep-link.
+                </p>
+            </div>
+
+            <!-- Update Status -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Update Status</h3>
+                <form method="post" th:action="@{'/admin/inquiries/' + ${inquiry.inquiryId} + '/update-status'}">
+                    <div class="form-group">
+                        <label class="form-label" for="inq-status">New Status</label>
+                        <select id="inq-status" name="status" class="form-input">
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                                    th:selected="${s == inquiry.status}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inq-notes">Admin Notes</label>
+                        <textarea id="inq-notes" name="adminNotes" class="form-textarea" rows="3"
+                                  th:text="${inquiry.adminNotes}"
+                                  placeholder="Internal notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Payment Proofs Link -->
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">💳 Payment Proofs</h3>
+                <a th:href="@{/admin/payments(inquiryId=${inquiry.inquiryId})}"
+                   class="btn btn-outline" style="display:block; text-align:center;">
+                    View Payment Proofs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function resolvePlaceholders(text) {
+            return text
+                .replace(/\{visitorName\}/g, VISITOR_NAME)
+                .replace(/\{inquiryId\}/g, INQUIRY_ID)
+                .replace(/\{eventDate\}/g, EVENT_DATE)
+                .replace(/\{status\}/g, INQUIRY_STATUS);
+        }
+
+        function buildWaLink() {
+            const sel = document.getElementById('wa-template-select');
+            const raw = sel.value;
+            const preview = document.getElementById('wa-preview');
+            const btn = document.getElementById('wa-send-btn');
+            const hint = document.getElementById('wa-hint');
+
+            if (!raw) {
+                preview.style.display = 'none';
+                btn.style.display = 'none';
+                hint.style.display = 'block';
+                return;
+            }
+
+            const resolved = resolvePlaceholders(raw);
+            preview.textContent = resolved;
+            preview.style.display = 'block';
+            hint.style.display = 'none';
+
+            const encoded = encodeURIComponent(resolved);
+            btn.href = `https://wa.me/${WA_NUMBER}?text=${encoded}`;
+            btn.style.display = 'block';
+        }
+    </script>
+</div>
+</body>
+</html>

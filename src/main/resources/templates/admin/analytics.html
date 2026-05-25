@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Analytics', 'analytics', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Traffic Analytics</h1>
+    </div>
+
+    <div class="admin-stats">
+        <div class="stat-card">
+            <div class="stat-label">Total Page Visits (All Time)</div>
+            <div class="stat-value" th:text="${totalHits}">0</div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+        <!-- Page breakdown -->
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">Visits Per Page (All Time)</h3>
+            <table class="admin-table" th:if="${!pageHits.isEmpty()}">
+                <thead><tr><th>Page</th><th>Visits</th></tr></thead>
+                <tbody>
+                    <tr th:each="entry : ${pageHits}">
+                        <td th:text="${entry.key}">Page</td>
+                        <td th:text="${entry.value}">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${pageHits.isEmpty()}" class="empty-state">
+                <p class="empty-state-text">No visits recorded yet.</p>
+            </div>
+        </div>
+
+        <!-- Daily breakdown (last 30 days) -->
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">Daily Visits (Last 30 Days)</h3>
+            <table class="admin-table" th:if="${!dailyHits.isEmpty()}">
+                <thead><tr><th>Date</th><th>Visits</th></tr></thead>
+                <tbody>
+                    <tr th:each="entry : ${dailyHits}">
+                        <td th:text="${entry.key}">Date</td>
+                        <td th:text="${entry.value}">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${dailyHits.isEmpty()}" class="empty-state">
+                <p class="empty-state-text">No data for the last 30 days.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

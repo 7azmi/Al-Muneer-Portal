@@ -12,10 +12,9 @@
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar" id="main-nav">
         <div class="nav-container">
-            <a href="/" class="nav-logo" id="nav-logo">
+            <a href="/#hero" class="nav-logo" id="nav-logo">
                 <span class="logo-icon">✦</span>
                 <span class="logo-text">Al-Muneer</span>
             </a>
@@ -23,20 +22,19 @@
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="nav-links">
-                <li><a href="/" id="nav-home">Home</a></li>
-                <li><a href="/venue" id="nav-venue">Venue</a></li>
-                <li><a href="/gallery" id="nav-gallery">Gallery</a></li>
-                <li><a href="/calendar" id="nav-calendar">Availability</a></li>
-                <li><a href="/pricing" id="nav-pricing">Pricing</a></li>
+                <li><a href="/#hero" data-section="hero">Home</a></li>
+                <li><a href="/#venue" data-section="venue">Venue</a></li>
+                <li><a href="/#gallery" data-section="gallery">Gallery</a></li>
+                <li><a href="/#availability" data-section="availability" class="nav-cta">Book</a></li>
+                <li><a href="/#pricing" data-section="pricing">Pricing</a></li>
+                <li><a href="/#feedback-cta" data-section="feedback-cta">Feedback</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Page Content -->
     <main class="main-content" layout:fragment="content">
     </main>
 
-    <!-- Footer -->
     <footer class="footer" id="site-footer">
         <div class="footer-container">
             <div class="footer-brand">
@@ -45,10 +43,11 @@
             </div>
             <p class="footer-tagline">Ibb, Yemen — Weddings &amp; Events</p>
             <div class="footer-links">
-                <a href="/venue">Venue Info</a>
-                <a href="/gallery">Gallery</a>
-                <a href="/calendar">Availability</a>
-                <a href="/pricing">Pricing</a>
+                <a href="/#venue">Venue</a>
+                <a href="/#gallery">Gallery</a>
+                <a href="/#availability">Book</a>
+                <a href="/#pricing">Pricing</a>
+                <a href="/#feedback-cta">Feedback</a>
             </div>
             <p class="footer-copy">&copy; 2026 Al-Muneer Hall. All rights reserved.</p>
         </div>

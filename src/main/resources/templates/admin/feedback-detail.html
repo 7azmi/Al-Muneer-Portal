@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/admin-layout :: admin-layout('Feedback Detail', 'feedback', ~{::adminContent})}">
+<body>
+<div th:fragment="adminContent">
+    <div class="admin-page-header">
+        <h1 class="admin-page-title">Feedback #<span th:text="${feedback.feedbackId}"></span></h1>
+        <a href="/admin/feedback" class="btn btn-outline btn-sm">← Back to Feedback</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem;">
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">Message</h3>
+            <p class="feedback-full-text" th:text="${feedback.feedbackText}">Feedback text</p>
+        </div>
+
+        <div>
+            <div class="admin-panel">
+                <h3 class="admin-panel-title">Details</h3>
+                <div style="display: grid; gap: 0.75rem;">
+                    <div style="display:flex; justify-content:space-between; gap:1rem;">
+                        <span class="text-muted">Visitor</span>
+                        <strong th:text="${feedback.visitorName != null ? feedback.visitorName : 'Anonymous'}">—</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; gap:1rem;"
+                         th:if="${feedback.visitorWhatsApp != null}">
+                        <span class="text-muted">WhatsApp</span>
+                        <strong th:text="${feedback.visitorWhatsApp}">—</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; gap:1rem;">
+                        <span class="text-muted">Rating</span>
+                        <strong>
+                            <span th:each="i : ${#numbers.sequence(1, feedback.rating)}">⭐</span>
+                            (<span th:text="${feedback.rating}"></span>/5)
+                        </strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; gap:1rem;">
+                        <span class="text-muted">Submitted</span>
+                        <strong th:text="${#temporals.format(feedback.submissionDate, 'dd MMM yyyy HH:mm')}">—</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; gap:1rem;">
+                        <span class="text-muted">Status</span>
+                        <span th:if="${feedback.isReviewed}" class="badge badge-active">Reviewed</span>
+                        <span th:unless="${feedback.isReviewed}" class="badge badge-inactive">Unreviewed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-panel" th:if="${feedback.isReviewed}">
+                <p class="text-muted" style="margin:0; font-size:0.875rem;">✓ This feedback has been marked as reviewed.</p>
+            </div>
+
+            <div class="admin-panel" th:unless="${feedback.isReviewed}">
+                <form method="post" th:action="@{'/admin/feedback/' + ${feedback.feedbackId} + '/review'}">
+                    <input type="hidden" name="from" value="detail">
+                    <input type="hidden" name="adminNotes" value="">
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Mark reviewed</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .feedback-full-text {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.75;
+        font-size: 1rem;
+        color: var(--color-text);
+    }
+</style>
+</body>
+</html>

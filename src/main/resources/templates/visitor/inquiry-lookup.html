@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Find My Inquiry</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="inquiry-lookup-page">
+        <div class="section-container" style="max-width: 640px;">
+            <div class="section-header">
+                <h1 class="section-title">Find My Inquiry</h1>
+                <p class="section-subtitle">Enter your WhatsApp number to retrieve your past inquiries</p>
+            </div>
+
+            <!-- Recent from localStorage (client-side only) -->
+            <div id="local-history-section" class="card" style="padding:1.5rem; margin-bottom:1.5rem; display:none;">
+                <h3 style="font-size:1rem; margin-bottom:0.75rem;">📱 Recent Inquiries (This Device)</h3>
+                <div id="local-history-list"></div>
+            </div>
+
+            <!-- WhatsApp lookup form -->
+            <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                <form method="post" action="/inquiry/lookup" id="lookup-form">
+                    <div class="form-group">
+                        <label class="form-label" for="lookup-wa">Your WhatsApp Number *</label>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span style="background:var(--color-surface-2); border:1px solid var(--color-border); border-radius:6px;
+                                         padding:0.6rem 0.75rem; font-weight:600; white-space:nowrap; color:var(--color-text-muted);"
+                                  th:text="${countryCode}">+967</span>
+                            <input type="tel" id="lookup-wa" name="whatsAppNumber" class="form-input"
+                                   placeholder="772629404" maxlength="9" pattern="[0-9]{9}"
+                                   title="Enter 9 digits" required style="flex:1;">
+                        </div>
+                        <small class="text-muted">Enter the same number you used when submitting the inquiry</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="lookup-btn" style="width:100%;">
+                        🔍 Find My Inquiries
+                    </button>
+                </form>
+            </div>
+
+            <!-- Search results -->
+            <div th:if="${searched}">
+                <div th:if="${results.isEmpty()}" class="card" style="padding:1.5rem; text-align:center;">
+                    <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
+                    <p class="text-muted">No inquiries found for <strong th:text="${searchedNumber}"></strong>.</p>
+                    <p class="text-muted" style="font-size:0.875rem;">
+                        Make sure you're using the same number you submitted the inquiry with.
+                    </p>
+                </div>
+
+                <div th:unless="${results.isEmpty()}" class="admin-panel"
+                     style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="margin-bottom:1rem; font-size:1rem;">
+                        Found <span th:text="${results.size()}">0</span> inquiry/inquiries
+                        for <span th:text="${searchedNumber}" style="color:var(--color-primary);"></span>
+                    </h3>
+                    <div th:each="inq : ${results}"
+                         style="padding:1rem; border:1px solid var(--color-border); border-radius:8px; margin-bottom:0.75rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                            <strong style="font-size:1.1rem; color:var(--color-primary);"
+                                    th:text="'Inquiry #' + ${inq.inquiryId}">ID</strong>
+                            <span class="badge badge-active" th:text="${inq.status}">Status</span>
+                        </div>
+                        <div style="display:grid; gap:0.35rem; font-size:0.875rem; color:var(--color-text-muted);">
+                            <span th:text="'Event Date: ' + ${inq.slot?.slotDate}">Date</span>
+                            <span th:text="'Submitted: ' + ${#temporals.format(inq.submissionDate, 'dd MMM yyyy')}">Submitted</span>
+                        </div>
+                        <a th:href="@{'/payment/upload?inquiryId=' + ${inq.inquiryId}}"
+                           class="btn btn-outline btn-sm"
+                           style="margin-top:0.75rem; display:inline-block;">
+                            💳 Upload Payment Proof
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<th:block layout:fragment="scripts">
+<script>
+    // Show locally saved inquiry IDs from this browser
+    try {
+        const saved = JSON.parse(localStorage.getItem('almuneer_inquiries') || '[]');
+        if (saved.length > 0) {
+            const section = document.getElementById('local-history-section');
+            const list = document.getElementById('local-history-list');
+            section.style.display = 'block';
+            saved.forEach(id => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid var(--color-border);';
+                div.innerHTML = `<span style="font-weight:600;">Inquiry #${id}</span>
+                    <a href="/payment/upload?inquiryId=${id}" class="btn btn-outline btn-sm">Upload Proof</a>`;
+                list.appendChild(div);
+            });
+        }
+    } catch(e) {}
+</script>
+</th:block>
+</body>
+</html>

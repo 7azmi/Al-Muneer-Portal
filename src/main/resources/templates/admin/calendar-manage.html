@@ -52,11 +52,8 @@
             })
             .then(r => r.json())
             .then(() => {
-                // Refresh the calendar
-                const calMonthLabel = document.querySelector('#admin-calendar .calendar-header h2');
-                if (calMonthLabel) {
-                    // Re-trigger calendar load
-                    location.reload();
+                if (window.adminCalRefresh) {
+                    window.adminCalRefresh();
                 }
             })
             .catch(err => alert('Error: ' + err.message));

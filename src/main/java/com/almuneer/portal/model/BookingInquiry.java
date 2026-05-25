@@ -4,6 +4,7 @@ import com.almuneer.portal.model.enums.InquiryStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Table(name = "booking_inquiries")
@@ -13,6 +14,15 @@ public class BookingInquiry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inquiryId;
+
+    /**
+     * Visitor-facing 9-digit reference code (e.g. 472918305).
+     * Random, unique — used for lookup and cookie storage.
+     * Nullable only to allow Hibernate schema-update on existing tables;
+     * @PrePersist always populates this before insert.
+     */
+    @Column(unique = true)
+    private Long referenceCode;
 
     @Column(nullable = false)
     private String visitorName;
@@ -51,5 +61,10 @@ public class BookingInquiry {
         if (this.status == null) {
             this.status = InquiryStatus.NEW;
         }
+        if (this.referenceCode == null) {
+            // 9-digit random: 100_000_000 – 999_999_999
+            this.referenceCode = ThreadLocalRandom.current().nextLong(100_000_000L, 1_000_000_000L);
+        }
     }
 }
+

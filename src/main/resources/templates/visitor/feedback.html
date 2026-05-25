@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Leave Feedback</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section" id="feedback-page">
+        <div class="section-container" style="max-width: 640px;">
+            <div class="section-header">
+                <h1 class="section-title">Share Your Feedback</h1>
+                <p class="section-subtitle">We value your experience — help us improve</p>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div th:if="${success}" class="card feedback-thanks" style="padding: 2.5rem; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                <h2 style="font-size: 1.35rem; margin-bottom: 0.75rem;">Thank you!</h2>
+                <p class="text-muted" style="margin-bottom: 1.5rem;" th:text="${success}">
+                    Thank you for your feedback!
+                </p>
+                <a href="/" class="btn btn-primary">Back to home</a>
+                <a href="/feedback" class="btn btn-outline" style="margin-left: 0.5rem;">Submit another</a>
+            </div>
+
+            <div class="card" style="padding: 2rem;" th:unless="${success}">
+                <form method="post" action="/feedback/submit" id="feedback-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="fb-name">Full Name <span class="label-optional">(optional)</span></label>
+                            <input type="text" id="fb-name" name="visitorName" class="form-input"
+                                   placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="fb-wa">WhatsApp <span class="label-optional">(optional)</span></label>
+                            <div class="phone-input-row">
+                                <span class="phone-prefix" th:text="${countryCode}">+967</span>
+                                <input type="tel" id="fb-wa" name="visitorWhatsApp" class="form-input"
+                                       placeholder="772629404" maxlength="9" pattern="[0-9]{9}"
+                                       title="9 digits, optional">
+                            </div>
+                            <small class="text-muted">Leave blank to stay anonymous</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Overall Rating *</label>
+                        <div class="star-rating" id="star-rating">
+                            <label th:each="i : ${#numbers.sequence(1,5)}" class="star-label">
+                                <input type="radio" name="rating" th:value="${i}" style="display:none;"
+                                       th:checked="${i == 5}">
+                                <span class="star" th:data-value="${i}">⭐</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="fb-text">Your Feedback *</label>
+                        <textarea id="fb-text" name="feedbackText" class="form-textarea" rows="5"
+                                  placeholder="Tell us about your experience at Al-Muneer Hall..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submit-feedback-btn"
+                            style="width: 100%; margin-top: 0.5rem;">
+                        Submit Feedback →
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+<th:block layout:fragment="scripts">
+<style>
+    .label-optional { font-weight: 400; color: var(--color-text-muted); font-size: 0.8em; }
+    .phone-input-row { display: flex; align-items: stretch; gap: 0.5rem; }
+    .phone-prefix {
+        display: flex; align-items: center; padding: 0 0.75rem;
+        background: var(--color-surface-light); border: 1px solid var(--color-border);
+        border-radius: var(--radius-md); font-weight: 600; color: var(--color-text-muted);
+        white-space: nowrap;
+    }
+    .phone-input-row .form-input { flex: 1; }
+    .star-rating { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+    .star-label { cursor: pointer; font-size: 2rem; line-height: 1; }
+    @media (max-width: 560px) {
+        div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+    }
+</style>
+<script>
+    document.querySelectorAll('.star').forEach(star => {
+        star.addEventListener('mouseenter', () => {
+            const val = parseInt(star.dataset.value);
+            document.querySelectorAll('.star').forEach((s, i) => {
+                s.style.opacity = (i + 1) <= val ? '1' : '0.3';
+            });
+        });
+        star.addEventListener('click', () => {
+            star.closest('label').querySelector('input').checked = true;
+        });
+    });
+    document.getElementById('star-rating')?.addEventListener('mouseleave', () => {
+        document.querySelectorAll('.star').forEach(s => s.style.opacity = '1');
+    });
+</script>
+</th:block>
+</body>
+</html>
