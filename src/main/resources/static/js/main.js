@@ -338,5 +338,9 @@ function initCalendar(elementId, year, month, isAdmin = false) {
         loadSlots();
     };
 
+    if (isAdmin) {
+        window.adminCalRefresh = () => loadSlots();
+    }
+
     loadSlots();
 }

@@ -38,20 +38,26 @@ public class FeedbackController {
     /** UC012 — process feedback submission */
     @PostMapping("/submit")
     public String submit(
-            @RequestParam String visitorName,
-            @RequestParam String visitorWhatsApp,
+            @RequestParam(required = false) String visitorName,
+            @RequestParam(required = false) String visitorWhatsApp,
             @RequestParam String feedbackText,
             @RequestParam(defaultValue = "5") Integer rating,
             RedirectAttributes redirectAttributes) {
 
-        if (visitorName.isBlank() || visitorWhatsApp.isBlank() || feedbackText.isBlank()) {
-            redirectAttributes.addFlashAttribute("error", "All fields are required.");
+        if (feedbackText == null || feedbackText.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Please enter your feedback before submitting.");
             return "redirect:/feedback";
         }
 
+        String name = (visitorName != null && !visitorName.isBlank()) ? visitorName.trim() : null;
+        String wa = null;
+        if (visitorWhatsApp != null && !visitorWhatsApp.isBlank()) {
+            wa = normaliseWhatsApp(visitorWhatsApp.trim());
+        }
+
         Feedback feedback = Feedback.builder()
-                .visitorName(visitorName.trim())
-                .visitorWhatsApp(normaliseWhatsApp(visitorWhatsApp.trim()))
+                .visitorName(name)
+                .visitorWhatsApp(wa)
                 .feedbackText(feedbackText.trim())
                 .rating(Math.max(1, Math.min(5, rating)))
                 .isReviewed(false)

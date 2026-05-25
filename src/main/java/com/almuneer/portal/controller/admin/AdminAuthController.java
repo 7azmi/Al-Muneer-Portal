@@ -1,6 +1,7 @@
 package com.almuneer.portal.controller.admin;
 
 import com.almuneer.portal.security.JwtUtil;
+import com.almuneer.portal.service.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,12 @@ public class AdminAuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final AdminDashboardService dashboardService;
+
+    @GetMapping({"", "/"})
+    public String adminRoot() {
+        return "redirect:/admin/dashboard";
+    }
 
     @GetMapping("/login")
     public String loginPage() {
@@ -67,6 +74,7 @@ public class AdminAuthController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
+        model.addAttribute("stats", dashboardService.getStats());
         return "admin/dashboard";
     }
 }

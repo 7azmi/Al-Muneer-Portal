@@ -1092,49 +1092,76 @@ button.calendar-day {
     font-weight: 500;
 }
 
-/* ── Venue map + split layout ── */
-.venue-split {
+/* ── Venue section layout ── */
+.venue-layout {
     display: grid;
-    grid-template-columns: 1fr 1.25fr;
+    grid-template-columns: 1fr 1.15fr;
     gap: var(--space-8);
-    align-items: start;
+    align-items: stretch;
 }
 
-.venue-split-info {
+.venue-layout-details {
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
 }
 
-.venue-details--compact {
-    margin-top: 0;
-    grid-template-columns: 1fr 1fr;
+.venue-info-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
 }
 
-.venue-services-panel {
+.venue-services-card {
+    background: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+}
+
+.venue-services-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0 0 var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.venue-services-text {
     margin: 0;
-}
-
-.venue-services-panel p {
     line-height: 1.8;
     color: var(--color-text-muted);
-    margin: 0;
+    white-space: pre-line;
+}
+
+.venue-layout-map {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-height: 100%;
 }
 
 .map-embed-wrap {
+    flex: 1;
     border-radius: var(--radius-2xl);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
-    min-height: 320px;
+    min-height: 340px;
     border: 1px solid var(--color-border);
 }
 
 .map-embed {
     width: 100%;
     height: 100%;
-    min-height: 360px;
+    min-height: 340px;
     border: 0;
     display: block;
+}
+
+.venue-maps-btn {
+    width: 100%;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 /* ── Packed masonry gallery ── */
@@ -1506,10 +1533,15 @@ button.calendar-day {
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-    .venue-split {
+    .venue-layout {
         grid-template-columns: 1fr;
     }
 
+    .venue-layout-map {
+        order: -1;
+    }
+
+    .map-embed-wrap,
     .map-embed {
         min-height: 280px;
     }
@@ -1520,7 +1552,7 @@ button.calendar-day {
         display: flex;
     }
 
-    .venue-details--compact {
+    .venue-info-row {
         grid-template-columns: 1fr;
     }
 

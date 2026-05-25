@@ -10,6 +10,7 @@ import com.almuneer.portal.repository.NotificationTemplateRepository;
 import com.almuneer.portal.repository.VenueInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,12 @@ public class DataSeeder implements CommandLineRunner {
     private final NotificationTemplateRepository templateRepository;
     private final GalleryLabelRepository galleryLabelRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.maps.share-url:https://maps.google.com}")
+    private String defaultMapsShareUrl;
+
+    @Value("${app.maps.embed-url:https://www.google.com/maps?q=Ibb+Yemen&output=embed}")
+    private String defaultMapsEmbedUrl;
 
     @Override
     public void run(String... args) {
@@ -49,10 +56,28 @@ public class DataSeeder implements CommandLineRunner {
                     .capacity(500)
                     .location("Ibb, Yemen")
                     .contactInfo("+967-XXX-XXX-XXX")
+                    .mapsShareUrl(defaultMapsShareUrl)
+                    .mapsEmbedUrl(defaultMapsEmbedUrl)
                     .faqJson("[]")
                     .build();
             venueInfoRepository.save(venue);
             log.info("Default venue info record created");
+        } else {
+            venueInfoRepository.findAll().forEach(venue -> {
+                boolean changed = false;
+                if (venue.getMapsShareUrl() == null || venue.getMapsShareUrl().isBlank()) {
+                    venue.setMapsShareUrl(defaultMapsShareUrl);
+                    changed = true;
+                }
+                if (venue.getMapsEmbedUrl() == null || venue.getMapsEmbedUrl().isBlank()) {
+                    venue.setMapsEmbedUrl(defaultMapsEmbedUrl);
+                    changed = true;
+                }
+                if (changed) {
+                    venueInfoRepository.save(venue);
+                    log.info("Venue map URLs backfilled from application defaults");
+                }
+            });
         }
 
         // Seed default notification templates

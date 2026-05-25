@@ -63,7 +63,7 @@
                     <div class="label-fields">
                         <input type="text" name="name" class="form-input form-input-sm"
                                th:value="${label.name}" required maxlength="60"
-                               th:attr="aria-label='Name for ' + ${label.name}">
+                               th:attr="aria-label=${'Name for ' + label.name}">
                         <input type="text" name="icon" class="form-input form-input-sm"
                                th:value="${label.icon}" maxlength="8" placeholder="🏷️"
                                aria-label="Icon">
@@ -74,13 +74,23 @@
                     <button type="submit" class="btn btn-outline btn-sm">Save</button>
                 </form>
                 <form th:action="@{'/admin/gallery/labels/' + ${label.labelId} + '/delete'}"
-                      method="post" class="label-delete-form"
-                      th:onsubmit="|return confirm('Delete label \'${label.name}\'? Media keeps its text but won\\'t match a filter.');|">
+                      method="post" class="label-delete-form label-delete-form-js"
+                      th:attr="data-label-name=${label.name}">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.label-delete-form-js').forEach((form) => {
+            form.addEventListener('submit', (e) => {
+                const name = form.dataset.labelName || 'this label';
+                const msg = 'Delete “' + name + '”? Media items keep their category text but will no longer match a filter.';
+                if (!confirm(msg)) e.preventDefault();
+            });
+        });
+    </script>
 </div>
 
 <style>

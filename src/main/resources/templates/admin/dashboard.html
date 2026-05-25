@@ -5,42 +5,160 @@
 <div th:fragment="adminContent">
     <div class="admin-page-header">
         <h1 class="admin-page-title">Dashboard</h1>
+        <a href="/" target="_blank" class="btn btn-outline btn-sm">View public site →</a>
     </div>
 
-    <div class="admin-stats">
+    <!-- Work waiting -->
+    <div class="admin-stats dashboard-stats">
+        <a href="/admin/inquiries?filter=NEW" class="stat-card stat-card-link">
+            <div class="stat-label">New inquiries</div>
+            <div class="stat-value" th:text="${stats.newInquiries}">0</div>
+            <div class="stat-hint">Need first review</div>
+        </a>
+        <a href="/admin/inquiries" class="stat-card stat-card-link">
+            <div class="stat-label">Active inquiries</div>
+            <div class="stat-value" th:text="${stats.activeInquiries}">0</div>
+            <div class="stat-hint">Open bookings</div>
+        </a>
+        <a href="/admin/payments" class="stat-card stat-card-link">
+            <div class="stat-label">Pending payments</div>
+            <div class="stat-value" th:text="${stats.pendingPayments}">0</div>
+            <div class="stat-hint">Awaiting verification</div>
+        </a>
+        <a href="/admin/feedback" class="stat-card stat-card-link">
+            <div class="stat-label">Unreviewed feedback</div>
+            <div class="stat-value" th:text="${stats.unreviewedFeedback}">0</div>
+            <div class="stat-hint">Visitor messages</div>
+        </a>
+    </div>
+
+    <!-- Traffic -->
+    <div class="admin-stats dashboard-stats">
         <div class="stat-card">
-            <div class="stat-label">Quick Links — Content</div>
-            <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
-                <a href="/admin/venue" class="btn btn-outline btn-sm" style="text-align:center;">🏛️ Venue Info</a>
-                <a href="/admin/gallery" class="btn btn-outline btn-sm" style="text-align:center;">🖼️ Gallery</a>
-                <a href="/admin/pricing" class="btn btn-outline btn-sm" style="text-align:center;">💰 Pricing</a>
-                <a href="/admin/calendar" class="btn btn-outline btn-sm" style="text-align:center;">📅 Calendar</a>
-            </div>
+            <div class="stat-label">Visits today</div>
+            <div class="stat-value" th:text="${stats.visitsToday}">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Quick Links — Operations</div>
-            <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
-                <a href="/admin/inquiries" class="btn btn-outline btn-sm" style="text-align:center;">📋 Inquiries</a>
-                <a href="/admin/payments" class="btn btn-outline btn-sm" style="text-align:center;">💳 Payments</a>
-                <a href="/admin/feedback" class="btn btn-outline btn-sm" style="text-align:center;">💬 Feedback</a>
-            </div>
+            <div class="stat-label">Visits (last 7 days)</div>
+            <div class="stat-value" th:text="${stats.visitsLast7Days}">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Quick Links — Insights</div>
-            <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
-                <a href="/admin/reports" class="btn btn-outline btn-sm" style="text-align:center;">📈 Reports</a>
-                <a href="/admin/analytics" class="btn btn-outline btn-sm" style="text-align:center;">👁️ Analytics</a>
-                <a href="/admin/templates" class="btn btn-outline btn-sm" style="text-align:center;">💌 Templates</a>
-                <a href="/" target="_blank" class="btn btn-primary btn-sm" style="text-align:center;">View Site →</a>
+            <div class="stat-label">Average rating</div>
+            <div class="stat-value">
+                <span th:text="${#numbers.formatDecimal(stats.averageRating, 1, 1)}">0</span>
+                <span style="font-size:1rem;">⭐</span>
             </div>
+        </div>
+        <a href="/admin/analytics" class="stat-card stat-card-link">
+            <div class="stat-label">Full analytics</div>
+            <div class="stat-value" style="font-size:1.25rem;">View →</div>
+            <div class="stat-hint">Page breakdown</div>
+        </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:1.5rem; align-items:start;">
+        <!-- Recent inquiries -->
+        <div class="admin-panel" style="padding:0; overflow:hidden;">
+            <div style="padding:1rem 1.5rem; border-bottom:1px solid var(--color-border);
+                        display:flex; justify-content:space-between; align-items:center;">
+                <h3 class="admin-panel-title" style="margin:0;">Recent inquiries</h3>
+                <a href="/admin/inquiries" class="btn btn-outline btn-sm">View all</a>
+            </div>
+            <div th:if="${stats.recentInquiries.isEmpty()}" class="empty-state" style="padding:2rem;">
+                <p class="text-muted">No inquiries yet.</p>
+            </div>
+            <table class="admin-table" th:if="${!stats.recentInquiries.isEmpty()}">
+                <thead>
+                    <tr>
+                        <th>Ref</th>
+                        <th>Visitor</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="inq : ${stats.recentInquiries}">
+                        <td>
+                            <a th:href="@{'/admin/inquiries/' + ${inq.inquiryId}}"
+                               th:text="${inq.referenceCode}" style="font-weight:600;">REF</a>
+                        </td>
+                        <td th:text="${inq.visitorName}">Name</td>
+                        <td th:text="${inq.slot?.slotDate}">—</td>
+                        <td><span class="badge badge-inactive" th:text="${inq.status}">NEW</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Top pages -->
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">Top pages (all time)</h3>
+            <div th:if="${stats.topPages.isEmpty()}" class="text-muted" style="font-size:0.9rem;">
+                No traffic recorded yet. Visits are logged as visitors browse the site.
+            </div>
+            <ul class="dashboard-page-list" th:if="${!stats.topPages.isEmpty()}">
+                <li th:each="entry : ${stats.topPages}">
+                    <span class="dashboard-page-path" th:text="${entry.key}">/</span>
+                    <span class="dashboard-page-hits" th:text="${entry.value} + ' hits'">0</span>
+                </li>
+            </ul>
+            <a href="/admin/analytics" class="btn btn-outline btn-sm" style="margin-top:1rem;">Detailed analytics</a>
         </div>
     </div>
 
-    <div class="admin-panel">
-        <h3 class="admin-panel-title">Welcome to Al-Muneer Admin Panel</h3>
-        <p class="text-muted">Use the sidebar to navigate between management sections. All 16 system use cases are now implemented and accessible from this dashboard.</p>
+    <div class="admin-panel" style="margin-top:1.5rem;">
+        <h3 class="admin-panel-title">Quick links</h3>
+        <div class="dashboard-quick-links">
+            <a href="/admin/venue" class="btn btn-outline btn-sm">🏛️ Venue</a>
+            <a href="/admin/gallery" class="btn btn-outline btn-sm">🖼️ Gallery</a>
+            <a href="/admin/calendar" class="btn btn-outline btn-sm">📅 Calendar</a>
+            <a href="/admin/inquiries" class="btn btn-outline btn-sm">📋 Inquiries</a>
+            <a href="/admin/payments" class="btn btn-outline btn-sm">💳 Payments</a>
+            <a href="/admin/reports" class="btn btn-outline btn-sm">📈 Reports</a>
+        </div>
     </div>
 </div>
+
+<style>
+    .dashboard-stats { margin-bottom: 1.5rem; }
+    .stat-card-link {
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .stat-card-link:hover {
+        border-color: rgba(201, 168, 76, 0.45);
+        transform: translateY(-2px);
+    }
+    .stat-hint {
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+        margin-top: 0.35rem;
+    }
+    .dashboard-page-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .dashboard-page-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--color-border);
+        font-size: 0.875rem;
+    }
+    .dashboard-page-path { color: var(--color-text-muted); }
+    .dashboard-page-hits { font-weight: 600; color: var(--color-primary); }
+    .dashboard-quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    @media (max-width: 900px) {
+        div[style*="grid-template-columns: 1.2fr"] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
 </body>
 </html>
-

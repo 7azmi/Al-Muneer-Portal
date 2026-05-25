@@ -1,7 +1,9 @@
 package com.almuneer.portal.config;
 
 import com.almuneer.portal.model.GalleryLabel;
+import com.almuneer.portal.model.VenueInfo;
 import com.almuneer.portal.service.GalleryLabelService;
+import com.almuneer.portal.service.VenueInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +22,7 @@ import java.util.List;
 public class GlobalModelAdvice {
 
     private final GalleryLabelService galleryLabelService;
+    private final VenueInfoService venueInfoService;
 
     @Value("${app.country.code:+967}")
     private String countryCode;
@@ -28,10 +31,10 @@ public class GlobalModelAdvice {
     private String rawCode;
 
     @Value("${app.maps.share-url:https://maps.google.com}")
-    private String mapsShareUrl;
+    private String defaultMapsShareUrl;
 
     @Value("${app.maps.embed-url:https://www.google.com/maps?q=Ibb+Yemen&output=embed}")
-    private String mapsEmbedUrl;
+    private String defaultMapsEmbedUrl;
 
     @ModelAttribute("countryCode")
     public String countryCode() {
@@ -46,12 +49,36 @@ public class GlobalModelAdvice {
 
     @ModelAttribute("mapsShareUrl")
     public String mapsShareUrl() {
-        return mapsShareUrl;
+        return resolveMapsShareUrl();
     }
 
     @ModelAttribute("mapsEmbedUrl")
     public String mapsEmbedUrl() {
-        return mapsEmbedUrl;
+        return resolveMapsEmbedUrl();
+    }
+
+    private VenueInfo venueOrNull() {
+        try {
+            return venueInfoService.getVenueInfo();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String resolveMapsShareUrl() {
+        VenueInfo venue = venueOrNull();
+        if (venue != null && venue.getMapsShareUrl() != null && !venue.getMapsShareUrl().isBlank()) {
+            return venue.getMapsShareUrl().trim();
+        }
+        return defaultMapsShareUrl;
+    }
+
+    private String resolveMapsEmbedUrl() {
+        VenueInfo venue = venueOrNull();
+        if (venue != null && venue.getMapsEmbedUrl() != null && !venue.getMapsEmbedUrl().isBlank()) {
+            return venue.getMapsEmbedUrl().trim();
+        }
+        return defaultMapsEmbedUrl;
     }
 
     /** Gallery labels ordered by sortOrder — used in the visitor gallery filter bar. */

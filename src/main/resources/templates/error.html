@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Error</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <section class="section">
+        <div class="section-container" style="max-width: 560px; text-align: center;">
+            <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <h1 class="section-title" th:text="${status} ?: 'Error'">Error</h1>
+                <p class="section-subtitle" th:if="${status == 404}">
+                    The page you requested could not be found.
+                </p>
+                <p class="section-subtitle" th:if="${status != null and status != 404}"
+                   th:text="${error ?: 'Something went wrong. Please try again.'}">
+                    Something went wrong.
+                </p>
+                <p class="text-muted" th:if="${message}" th:text="${message}" style="margin-top: 1rem; font-size: 0.875rem;"></p>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/" class="btn btn-primary">Back to home</a>
+                    <a href="/admin/login" class="btn btn-outline">Admin login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -62,9 +62,9 @@
             <p class="section-subtitle" th:text="${venue.description}">Al-Muneer Hall — where memories are made.</p>
         </div>
 
-        <div class="venue-split">
-            <div class="venue-split-info">
-                <div class="venue-details venue-details--compact">
+        <div class="venue-layout">
+            <div class="venue-layout-details">
+                <div class="venue-info-row">
                     <div class="venue-detail-card">
                         <div class="venue-detail-icon">👥</div>
                         <div class="venue-detail-label">Capacity</div>
@@ -75,27 +75,33 @@
                         <div class="venue-detail-label">Contact</div>
                         <div class="venue-detail-value" th:text="${venue.contactInfo ?: 'Contact us'}">Phone</div>
                     </div>
+                    <div class="venue-detail-card" th:if="${venue.location != null and !venue.location.isBlank()}">
+                        <div class="venue-detail-icon">📍</div>
+                        <div class="venue-detail-label">Location</div>
+                        <div class="venue-detail-value" th:text="${venue.location}">Ibb, Yemen</div>
+                    </div>
                 </div>
 
-                <div class="admin-panel venue-services-panel" th:if="${venue.services != null}">
-                    <h3 class="admin-panel-title">Services We Offer</h3>
-                    <p th:text="${venue.services}">Services</p>
+                <div class="venue-services-card" th:if="${venue.services != null and !venue.services.isBlank()}">
+                    <h3 class="venue-services-title">Services We Offer</h3>
+                    <p class="venue-services-text" th:text="${venue.services}">Services</p>
                 </div>
-
-                <a th:href="${mapsShareUrl}" target="_blank" rel="noopener noreferrer"
-                   class="btn btn-outline" id="open-maps-btn">
-                    📍 Open in Google Maps
-                </a>
             </div>
 
-            <div class="map-embed-wrap">
-                <iframe class="map-embed"
-                        th:src="${mapsEmbedUrl}"
-                        loading="lazy"
-                        allowfullscreen=""
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="Al-Muneer Hall on Google Maps">
-                </iframe>
+            <div class="venue-layout-map">
+                <div class="map-embed-wrap">
+                    <iframe class="map-embed"
+                            th:src="${mapsEmbedUrl}"
+                            loading="lazy"
+                            allowfullscreen=""
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Al-Muneer Hall on Google Maps">
+                    </iframe>
+                </div>
+                <a th:href="${mapsShareUrl}" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-outline venue-maps-btn" id="open-maps-btn">
+                    📍 Open in Google Maps
+                </a>
             </div>
         </div>
     </div>

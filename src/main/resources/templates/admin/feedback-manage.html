@@ -9,55 +9,79 @@
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <div class="admin-panel">
-        <h3 class="admin-panel-title">All Feedback (<span th:text="${feedbacks.size()}">0</span>)</h3>
-        <table class="admin-table" th:if="${!feedbacks.isEmpty()}">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Visitor</th>
-                    <th>Rating</th>
-                    <th>Feedback</th>
-                    <th>Submitted</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="fb : ${feedbacks}">
-                    <td th:text="${fb.feedbackId}">1</td>
-                    <td>
-                        <div th:text="${fb.visitorName}">Name</div>
-                        <small class="text-muted" th:text="${fb.visitorWhatsApp}">WA</small>
-                    </td>
-                    <td>
-                        <span th:each="i : ${#numbers.sequence(1,fb.rating)}">⭐</span>
-                    </td>
-                    <td>
-                        <span th:text="${#strings.abbreviate(fb.feedbackText, 80)}">Text...</span>
-                    </td>
-                    <td th:text="${#temporals.format(fb.submissionDate, 'dd MMM yyyy')}">Date</td>
-                    <td>
-                        <span th:if="${fb.isReviewed}" class="badge badge-active">Reviewed</span>
-                        <span th:unless="${fb.isReviewed}" class="badge badge-inactive">Unreviewed</span>
-                    </td>
-                    <td>
-                        <form method="post" th:action="@{'/admin/feedback/' + ${fb.feedbackId} + '/review'}"
-                              style="display:inline;">
-                            <input type="hidden" name="adminNotes" value="">
-                            <button type="submit" class="btn btn-outline btn-sm"
-                                    th:if="${!fb.isReviewed}">Mark Reviewed</button>
-                            <span th:if="${fb.isReviewed}" class="text-muted" style="font-size:0.8rem;">✓ Done</span>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div th:if="${feedbacks.isEmpty()}" class="empty-state">
+    <div class="admin-panel" style="padding:0; overflow:hidden;">
+        <div style="padding:1rem 1.5rem; border-bottom:1px solid var(--color-border);">
+            <h3 class="admin-panel-title" style="margin:0;">
+                All Feedback (<span th:text="${feedbacks.size()}">0</span>)
+            </h3>
+        </div>
+
+        <div th:if="${feedbacks.isEmpty()}" class="empty-state" style="padding:3rem;">
             <div class="empty-state-icon">💬</div>
             <p class="empty-state-text">No feedback submitted yet.</p>
         </div>
+
+        <div th:unless="${feedbacks.isEmpty()}" style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Visitor</th>
+                        <th>Rating</th>
+                        <th>Feedback</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="fb : ${feedbacks}">
+                        <td th:text="${fb.feedbackId}">1</td>
+                        <td>
+                            <div th:if="${fb.visitorName != null}" th:text="${fb.visitorName}">Name</div>
+                            <div th:unless="${fb.visitorName != null}" class="text-muted">Anonymous</div>
+                            <small class="text-muted" th:if="${fb.visitorWhatsApp != null}"
+                                   th:text="${fb.visitorWhatsApp}">WA</small>
+                        </td>
+                        <td>
+                            <span th:each="i : ${#numbers.sequence(1,fb.rating)}">⭐</span>
+                        </td>
+                        <td class="feedback-snippet-cell">
+                            <p class="feedback-snippet" th:text="${#strings.abbreviate(fb.feedbackText, 100)}">Text...</p>
+                        </td>
+                        <td th:text="${#temporals.format(fb.submissionDate, 'dd MMM yyyy')}">Date</td>
+                        <td>
+                            <span th:if="${fb.isReviewed}" class="badge badge-active">Reviewed</span>
+                            <span th:unless="${fb.isReviewed}" class="badge badge-inactive">Unreviewed</span>
+                        </td>
+                        <td>
+                            <div class="admin-table-actions">
+                                <a th:href="@{/admin/feedback/{id}(id=${fb.feedbackId})}"
+                                   class="btn btn-outline btn-sm">View</a>
+                                <form method="post" th:action="@{'/admin/feedback/' + ${fb.feedbackId} + '/review'}"
+                                      th:if="${!fb.isReviewed}">
+                                    <input type="hidden" name="adminNotes" value="">
+                                    <button type="submit" class="btn btn-outline btn-sm">Mark reviewed</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+<style>
+    .feedback-snippet-cell { max-width: 320px; }
+    .feedback-snippet { margin: 0; font-size: 0.875rem; color: var(--color-text-muted); }
+    .admin-table-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        align-items: center;
+    }
+    .admin-table-actions form { margin: 0; }
+</style>
 </body>
 </html>

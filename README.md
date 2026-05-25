@@ -10,7 +10,7 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 
 ### 🌍 Visitor Module
 - **Single-Page Home:** One scrollable landing page (hero → venue → gallery → booking calendar → pricing → feedback) with anchor navigation; legacy routes (`/gallery`, `/calendar`, `/pricing`, `/venue`) redirect to the matching section.
-- **Venue Showcase:** Services, capacity, contact details, and an embedded **Google Maps** iframe (configurable share + embed URLs).
+- **Venue Showcase:** Services, capacity, contact, location label, and an embedded **Google Maps** iframe. Map share + embed URLs are editable in admin (with `application.properties` defaults as fallback).
 - **Media Gallery:** Packed masonry layout (variable-height images/videos), category filters from admin-defined labels, and a full-screen lightbox.
 - **Interactive Booking Calendar:** Future dates default to **Available**; past dates are dimmed. Tap an available day to reveal a single **Submit inquiry** action; inquiry opens with the date pre-filled (`/inquiry?date=YYYY-MM-DD`).
 - **Pricing Packages:** Each package has a **Book [name]** button that opens the inquiry form with that tier pre-selected (`/inquiry?pricingId=…`); if a date was chosen on the home calendar, both parameters are passed.
@@ -18,16 +18,17 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 - **9-Digit Reference Codes:** Every inquiry is assigned a random 9-digit visitor-facing reference code stored in a 150-day cookie for seamless retrieval.
 - **Visitor Self-Cancellation:** Visitors can cancel their own inquiry (if no payment proof is attached) directly from the confirmation page.
 - **Payment Proof Upload:** Security-verified upload system for offline payment receipts.
-- **Feedback System:** Visitors can share their experience via a dedicated feedback form.
+- **Feedback System:** Rating and message are required; name and WhatsApp are optional. Thank-you screen after submit.
 
 ### 🛠️ Administrator Module
-- **Dashboard Overview:** Real-time metrics for bookings, pending proofs, and inquiries.
-- **Content Management:** Full CRUD for venue info, gallery items, **gallery labels** (filter categories), and pricing tiers.
+- **Dashboard Overview:** Daily workload at a glance — new/active inquiries, pending payment proofs, unreviewed feedback, visits today/last 7 days, average rating, recent inquiries, and top pages.
+- **Content Management:** Full CRUD for venue info (including **Google Maps share + embed URLs**), gallery items, **gallery labels** (filter categories), and pricing tiers.
 - **Inquiry Management:** Rich filter bar with per-status counts; active inquiries shown by default; completed/cancelled hidden. Client-side search. Reference code displayed per row.
-- **Payment Verification:** Review uploaded payment receipts with image display. Cascades status to inquiry and slot on verification.
+- **Payment Verification:** Review uploaded payment receipts with image display. From an inquiry, **View Payment Proofs** opens proofs filtered by that inquiry (`/admin/payments?inquiryId=…`). Cascades status to inquiry and slot on verification.
 - **Dynamic WhatsApp Notifications:** Select any notification template from a dropdown on the inquiry/payment detail page; message preview with placeholder resolution; deep-link generated client-side.
 - **Notification Template CRUD:** Full create, edit, and delete for WhatsApp message templates.
-- **Feedback Management:** Review and respond to visitor feedback.
+- **Feedback Management:** List with snippet preview; **View** opens full message on a detail page; mark as reviewed from list or detail.
+- **Calendar Management:** Slot updates refresh the grid in place (no full-page reload or jump back to the current month).
 
 ---
 
@@ -101,8 +102,8 @@ Default admin account created on first run (`DataSeeder`):
 | `app.upload.gallery-dir` | `uploads/gallery` | Relative path for gallery image uploads. |
 | `app.upload.proofs-dir` | `uploads/proofs` | Relative path for payment proof uploads. |
 | `app.jwt.secret` | *(see file)* | JWT signing secret — **must** be changed in production. |
-| `app.maps.share-url` | Google share link | “Open in Google Maps” buttons |
-| `app.maps.embed-url` | Maps embed URL | iframe `src` on the home venue section |
+| `app.maps.share-url` | Google share link | Default “Open in Google Maps” link (overridden by **Admin → Venue Info** when set) |
+| `app.maps.embed-url` | Maps embed URL | Default map iframe `src` (overridden by **Admin → Venue Info** when set) |
 
 ---
 
@@ -122,7 +123,7 @@ src/main/resources/
 ├── static/
 │   ├── css/main.css
 │   └── js/
-│       ├── main.js              # Nav, scroll-spy, admin calendar, lightbox helpers
+│       ├── main.js              # Nav, scroll-spy, admin calendar (in-place slot refresh), lightbox helpers
 │       ├── visitor-calendar.js  # Interactive visitor availability calendar
 │       ├── booking-flow.js      # Syncs inquiry URLs with selected date/package
 │       ├── masonry-layout.js    # Packed gallery layout
@@ -145,6 +146,14 @@ src/main/resources/
 ---
 
 ## 🔄 Changelog
+
+### v0.5 — 2026-05-24
+- **Feature:** Admin dashboard stats (`AdminDashboardService`) — inquiries, pending proofs, unreviewed feedback, traffic, recent activity.
+- **Feature:** Venue admin stores **maps share + embed URLs** in DB; home page and preview use saved values; properties remain fallback.
+- **Feature:** Admin feedback **View** detail page (`/admin/feedback/{id}`) for full messages; visitor name/WhatsApp optional on submit.
+- **UX:** Venue section layout (info row + services + map column); admin venue live preview synced with landing page.
+- **UX:** Admin calendar slot updates without full page reload; inquiry **View Payment Proofs** filtered by `inquiryId`.
+- **Fix:** `/admin` redirect; global `error.html`; gallery label delete confirm (no Thymeleaf `th:onsubmit` breakage).
 
 ### v0.4 — 2026-05-24
 - **Feature:** Single-page scroll home with anchor nav and scroll-spy; consolidated visitor journey on `/`.

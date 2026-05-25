@@ -24,6 +24,14 @@ public class VenueInfo {
 
     private String contactInfo;
 
+    /** Google Maps share / open link for “Open in Google Maps” buttons */
+    @Column(columnDefinition = "TEXT")
+    private String mapsShareUrl;
+
+    /** Google Maps embed iframe URL (from Share → Embed a map) */
+    @Column(columnDefinition = "TEXT")
+    private String mapsEmbedUrl;
+
     @Column(columnDefinition = "TEXT")
     private String faqJson;
 }

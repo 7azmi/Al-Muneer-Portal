@@ -13,10 +13,10 @@ public class Feedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long feedbackId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String visitorName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String visitorWhatsApp;
 
     @Column(nullable = false, columnDefinition = "TEXT")

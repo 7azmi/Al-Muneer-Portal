@@ -91,7 +91,7 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
 
 ### Visitor Module
 
-- **UC001: View Venue Info:** Retrieves and displays description, services, capacity, and an embedded Google Maps location (home page scroll section; `/venue` redirects to `/#venue`).
+- **UC001: View Venue Info:** Retrieves and displays description, services, capacity, contact, location label, and an embedded Google Maps iframe. Map URLs are loaded from `VenueInfo` (admin-managed); `application.properties` defaults apply when unset. Home page section `/#venue`; `/venue` redirects to `/#venue`.
     
 - **UC002: View Media Gallery:** Packed masonry display of images and YouTube tiles with admin-defined category filters and lightbox; full gallery on home (`/#gallery`); `/gallery` redirects to home.
     
@@ -103,26 +103,26 @@ _Note: The project's end-user target language is Arabic (due to the local Yemeni
     
 - **UC011: Submit Payment Proof:** Visitor enters their Inquiry ID (provided on the UC005 confirmation screen) and uploads a JPG/PNG receipt screenshot (Max 5MB). The proof is linked to the inquiry record. Multiple uploads are allowed (e.g., if a previous proof was rejected). Flags payment for Admin review.
     
-- **UC012: Submit Feedback:** Form capture -> Saves to DB.
+- **UC012: Submit Feedback:** Form capture (rating and feedback text required; name and WhatsApp optional) -> Saves to DB -> Thank-you confirmation on `/feedback`.
     
 
 ### Administrator (Owner) Module
 
-- **UC006: Manage Hall Info:** CRUD operations for venue descriptions, contact details, and FAQs.
+- **UC006: Manage Hall Info:** CRUD for venue description, services, capacity, location label, contact info, **Google Maps share link**, and **map embed URL** (live preview matches home page). FAQs via `faqJson`. Defaults seeded from `app.maps.share-url` / `app.maps.embed-url`.
     
 - **UC007: Manage Media Gallery:** Upload new image files (JPG/PNG, Max 5MB) or add YouTube video URLs; assign a gallery label (category) per item; delete existing media. **Gallery Labels** CRUD at `/admin/gallery/labels` drives visitor filter chips.
     
 - **UC008: Manage Pricing Panel:** Add, edit, or remove pricing tiers/packages.
     
-- **UC009: Manage Calendar & Inquiries:** Manually override calendar dates and read submitted inquiries. Admin can click to initiate a pre-filled WhatsApp chat with the inquirer.
+- **UC009: Manage Calendar & Inquiries:** Manually override calendar dates (slot grid refreshes in place without losing the selected month) and read submitted inquiries. Admin can click to initiate a pre-filled WhatsApp chat with the inquirer. Inquiry detail links to payment proofs filtered by inquiry ID.
     
-- **UC010: View Traffic Analytics:** View basic logged data (e.g., total page visits).
+- **UC010: View Traffic Analytics:** Dashboard summary includes visits today, last 7 days, and top pages (from `PageVisit` logging).
     
 - **UC013: Manage Payment Status:** View uploaded proof -> Verify offline -> Update status -> Add internal notes -> Admin clicks a generated deep link to notify the visitor of the status via WhatsApp.
     
 - **UC014: View/Generate Reports:** Generate basic predefined summaries (Inquiry volume, Bookings, Feedback).
     
-- **UC015: Manage Feedback:** Read visitor feedback, mark as "Reviewed", and add internal notes.
+- **UC015: Manage Feedback:** List with abbreviated preview; **View** (`/admin/feedback/{id}`) shows the full message; mark as "Reviewed" from list or detail (optional admin notes).
     
 - **UC016: Configure Notification Templates:** Admin edits message templates (e.g., "Inquiry Received", "Payment Verified") containing placeholders. These templates populate the `wa.me` deep links generated across the dashboard.
     
@@ -197,6 +197,8 @@ entity "VenueInfo" as venue {
   capacity : INT
   location : VARCHAR
   contactInfo : VARCHAR
+  mapsShareUrl : TEXT
+  mapsEmbedUrl : TEXT
   faqJson : TEXT
 }
 
@@ -258,8 +260,8 @@ entity "PaymentProof" as proof {
 entity "Feedback" as feedback {
   * feedbackId : BIGINT <<PK>>
   --
-  visitorName : VARCHAR
-  visitorWhatsApp : VARCHAR
+  visitorName : VARCHAR <<nullable>>
+  visitorWhatsApp : VARCHAR <<nullable>>
   feedbackText : TEXT
   rating : INT
   submissionDate : TIMESTAMP
@@ -300,7 +302,7 @@ inquiry ||--o{ proof : has
     
 - **Inquiry Form:** Standard web form (Name, WhatsApp Number, Date picker, Event type dropdown, Pricing Package dropdown (optional), special requests text area) with a side panel displaying direct contact info (Hotline/WhatsApp). On successful submission, a confirmation screen displays the visitor's Inquiry ID with instructions for submitting a payment proof.
     
-- **Admin Dashboard:** Secure login leading to a metrics overview (Bookings this month, Pending proofs, Recent inquiries). Sidebar navigation for CRUD operations on all entities, including a dedicated "Message Templates" settings page.
+- **Admin Dashboard:** Secure login leading to a metrics overview (new/active inquiries, pending proofs, unreviewed feedback, visits, average rating, recent inquiries, top pages). Sidebar navigation for CRUD operations on all entities, including a dedicated "Message Templates" settings page.
     
 
 ## 8. Quality Assurance & Acceptance Criteria (Testing Reference)
@@ -309,7 +311,7 @@ _Note: This section summarizes the STD for practical development checks. Ensure 
 
 **Core Acceptance Criteria for Development:**
 
-1. **Form Validation (UC005, UC012):** The system MUST reject submissions with empty required fields or invalid data formats (e.g., malformed WhatsApp numbers) and display clear error messages without crashing or losing valid input data.
+1. **Form Validation (UC005, UC012):** The system MUST reject submissions with empty required fields or invalid data formats (e.g., malformed WhatsApp numbers on UC005) and display clear error messages without crashing or losing valid input data. UC012 requires rating and feedback text only; name and WhatsApp are optional.
     
 2. **File Upload Security (UC007, UC011):** The system MUST restrict Payment Proof uploads (UC011) to JPG/PNG image types with a strict 5MB limit. Gallery image uploads (UC007) are similarly restricted to JPG/PNG; videos are added via YouTube URL only (no file upload). Invalid uploads must trigger an immediate UI error.
     

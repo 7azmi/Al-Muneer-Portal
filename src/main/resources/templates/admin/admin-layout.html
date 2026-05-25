@@ -14,8 +14,10 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar" id="admin-sidebar">
             <div class="admin-sidebar-header">
-                <span class="logo-icon">✦</span>
-                <span>Admin Panel</span>
+                <a href="/admin/dashboard" style="display:flex; align-items:center; gap:0.5rem; color:inherit; text-decoration:none;">
+                    <span class="logo-icon">✦</span>
+                    <span>Admin Panel</span>
+                </a>
             </div>
             <ul class="admin-nav">
                 <li><a href="/admin/dashboard" th:classappend="${activeNav == 'dashboard'} ? 'active'">

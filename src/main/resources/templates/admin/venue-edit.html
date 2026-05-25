@@ -5,42 +5,164 @@
 <div th:fragment="adminContent">
     <div class="admin-page-header">
         <h1 class="admin-page-title">Manage Venue Info</h1>
+        <a href="/#venue" target="_blank" class="btn btn-outline btn-sm">Preview on site →</a>
     </div>
 
     <div th:if="${success}" class="alert alert-success" th:text="${success}">Success</div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}">Error</div>
 
-    <div class="admin-panel">
-        <h3 class="admin-panel-title">Edit Venue Information</h3>
-        <form method="post" th:action="@{/admin/venue}" th:object="${venue}" id="venue-edit-form">
-            <div class="form-group">
-                <label class="form-label" for="description">Description</label>
-                <textarea id="description" name="description" class="form-textarea" rows="4"
-                          th:text="${venue.description}" placeholder="Venue description"></textarea>
+    <div class="venue-admin-grid">
+        <div class="admin-panel">
+            <h3 class="admin-panel-title">Edit Venue Information</h3>
+            <p class="text-muted" style="font-size:0.875rem; margin-bottom:1rem;">
+                Changes appear on the home page venue section and public map embed.
+            </p>
+            <form method="post" th:action="@{/admin/venue}" th:object="${venue}" id="venue-edit-form">
+                <div class="form-group">
+                    <label class="form-label" for="description">Description (shown under “Our Venue”)</label>
+                    <textarea id="description" name="description" class="form-textarea" rows="4"
+                              th:text="${venue.description}" placeholder="Venue description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="services">Services</label>
+                    <textarea id="services" name="services" class="form-textarea" rows="3"
+                              th:text="${venue.services}" placeholder="Wedding Receptions, Engagement Parties..."></textarea>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="capacity">Capacity (Guests)</label>
+                        <input type="number" id="capacity" name="capacity" class="form-input"
+                               th:value="${venue.capacity}" placeholder="e.g. 350" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="location">Location label</label>
+                        <input type="text" id="location" name="location" class="form-input"
+                               th:value="${venue.location}" placeholder="e.g. Ibb, Yemen">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="contactInfo">Contact info</label>
+                    <input type="text" id="contactInfo" name="contactInfo" class="form-input"
+                           th:value="${venue.contactInfo}" placeholder="Phone / WhatsApp">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="mapsShareUrl">Google Maps link</label>
+                    <input type="url" id="mapsShareUrl" name="mapsShareUrl" class="form-input"
+                           th:value="${venue.mapsShareUrl != null ? venue.mapsShareUrl : mapsShareUrl}"
+                           placeholder="https://maps.google.com/... or share link">
+                    <small class="text-muted">Used for “Open in Google Maps” on the home page.</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="mapsEmbedUrl">Map embed URL (iframe)</label>
+                    <input type="url" id="mapsEmbedUrl" name="mapsEmbedUrl" class="form-input"
+                           th:value="${venue.mapsEmbedUrl != null ? venue.mapsEmbedUrl : mapsEmbedUrl}"
+                           placeholder="https://www.google.com/maps/embed?... or ?q=...&output=embed">
+                    <small class="text-muted">From Google Maps → Share → Embed a map. Update when the venue moves.</small>
+                </div>
+                <button type="submit" class="btn btn-primary" id="save-venue-btn">Save Changes</button>
+            </form>
+        </div>
+
+        <div class="admin-panel venue-preview-panel">
+            <h3 class="admin-panel-title">Live preview (home page)</h3>
+            <p class="venue-preview-desc" id="preview-desc" th:text="${venue.description}">Description</p>
+            <div class="venue-info-row venue-info-row--preview">
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">👥</div>
+                    <div class="venue-detail-label">Capacity</div>
+                    <div class="venue-detail-value" id="preview-capacity"
+                         th:text="${venue.capacity != null ? venue.capacity + ' Guests' : '—'}">—</div>
+                </div>
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">📞</div>
+                    <div class="venue-detail-label">Contact</div>
+                    <div class="venue-detail-value" id="preview-contact"
+                         th:text="${venue.contactInfo ?: '—'}">—</div>
+                </div>
+                <div class="venue-detail-card">
+                    <div class="venue-detail-icon">📍</div>
+                    <div class="venue-detail-label">Location</div>
+                    <div class="venue-detail-value" id="preview-location"
+                         th:text="${venue.location ?: '—'}">—</div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="services">Services</label>
-                <textarea id="services" name="services" class="form-textarea" rows="3"
-                          th:text="${venue.services}" placeholder="Comma-separated services"></textarea>
+            <div class="venue-services-card" id="preview-services-wrap"
+                 th:style="${venue.services != null and !venue.services.isBlank()} ? '' : 'display:none'">
+                <h3 class="venue-services-title">Services We Offer</h3>
+                <p class="venue-services-text" id="preview-services" th:text="${venue.services}"></p>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="capacity">Capacity (Guests)</label>
-                <input type="number" id="capacity" name="capacity" class="form-input"
-                       th:value="${venue.capacity}" placeholder="e.g. 500">
+            <div class="map-embed-wrap map-embed-wrap--preview">
+                <iframe class="map-embed" id="preview-map-embed" loading="lazy" title="Map preview"
+                        th:src="${venue.mapsEmbedUrl != null and !#strings.isEmpty(venue.mapsEmbedUrl)} ? ${venue.mapsEmbedUrl} : ${mapsEmbedUrl}"></iframe>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="location">Location</label>
-                <input type="text" id="location" name="location" class="form-input"
-                       th:value="${venue.location}" placeholder="e.g. Ibb, Yemen">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="contactInfo">Contact Info</label>
-                <input type="text" id="contactInfo" name="contactInfo" class="form-input"
-                       th:value="${venue.contactInfo}" placeholder="Phone / WhatsApp number">
-            </div>
-            <button type="submit" class="btn btn-primary" id="save-venue-btn">Save Changes</button>
-        </form>
+            <a id="preview-map-share" target="_blank" rel="noopener" class="btn btn-outline btn-sm"
+               style="width:100%; margin-top:0.75rem; text-align:center;"
+               th:href="${venue.mapsShareUrl != null and !#strings.isEmpty(venue.mapsShareUrl)} ? ${venue.mapsShareUrl} : ${mapsShareUrl}">
+                📍 Open in Google Maps
+            </a>
+        </div>
     </div>
 </div>
+
+<style>
+    .venue-admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+    .venue-preview-panel { position: sticky; top: 1rem; }
+    .venue-preview-desc {
+        color: var(--color-text-muted);
+        line-height: 1.7;
+        margin-bottom: 1.25rem;
+        font-size: 0.95rem;
+    }
+    .venue-info-row--preview { margin-bottom: 1rem; }
+    .map-embed-wrap--preview { min-height: 220px; }
+    .map-embed-wrap--preview .map-embed { min-height: 220px; }
+    @media (max-width: 1000px) {
+        .venue-admin-grid { grid-template-columns: 1fr; }
+        .venue-preview-panel { position: static; }
+    }
+</style>
+<script>
+    (function () {
+        const desc = document.getElementById('description');
+        const services = document.getElementById('services');
+        const cap = document.getElementById('capacity');
+        const contact = document.getElementById('contactInfo');
+        const loc = document.getElementById('location');
+        const mapShare = document.getElementById('mapsShareUrl');
+        const mapEmbed = document.getElementById('mapsEmbedUrl');
+        const previewEmbed = document.getElementById('preview-map-embed');
+        const previewShare = document.getElementById('preview-map-share');
+        function sync() {
+            if (desc) document.getElementById('preview-desc').textContent = desc.value || '—';
+            if (cap) document.getElementById('preview-capacity').textContent =
+                cap.value ? cap.value + ' Guests' : '—';
+            if (contact) document.getElementById('preview-contact').textContent = contact.value || '—';
+            if (loc) document.getElementById('preview-location').textContent = loc.value || '—';
+            const sw = document.getElementById('preview-services-wrap');
+            const st = document.getElementById('preview-services');
+            if (services && sw && st) {
+                const v = services.value.trim();
+                sw.style.display = v ? '' : 'none';
+                st.textContent = v;
+            }
+            if (mapEmbed && previewEmbed) {
+                const embed = mapEmbed.value.trim();
+                if (embed) previewEmbed.src = embed;
+            }
+            if (mapShare && previewShare) {
+                const share = mapShare.value.trim();
+                if (share) previewShare.href = share;
+            }
+        }
+        [desc, services, cap, contact, loc, mapShare, mapEmbed].forEach(el => {
+            if (el) el.addEventListener('input', sync);
+        });
+    })();
+</script>
 </body>
 </html>

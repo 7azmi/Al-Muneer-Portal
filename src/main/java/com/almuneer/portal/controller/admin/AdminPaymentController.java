@@ -29,9 +29,14 @@ public class AdminPaymentController {
 
     /** UC013 — list all payment proofs */
     @GetMapping
-    public String listProofs(Model model) {
-        List<PaymentProof> proofs = paymentProofService.getAll();
+    public String listProofs(
+            @RequestParam(required = false) Long inquiryId,
+            Model model) {
+        List<PaymentProof> proofs = inquiryId != null
+                ? paymentProofService.getByInquiryId(inquiryId)
+                : paymentProofService.getAll();
         model.addAttribute("proofs", proofs);
+        model.addAttribute("filterInquiryId", inquiryId);
         return "admin/payment-manage";
     }
 

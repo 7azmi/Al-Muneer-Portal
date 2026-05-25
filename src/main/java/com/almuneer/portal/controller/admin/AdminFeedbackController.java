@@ -25,14 +25,25 @@ public class AdminFeedbackController {
         return "admin/feedback-manage";
     }
 
+    /** UC015 — view full feedback message */
+    @GetMapping("/{id}")
+    public String viewFeedback(@PathVariable Long id, Model model) {
+        model.addAttribute("feedback", feedbackService.getById(id));
+        return "admin/feedback-detail";
+    }
+
     /** UC015 — mark feedback as reviewed with optional notes */
     @PostMapping("/{id}/review")
     public String markReviewed(
             @PathVariable Long id,
             @RequestParam(required = false) String adminNotes,
+            @RequestParam(required = false, defaultValue = "list") String from,
             RedirectAttributes redirectAttributes) {
         feedbackService.markReviewed(id, adminNotes);
         redirectAttributes.addFlashAttribute("success", "Feedback marked as reviewed.");
+        if ("detail".equals(from)) {
+            return "redirect:/admin/feedback/" + id;
+        }
         return "redirect:/admin/feedback";
     }
 }

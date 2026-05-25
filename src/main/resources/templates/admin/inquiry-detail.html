@@ -124,8 +124,9 @@
             <!-- Payment Proofs Link -->
             <div class="admin-panel">
                 <h3 class="admin-panel-title">💳 Payment Proofs</h3>
-                <a href="/admin/payments" class="btn btn-outline" style="display:block; text-align:center;">
-                    View All Payment Proofs
+                <a th:href="@{/admin/payments(inquiryId=${inquiry.inquiryId})}"
+                   class="btn btn-outline" style="display:block; text-align:center;">
+                    View Payment Proofs
                 </a>
             </div>
         </div>

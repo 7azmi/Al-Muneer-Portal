@@ -15,6 +15,7 @@ public interface BookingInquiryRepository extends JpaRepository<BookingInquiry, 
     List<BookingInquiry> findByStatusNotInOrderBySubmissionDateDesc(List<InquiryStatus> statuses);
     Optional<BookingInquiry> findByReferenceCode(Long referenceCode);
     long countByStatus(InquiryStatus status);
+    long countByStatusNotIn(List<InquiryStatus> statuses);
 
     /** Check whether any payment proof exists for an inquiry */
     @Query("SELECT COUNT(p) > 0 FROM PaymentProof p WHERE p.inquiry.inquiryId = :inquiryId")
