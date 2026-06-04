@@ -25,6 +25,18 @@
         </form>
     </div>
 
+    <!-- AI Insights Panel — loads asynchronously after page render -->
+    <div id="ai-insight-panel" class="admin-panel" style="margin-bottom: 1.5rem; border-left: 4px solid #6c63ff; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.4rem;">🤖</span>
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #4c1d95;">AI Advisor — Business Report</h3>
+            <span style="margin-left: auto; font-size: 0.7rem; color: #7c3aed; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">Powered by Gemini</span>
+        </div>
+        <div id="ai-insight-body" style="font-size: 0.92rem; color: #6b7280;">
+            <span class="ai-spinner">⏳ Analyzing your report data…</span>
+        </div>
+    </div>
+
     <div class="admin-stats">
         <!-- Inquiry Stats -->
         <div class="stat-card">
@@ -84,6 +96,29 @@
                 renderFeedbackRatingsChart('feedbackRatingsChart', feedbackRatingsData);
             }
         });
+
+        // Async AI insight fetch — does not block page load
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const url = '/admin/reports/ai-insight' + (params.toString() ? '?' + params.toString() : '');
+            fetch(url)
+                .then(r => r.text())
+                .then(text => {
+                    const body = document.getElementById('ai-insight-body');
+                    if (!body) return;
+                    // Render bullet lines as styled paragraphs
+                    const lines = text.split('\n').filter(l => l.trim());
+                    body.innerHTML = lines.map(line =>
+                        line.trim().startsWith('•')
+                            ? `<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;"><span style="color:#7c3aed;font-weight:700;flex-shrink:0;">•</span><span>${line.replace(/^\s*•\s*/, '')}</span></div>`
+                            : `<p style="margin:0 0 0.4rem;">${line}</p>`
+                    ).join('');
+                })
+                .catch(() => {
+                    const body = document.getElementById('ai-insight-body');
+                    if (body) body.innerHTML = '<span style="color:#9ca3af;">AI insight unavailable — could not reach Gemini.</span>';
+                });
+        })();
     </script>
 </div>
 </body>

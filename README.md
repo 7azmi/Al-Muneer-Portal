@@ -22,8 +22,10 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 
 ### 🛠️ Administrator Module
 - **Dashboard Overview:** Daily workload at a glance — new/active inquiries, pending payment proofs, unreviewed feedback, visits today/last 7 days, average rating, recent inquiries, and top pages.
-- **Analytics Dashboard:** Interactive **Chart.js visualizations** — bar chart of top pages, line chart of daily traffic trends over last 30 days.
-- **Reports with Visualizations:** Comprehensive reports with **pie charts** (inquiry status, payment status) and **bar charts** (feedback rating distribution). Date range filtering to analyze trends by period (`?fromDate=` and `?toDate=`).
+- **Analytics Dashboard:** Interactive **Chart.js visualizations** — bar chart of top pages, line chart of daily traffic trends over last 30 days. Includes an **AI Traffic Funnel Advisor** that analyzes page visit counts and booking funnel drop-off.
+- **Reports with Visualizations:** Comprehensive reports with **pie charts** (inquiry status, payment status) and **bar charts** (feedback rating distribution). Date range filtering to analyze trends by period (`?fromDate=` and `?toDate=`). Includes an **AI Business Report Advisor** that computes conversion and cancellation rates and surfaces urgent action bullets.
+- **Feedback AI Analysis:** The feedback management list includes an **AI Feedback Advisor** that separates low-rating complaints from positive highlights and tells the owner what to address first.
+- **Non-blocking AI panels:** All three AI advisors load asynchronously via `fetch()` after the page renders — page load is never delayed by Gemini. Each panel shows a spinner while loading and degrades gracefully on API error.
 - **Content Management:** Full CRUD for venue info (including **Google Maps share + embed URLs**), gallery items, **gallery labels** (filter categories), and pricing tiers.
 - **Inquiry Management:** Rich filter bar with per-status counts; active inquiries shown by default; completed/cancelled hidden. Client-side search. Reference code displayed per row.
 - **Payment Verification:** Review uploaded payment receipts with image display. From an inquiry, **View Payment Proofs** opens proofs filtered by that inquiry (`/admin/payments?inquiryId=…`). Cascades status to inquiry and slot on verification.
@@ -42,6 +44,7 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 | Security | Spring Security (JWT-based, BCrypt) |
 | Database | PostgreSQL 16 |
 | Frontend | HTML5, CSS3, Vanilla JS, Thymeleaf, Chart.js |
+| AI | Google GenAI Java SDK (`google-genai` 1.56.0) — Gemini 2.0 Flash Lite |
 | Build | Maven |
 | Utilities | Lombok, Spring Data JPA, jjwt |
 
@@ -106,6 +109,7 @@ Default admin account created on first run (`DataSeeder`):
 | `app.jwt.secret` | *(see file)* | JWT signing secret — **must** be changed in production. |
 | `app.maps.share-url` | Google share link | Default “Open in Google Maps” link (overridden by **Admin → Venue Info** when set) |
 | `app.maps.embed-url` | Maps embed URL | Default map iframe `src` (overridden by **Admin → Venue Info** when set) |
+| `app.gemini.api-key` | *(required)* | Gemini API key from [aistudio.google.com](https://aistudio.google.com/). Without it, AI panels show a graceful fallback message. |
 
 ---
 
@@ -119,7 +123,8 @@ src/main/java/com/almuneer/portal/
 ├── repository/     # Spring Data JPA repositories
 ├── security/       # JWT and Auth logic
 ├── service/        # Business logic interfaces + implementations
-└── util/           # FileUploadUtil, DeepLinkBuilderUtil
+│   └── GeminiService.java   # Google GenAI SDK wrapper — async AI advisor endpoints
+└── util/           # FileUploadUtil, DeepLinkBuilderUtil, ReportGeneratorUtil
 
 src/main/resources/
 ├── static/
@@ -148,6 +153,15 @@ src/main/resources/
 ---
 
 ## 🔄 Changelog
+
+### v0.7 — 2026-06-04
+- **Feature:** Gemini AI integration using the official **Google GenAI Java SDK** (`google-genai` 1.56.0, model `gemini-2.0-flash-lite`).
+- **Feature:** `GeminiService` — Spring `@Service` wrapping the SDK; returns a graceful fallback on any error so pages never crash.
+- **Feature:** **AI Business Report Advisor** (`GET /admin/reports/ai-insight`) — derives booking conversion rate and cancellation rate, then prompts Gemini for 3 number-backed action bullets.
+- **Feature:** **AI Feedback Advisor** (`GET /admin/feedback/ai-insight`) — separates 1-2★ complaints from 4-5★ positives; asks Gemini what the owner should address first this week.
+- **Feature:** **AI Traffic Funnel Advisor** (`GET /admin/analytics/ai-insight`) — maps Home → Gallery → Pricing → Inquiry visit counts to surface funnel drop-off and suggest one concrete conversion improvement.
+- **Architecture:** All AI panels load **asynchronously** via dedicated `GET /ai-insight` endpoints; main pages render instantly, the browser fetches the insight after DOM load. Bullet responses are formatted as styled HTML lists client-side.
+- **Config:** `app.gemini.api-key` added to `application.properties`.
 
 ### v0.6 — 2026-06-04
 - **Feature:** Analytics dashboard with interactive **Chart.js visualizations** — bar chart for top pages, line chart for daily traffic trends.
