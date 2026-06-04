@@ -9,7 +9,7 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 ## 🚀 Key Features
 
 ### 🌍 Visitor Module
-- **Single-Page Home:** One scrollable landing page (hero → venue → gallery → booking calendar → pricing → feedback) with anchor navigation; legacy routes (`/gallery`, `/calendar`, `/pricing`, `/venue`) redirect to the matching section.
+- **Single-Page Home:** One scrollable landing page (hero → venue → gallery → booking calendar → pricing) with anchor navigation; legacy routes (`/gallery`, `/calendar`, `/pricing`, `/venue`) redirect to the matching section.
 - **Venue Showcase:** Services, capacity, contact, location label, and an embedded **Google Maps** iframe. Map share + embed URLs are editable in admin (with `application.properties` defaults as fallback).
 - **Media Gallery:** Packed masonry layout (variable-height images/videos), category filters from admin-defined labels, and a full-screen lightbox.
 - **Interactive Booking Calendar:** Future dates default to **Available**; past dates are dimmed. Tap an available day to reveal a single **Submit inquiry** action; inquiry opens with the date pre-filled (`/inquiry?date=YYYY-MM-DD`).
@@ -18,10 +18,12 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 - **9-Digit Reference Codes:** Every inquiry is assigned a random 9-digit visitor-facing reference code stored in a 150-day cookie for seamless retrieval.
 - **Visitor Self-Cancellation:** Visitors can cancel their own inquiry (if no payment proof is attached) directly from the confirmation page.
 - **Payment Proof Upload:** Security-verified upload system for offline payment receipts.
-- **Feedback System:** Rating and message are required; name and WhatsApp are optional. Thank-you screen after submit.
+- **Feedback System:** Publicly accessible feedback form at `/feedback` with optional name and WhatsApp fields. Rating and message required. Feedback form is suggested to visitors post-inquiry completion via a link on the inquiry confirmation page. Responses stored for admin review.
 
 ### 🛠️ Administrator Module
 - **Dashboard Overview:** Daily workload at a glance — new/active inquiries, pending payment proofs, unreviewed feedback, visits today/last 7 days, average rating, recent inquiries, and top pages.
+- **Analytics Dashboard:** Interactive **Chart.js visualizations** — bar chart of top pages, line chart of daily traffic trends over last 30 days.
+- **Reports with Visualizations:** Comprehensive reports with **pie charts** (inquiry status, payment status) and **bar charts** (feedback rating distribution). Date range filtering to analyze trends by period (`?fromDate=` and `?toDate=`).
 - **Content Management:** Full CRUD for venue info (including **Google Maps share + embed URLs**), gallery items, **gallery labels** (filter categories), and pricing tiers.
 - **Inquiry Management:** Rich filter bar with per-status counts; active inquiries shown by default; completed/cancelled hidden. Client-side search. Reference code displayed per row.
 - **Payment Verification:** Review uploaded payment receipts with image display. From an inquiry, **View Payment Proofs** opens proofs filtered by that inquiry (`/admin/payments?inquiryId=…`). Cascades status to inquiry and slot on verification.
@@ -39,7 +41,7 @@ Al-Muneer Portal is a modern, responsive web application designed for the Al-Mun
 | Backend | Java 21, Spring Boot 3.4.4 |
 | Security | Spring Security (JWT-based, BCrypt) |
 | Database | PostgreSQL 16 |
-| Frontend | HTML5, CSS3, Vanilla JS, Thymeleaf |
+| Frontend | HTML5, CSS3, Vanilla JS, Thymeleaf, Chart.js |
 | Build | Maven |
 | Utilities | Lombok, Spring Data JPA, jjwt |
 
@@ -146,6 +148,14 @@ src/main/resources/
 ---
 
 ## 🔄 Changelog
+
+### v0.6 — 2026-06-04
+- **Feature:** Analytics dashboard with interactive **Chart.js visualizations** — bar chart for top pages, line chart for daily traffic trends.
+- **Feature:** Reports page with **visual charts**: inquiry status breakdown (pie chart), payment status (pie chart), feedback ratings distribution (bar chart).
+- **Feature:** Date range filtering on reports page (`?fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD`) to analyze historical trends.
+- **Fix:** Feedback `visitor_name` column now nullable; feedback form optional name field now works without errors.
+- **UX:** Feedback form moved to post-inquiry flow — no longer suggested on home page, only linked after inquiry completion.
+- **UX:** Inquiry page (`/inquiry`) now fully responsive across mobile breakpoints (768px, 640px, 480px); two-column grids stack to single column on mobile.
 
 ### v0.5 — 2026-05-24
 - **Feature:** Admin dashboard stats (`AdminDashboardService`) — inquiries, pending proofs, unreviewed feedback, traffic, recent activity.

@@ -21,4 +21,13 @@ public interface PageVisitRepository extends JpaRepository<PageVisit, Long> {
 
     @Query("SELECT SUM(p.hitCount) FROM PageVisit p")
     Long sumAllHits();
+
+    @Query("SELECT SUM(p.hitCount) FROM PageVisit p WHERE p.visitDate >= :from AND p.visitDate <= :to")
+    Long sumAllHitsBetween(LocalDate from, LocalDate to);
+
+    @Query("SELECT p.pagePath, SUM(p.hitCount) FROM PageVisit p WHERE p.visitDate >= :from AND p.visitDate <= :to GROUP BY p.pagePath ORDER BY SUM(p.hitCount) DESC")
+    List<Object[]> findTotalHitsPerPageBetween(LocalDate from, LocalDate to);
+
+    @Query("SELECT p.visitDate, SUM(p.hitCount) FROM PageVisit p WHERE p.visitDate >= :from AND p.visitDate <= :to GROUP BY p.visitDate ORDER BY p.visitDate")
+    List<Object[]> findDailyHitsBetween(LocalDate from, LocalDate to);
 }

@@ -7,9 +7,27 @@
         <h1 class="admin-page-title">Traffic Analytics</h1>
     </div>
 
+    <!-- Date Filter Form -->
+    <div class="admin-panel" style="margin-bottom: 1.5rem;">
+        <form method="get" style="display: grid; grid-template-columns: 1fr 1fr 150px; gap: 1rem; align-items: flex-end;">
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem;">From Date</label>
+                <input type="date" name="fromDate" th:value="${fromDate}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 6px;">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem;">To Date</label>
+                <input type="date" name="toDate" th:value="${toDate}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 6px;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Filter</button>
+                <a href="/admin/analytics" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-align: center; text-decoration: none;">Reset</a>
+            </div>
+        </form>
+    </div>
+
     <div class="admin-stats">
         <div class="stat-card">
-            <div class="stat-label">Total Page Visits (All Time)</div>
+            <div class="stat-label">Total Page Visits</div>
             <div class="stat-value" th:text="${totalHits}">0</div>
         </div>
     </div>
@@ -17,38 +35,54 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
         <!-- Page breakdown -->
         <div class="admin-panel">
-            <h3 class="admin-panel-title">Visits Per Page (All Time)</h3>
-            <table class="admin-table" th:if="${!pageHits.isEmpty()}">
-                <thead><tr><th>Page</th><th>Visits</th></tr></thead>
-                <tbody>
-                    <tr th:each="entry : ${pageHits}">
-                        <td th:text="${entry.key}">Page</td>
-                        <td th:text="${entry.value}">0</td>
-                    </tr>
-                </tbody>
-            </table>
+            <h3 class="admin-panel-title">Visits Per Page</h3>
+            <div th:if="${!pageHits.isEmpty()}">
+                <canvas id="topPagesChart" style="max-height: 300px;"></canvas>
+            </div>
             <div th:if="${pageHits.isEmpty()}" class="empty-state">
-                <p class="empty-state-text">No visits recorded yet.</p>
+                <p class="empty-state-text">No visits recorded for this period.</p>
             </div>
         </div>
 
-        <!-- Daily breakdown (last 30 days) -->
+        <!-- Daily breakdown -->
         <div class="admin-panel">
-            <h3 class="admin-panel-title">Daily Visits (Last 30 Days)</h3>
-            <table class="admin-table" th:if="${!dailyHits.isEmpty()}">
-                <thead><tr><th>Date</th><th>Visits</th></tr></thead>
-                <tbody>
-                    <tr th:each="entry : ${dailyHits}">
-                        <td th:text="${entry.key}">Date</td>
-                        <td th:text="${entry.value}">0</td>
-                    </tr>
-                </tbody>
-            </table>
+            <h3 class="admin-panel-title">Daily Visits</h3>
+            <div th:if="${!dailyHits.isEmpty()}">
+                <canvas id="dailyTrendChart" style="max-height: 300px;"></canvas>
+            </div>
             <div th:if="${dailyHits.isEmpty()}" class="empty-state">
-                <p class="empty-state-text">No data for the last 30 days.</p>
+                <p class="empty-state-text">No data for this period.</p>
             </div>
         </div>
     </div>
+
+    <script th:src="@{/js/admin-charts.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const pageHitsData = [[${pageHits}]];
+            const dailyHitsData = [[${dailyHits}]];
+
+            // Convert page hits map to chart data
+            if (pageHitsData && Object.keys(pageHitsData).length > 0) {
+                const chartData = Object.entries(pageHitsData).map(([page, hits]) => ({
+                    page: page,
+                    hits: hits
+                }));
+                renderTopPagesChart('topPagesChart', chartData);
+            }
+
+            // Convert daily hits map to chart data
+            if (dailyHitsData && Object.keys(dailyHitsData).length > 0) {
+                const chartData = Object.entries(dailyHitsData)
+                    .sort()
+                    .map(([date, hits]) => ({
+                        date: date,
+                        hits: hits
+                    }));
+                renderDailyTrendChart('dailyTrendChart', chartData);
+            }
+        });
+    </script>
 </div>
 </body>
 </html>

@@ -71,6 +71,17 @@
                 </div>
             </div>
 
+            <!-- ── Share feedback section ──────────────────────────────── -->
+            <div style="background: rgba(201, 168, 76, 0.08); border: 1px solid rgba(201, 168, 76, 0.2);
+                        border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center;">
+                <p style="margin: 0 0 0.75rem; color: var(--color-text-muted); font-size: 0.85rem;">
+                    Had a great experience at Al-Muneer?
+                </p>
+                <a href="/feedback" class="btn btn-outline" id="go-feedback-btn" style="display: inline-block;">
+                    ⭐ Share Your Feedback
+                </a>
+            </div>
+
             <!-- ── Action buttons ─────────────────────────────────────── -->
             <div style="display:grid; gap:0.65rem; margin-bottom:1.5rem;"
                  th:if="${inquiry.status.name() != 'CANCELLED_BY_VISITOR' and inquiry.status.name() != 'CANCELLED_BY_ADMIN'}">
