@@ -7,6 +7,36 @@
         <h1 class="admin-page-title">Reports & Analytics Summary</h1>
     </div>
 
+    <!-- Date Filter Form -->
+    <div class="admin-panel" style="margin-bottom: 1.5rem;">
+        <form method="get" style="display: grid; grid-template-columns: 1fr 1fr 150px; gap: 1rem; align-items: flex-end;">
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem;">From Date</label>
+                <input type="date" name="fromDate" th:value="${fromDate}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 6px;">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem;">To Date</label>
+                <input type="date" name="toDate" th:value="${toDate}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: 6px;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Filter</button>
+                <a href="/admin/reports" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-align: center; text-decoration: none;">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- AI Insights Panel — loads asynchronously after page render -->
+    <div id="ai-insight-panel" class="admin-panel" style="margin-bottom: 1.5rem; border-left: 4px solid #6c63ff; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem;">
+            <span style="font-size: 1.4rem;">🤖</span>
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #4c1d95;">AI Advisor — Business Report</h3>
+            <span style="margin-left: auto; font-size: 0.7rem; color: #7c3aed; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">Powered by Gemini</span>
+        </div>
+        <div id="ai-insight-body" style="font-size: 0.92rem; color: #6b7280;">
+            <span class="ai-spinner">⏳ Analyzing your report data…</span>
+        </div>
+    </div>
+
     <div class="admin-stats">
         <!-- Inquiry Stats -->
         <div class="stat-card">
@@ -28,40 +58,68 @@
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-        <!-- Bookings -->
+        <!-- Inquiry Status Chart -->
         <div class="admin-panel">
-            <h3 class="admin-panel-title">📋 Inquiry Breakdown</h3>
-            <table class="admin-table">
-                <tr><td>New / Unread</td><td><strong th:text="${report['newInquiries']}">0</strong></td></tr>
-                <tr><td>Confirmed</td><td><strong th:text="${report['confirmedBookings']}">0</strong></td></tr>
-                <tr><td>Completed</td><td><strong th:text="${report['completedEvents']}">0</strong></td></tr>
-                <tr><td>Cancelled</td><td><strong th:text="${report['cancelledInquiries']}">0</strong></td></tr>
-                <tr><td><strong>Total</strong></td><td><strong th:text="${report['totalInquiries']}">0</strong></td></tr>
-            </table>
+            <h3 class="admin-panel-title">📊 Inquiry Status Breakdown</h3>
+            <canvas id="inquiryStatusChart" style="max-height: 300px;"></canvas>
         </div>
 
-        <!-- Payments -->
+        <!-- Payment Status Chart -->
         <div class="admin-panel">
-            <h3 class="admin-panel-title">💳 Payment Proofs</h3>
-            <table class="admin-table">
-                <tr><td>Pending Review</td><td><strong th:text="${report['proofsPending']}">0</strong></td></tr>
-                <tr><td>Verified</td><td><strong th:text="${report['proofsVerified']}">0</strong></td></tr>
-                <tr><td>Rejected</td><td><strong th:text="${report['proofsRejected']}">0</strong></td></tr>
-            </table>
+            <h3 class="admin-panel-title">💳 Payment Status</h3>
+            <canvas id="paymentStatusChart" style="max-height: 300px;"></canvas>
         </div>
 
-        <!-- Feedback -->
-        <div class="admin-panel">
-            <h3 class="admin-panel-title">💬 Feedback Summary</h3>
-            <table class="admin-table">
-                <tr><td>Total Submissions</td><td><strong th:text="${report['totalFeedback']}">0</strong></td></tr>
-                <tr><td>Unreviewed</td><td><strong th:text="${report['unreviewed']}">0</strong></td></tr>
-                <tr><td>Average Rating</td>
-                    <td><strong th:text="${report['averageRating']} + ' / 5'">0</strong></td>
-                </tr>
-            </table>
+        <!-- Feedback Ratings Chart -->
+        <div class="admin-panel" style="grid-column: 1 / -1;">
+            <h3 class="admin-panel-title">⭐ Feedback Ratings Distribution</h3>
+            <canvas id="feedbackRatingsChart" style="max-height: 300px;"></canvas>
         </div>
     </div>
+
+    <script th:src="@{/js/admin-charts.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const inquiryStatusData = [[${report['inquiryStatusBreakdown']}]];
+            const paymentStatusData = [[${report['paymentStatusBreakdown']}]];
+            const feedbackRatingsData = [[${report['feedbackRatings']}]];
+
+            if (inquiryStatusData && inquiryStatusData.length > 0) {
+                renderInquiryStatusChart('inquiryStatusChart', inquiryStatusData);
+            }
+
+            if (paymentStatusData && paymentStatusData.length > 0) {
+                renderPaymentStatusChart('paymentStatusChart', paymentStatusData);
+            }
+
+            if (feedbackRatingsData && feedbackRatingsData.length > 0) {
+                renderFeedbackRatingsChart('feedbackRatingsChart', feedbackRatingsData);
+            }
+        });
+
+        // Async AI insight fetch — does not block page load
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const url = '/admin/reports/ai-insight' + (params.toString() ? '?' + params.toString() : '');
+            fetch(url)
+                .then(r => r.text())
+                .then(text => {
+                    const body = document.getElementById('ai-insight-body');
+                    if (!body) return;
+                    // Render bullet lines as styled paragraphs
+                    const lines = text.split('\n').filter(l => l.trim());
+                    body.innerHTML = lines.map(line =>
+                        line.trim().startsWith('•')
+                            ? `<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;"><span style="color:#7c3aed;font-weight:700;flex-shrink:0;">•</span><span>${line.replace(/^\s*•\s*/, '')}</span></div>`
+                            : `<p style="margin:0 0 0.4rem;">${line}</p>`
+                    ).join('');
+                })
+                .catch(() => {
+                    const body = document.getElementById('ai-insight-body');
+                    if (body) body.innerHTML = '<span style="color:#9ca3af;">AI insight unavailable — could not reach Gemini.</span>';
+                });
+        })();
+    </script>
 </div>
 </body>
 </html>

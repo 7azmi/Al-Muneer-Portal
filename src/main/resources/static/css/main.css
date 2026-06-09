@@ -1934,4 +1934,88 @@ button.calendar-day {
         margin-left: 0;
         padding: var(--space-4);
     }
+
+    /* Inquiry page: stack 2-column grids to 1 column */
+    .inquiry-main-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .inquiry-form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .inquiry-form-fields-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .inquiry-contact-sidebar {
+        width: 100% !important;
+        margin-top: var(--space-4);
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-title {
+        font-size: var(--font-size-3xl);
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cal-nav-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 0.85rem;
+    }
+
+    .calendar-day {
+        padding: 0.35rem;
+    }
+
+    .form-input, .form-select, .form-textarea {
+        padding: 0.65rem;
+        min-height: 44px;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+    }
+
+    .inquiry-form-container {
+        padding: var(--space-4);
+    }
+
+    .inquiry-form-fields-row {
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    .section-container {
+        padding: var(--space-3) var(--space-2);
+    }
+
+    .btn {
+        padding: 0.65rem 1rem;
+        font-size: 0.85rem;
+        min-height: 44px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+        padding: 0.65rem;
+        font-size: 1rem;
+    }
+
+    .inquiry-form-container {
+        padding: var(--space-3);
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
 }

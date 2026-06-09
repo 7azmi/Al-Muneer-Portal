@@ -33,7 +33,7 @@
     </div>
 
     <!-- ── Two-panel layout ─────────────────────────────── -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+    <div class="inquiry-main-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
 
         <!-- LEFT: New inquiry form -->
         <div class="card" style="padding: 2rem;" id="new-inquiry-panel">
@@ -71,7 +71,7 @@
                     </small>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="inquiry-form-fields-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                     <div class="form-group">
                         <label class="form-label" for="inq-type">Event Type</label>
                         <select id="inq-type" name="eventType" class="form-input">
