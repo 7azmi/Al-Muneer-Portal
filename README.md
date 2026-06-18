@@ -155,7 +155,7 @@ src/main/resources/
 ## 🔄 Changelog
 
 ### v0.7 — 2026-06-04
-- **Feature:** Gemini AI integration using the official **Google GenAI Java SDK** (`google-genai` 1.56.0, model `gemini-2.0-flash-lite`).
+- **Feature:** Gemini AI integration using the official **Google GenAI Java SDK** (`google-genai` 1.56.0, model `gemini-3.1-flash-lite`).
 - **Feature:** `GeminiService` — Spring `@Service` wrapping the SDK; returns a graceful fallback on any error so pages never crash.
 - **Feature:** **AI Business Report Advisor** (`GET /admin/reports/ai-insight`) — derives booking conversion rate and cancellation rate, then prompts Gemini for 3 number-backed action bullets.
 - **Feature:** **AI Feedback Advisor** (`GET /admin/feedback/ai-insight`) — separates 1-2★ complaints from 4-5★ positives; asks Gemini what the owner should address first this week.
