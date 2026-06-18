@@ -11,11 +11,10 @@
 I declare that this thesis is classified as: I acknowledged that Universiti Teknologi Malaysia reserves the right as follows:
 
 - The thesis is the property of Universiti Teknologi Malaysia.
-    
+
 - The Library of Universiti Teknologi Malaysia has the right to make copies for the purpose of research only.
-    
+
 - The Library has the right to make copies of the thesis for academic exchange.
-    
 
 _(NOTES: If the thesis is CONFIDENTIAL or RESTRICTED, please attach with the letter from the organization with period and reasons for confidentiality or restriction)_
 
@@ -151,17 +150,16 @@ The primary objective of this project is to design, develop, and assess the Al-M
 To achieve the project aim, the following objectives have been defined:
 
 1. **Requirements Elicitation and Analysis:** To thoroughly gather, document, and analyze the functional and non-functional requirements and expectations of the Al-Muneer Hall owner and potential clients, covering features such as availability calendar, pricing, FAQ, media gallery, inquiry submission, payment proof upload, feedback, basic reporting, and notification management via pre-filled WhatsApp messaging.
-    
+
 2. **System Architecture and Design:** To design the comprehensive system architecture, including the database schema (ERD), user interface/user experience (UI/UX) mockups, and detailed module specifications for both client and administrator interfaces, ensuring all gathered requirements are effectively translated into a robust, intuitive, and culturally sensitive design.
-    
+
 3. **Software Development and Implementation:** To construct a functional, monolithic web application using the Spring Boot (Java) framework and Model-View-Controller (MVC) design pattern, meticulously implementing all specified features for both client-side interactions and secure administrative controls (content management, inquiry handling, payment proof verification, feedback management, report generation, and notification configuration).
-    
+
 4. **Comprehensive System Testing and Validation:** To conduct thorough functional, usability, performance, and basic security testing on the developed Al-Muneer Online Portal, ensuring all modules operate reliably, efficiently, and according to specifications, with a particular focus on the accuracy of reports, the workflow for payment proofs, the submission and management of feedback, and the delivery of notifications.
-    
+
 5. **System Deployment and Configuration:** To successfully deploy the developed Al-Muneer Online Portal to a production environment, ensuring proper configuration, accessibility via standard web browsers with responsive design, and operational readiness for both clients and administrators.
-    
+
 6. **Documentation and Handover for Future Maintenance:** To prepare comprehensive system documentation, including user manuals and technical guides for the administrator, and to establish a framework for post-deployment monitoring and initial evaluation, thereby ensuring the portal's stability and readiness for future enhancements or necessary maintenance activities.
-    
 
 ## 1.5 Project Scope
 
@@ -172,32 +170,30 @@ The Al-Muneer Online Portal project encompasses the following scope:
 **Users:**
 
 - **Visitors:** Can browse venue information, view media gallery, check availability, view pricing, consult FAQ, submit booking inquiries, optionally upload payment proof (e.g., transfer screenshot), and submit feedback.
-    
+
 - **Admin (Owner):** Can securely log in to manage hall information, media gallery, availability calendar, pricing, FAQ, view inquiries, view/manage submitted payment proofs (update status), manage feedback, view basic operational reports, and configure/manage notifications.
-    
 
 **Core Functionalities:** Content display, interactive calendar, dynamic pricing display, FAQ, inquiry submission, simple payment proof upload and admin verification, feedback submission and admin review, basic reporting dashboard for admin, and admin-configurable notifications via pre-filled WhatsApp messages.
 
 **Limitations:**
 
 - Simple payment proof upload only (e.g., screenshot of local transfer receipt). No direct online payment processing or integration with banks/payment gateways.
-    
+
 - No integration with external calendar systems.
-    
+
 - No integrated live chat feature. Standard contact information (Hotline/WhatsApp number) will be clearly displayed.
-    
+
 - No advanced event management or Customer Relationship Management (CRM) features.
-    
+
 - Analytics will be basic (e.g., visitor counts, inquiry logs contributing to reports).
-    
+
 - Owner provides initial content.
-    
+
 - Website anticipates moderate traffic.
-    
+
 - Reporting will be basic (e.g., summaries of inquiries, bookings based on payment status, feedback overview).
-    
+
 - Manual Notification Triggering: Notifications are not automated via API gateways; instead, they are managed through admin-initiated, pre-filled WhatsApp messages to accommodate local preferences and budget constraints. Email notifications will be minimal or optional.
-    
 
 ## 1.6 Project Importance
 
@@ -226,17 +222,16 @@ Modern event venue websites have evolved beyond simple static brochures to becom
 The current manual system at Al-Muneer Hall is common among SMEs but suffers from inefficiencies:
 
 - **Time Consumption:** Staff spend time on repetitive queries and manual tracking of bookings, payments, and feedback (Laudon & Laudon, 2016).
-    
+
 - **Limited Availability:** Information and process progression are tied to staff hours.
-    
+
 - **Inconsistency:** Information can vary; tracking booking confirmations and feedback lacks standardization.
-    
+
 - **Lack of Scalability:** Handling increased volume becomes difficult.
-    
+
 - **Poor User Experience:** Customers expect streamlined online interactions, including clear confirmation steps and ways to voice opinions (Sigala et al., 2012).
-    
+
 - **Documentation and Oversight Challenges:** Manual tracking makes it hard to generate operational insights or reliably follow up on client interactions.
-    
 
 ### 2.2.3 Current System Analysis - Comparison of Existing Systems/Approaches
 
@@ -376,17 +371,16 @@ _Figure 3.1: Waterfall Model Workflow for the Al-Muneer Online Portal_
 The development lifecycle for the Al-Muneer Online Portal, following the Waterfall model, is composed of distinct phases. Each phase has specific objectives and deliverables, ensuring a systematic progression towards the final product.
 
 1. **Requirements Analysis and Definition** This initial phase is essential for comprehending and documenting the specific requirements of the Al-Muneer Online Portal. It entails comprehensive discussions with the stakeholder (Mr. Almunajid) to extract all functional and non-functional requirements. Activities encompass identifying user roles (Visitor, Admin), defining features such as the display of venue information, media gallery, interactive availability calendar, pricing customization panel, submission of booking inquiries, simple payment proof uploads, feedback submissions, admin management of content, updates on payment status, review of feedback, basic report generation, and configuration of notifications. The primary output of this phase is the Software Requirements Specification (SRS) document, which acts as a foundational agreement regarding the functionalities of the system. This phase constituted a significant aspect of the early PSM1 activities.
-    
+
 2. **System and Software Design** Following the clear definition and documentation of requirements in the SRS, the design phase commences. During this phase, the overall system architecture for the Al-Muneer Online Portal is formulated. This includes the design of the database schema (for MySQL/PostgreSQL), detailing the backend structure (Spring Boot services and APIs), and crafting the user interface (UI) and user experience (UX) for both the visitor-facing front-end and the administrator panel. Decisions regarding module breakdown, data flow, and security considerations are made at this stage. The principal deliverable for this phase is the System Design Document (SDD), which serves as a blueprint for the development team (the student developer). This phase is a fundamental element of PSM1, particularly in preparation for Progress 2.
-    
+
 3. **Implementation and Unit Testing** This stage signifies the initiation of actual coding and development, which will predominantly take place during PSM2. In accordance with the SDD, the Al-Muneer Online Portal will be constructed. The web application will be developed as a cohesive, singular project. The backend logic will be managed by Spring Boot (Java), which will also provide the user interface. The View layer will be created utilizing a server-side templating engine (such as Thymeleaf) along with HTML, CSS, and JavaScript. The database will be established and filled with initial structures. As each module or component is crafted, it will undergo unit testing to confirm that it operates correctly in isolation, adhering to its design Description.
-    
+
 4. **Integration and System Testing** Once individual units have been developed and tested, they are combined into a comprehensive system. This integrated system subsequently undergoes thorough system testing to verify that all components function together seamlessly and that the system as a whole fulfills the requirements outlined in the SRS. This encompasses functional testing, usability testing, basic performance testing, and security testing. A Software Test Document (STD) will direct this process, and a test report will encapsulate the findings. This phase is also scheduled for PSM2.
-    
+
 5. **Deployment** Al-Muneer Online Portal will be migrated into a production-like environment after system testing is successfully done and has been certified to be stable and in compliance with all requirements. Deployment onto a Cloud VPS is expected to be for this project. This stage includes putting the hosting environment in place, deploying application code and database, and performing final testing to ensure the portal is live and user-accessible. This is expected to be finished towards the end of PSM2.
-    
+
 6. **Maintenance and Operation** Subsequent to deployment, the maintenance phase commences. This phase entails the continuous monitoring of the Al-Muneer Online Portal for any potential issues, bugs, or necessary updates. Within the context of the FYP, this phase may involve a period of observation, rectifying any immediate post-deployment issues, and preparing documentation for the transition of the system to the stakeholder. Although extensive long-term maintenance falls outside the scope of an FYP, it is essential to ensure that the system is stable and functional upon delivery.
-    
 
 ### 3.3.1 Gantt Chart for PSM1
 
@@ -463,76 +457,72 @@ Functional requirements describe what the system should do. For the Al-Muneer On
 **FR1: Visitor Functionalities**
 
 - **FR1.1 View Venue Information:** The system shall display comprehensive information about Al-Muneer Hall, including descriptions, capacity, services offered, and location details.
-    
+
 - **FR1.2 View Media Gallery:** The system shall allow visitors to browse a gallery of images and potentially videos showcasing the hall.
-    
+
 - **FR1.3 Check Availability:** The system shall provide an interactive calendar allowing visitors to view dates that are already booked and those that are available.
-    
+
 - **FR1.4 View Pricing Information:** The system shall display pricing information. This may include base rates and options for customizable packages or services that affect the price.
-    
+
 - **FR1.5 View FAQ:** The system shall display a list of frequently asked questions and their answers.
-    
+
 - **FR1.6 Submit Booking Inquiry:** The system shall provide a form for visitors to submit a booking inquiry, including their name, contact details, desired date(s), and any specific requests.
-    
+
 - **FR1.7 Submit Payment Proof (Optional):** The system shall allow visitors, after submitting an inquiry or upon instruction from the admin, to optionally upload an image file (e.g., screenshot of a local transfer receipt) as proof of payment. The system shall only accept common image formats (e.g., JPG, PNG) and enforce a reasonable file size limit.
-    
+
 - **FR1.8 Submit Feedback:** The system shall provide a form for visitors to submit feedback about the venue or their experience with the portal.
-    
 
 **FR2: Administrator Functionalities**
 
 - **FR2.1 Secure Admin Login:** The system shall require administrators to log in using unique, authenticated credentials (username and hashed password). The system shall display an error message if authentication fails.
-    
+
 - **FR2.2 Manage Venue Information:** The system shall allow the administrator to create, update, and delete textual information about the hall (descriptions, services, FAQs).
-    
+
 - **FR2.3 Manage Media Gallery:** The system shall allow the administrator to upload new images/videos to the gallery and delete existing ones.
-    
+
 - **FR2.4 Manage Availability Calendar:** The system shall allow the administrator to mark dates as booked or available on the interactive calendar.
-    
+
 - **FR2.5 Manage Pricing:** The system shall allow the administrator to set and update base pricing and any customizable pricing options.
-    
+
 - **FR2.6 Manage Booking Inquiries:** The system shall allow the administrator to view submitted booking inquiries.
-    
+
 - **FR2.7 Manage Payment Proofs:** The system shall allow the administrator to view uploaded payment proofs and update the status of a booking (e.g., "Payment Verified", "Pending Confirmation").
-    
+
 - **FR2.8 Manage Feedback:** The system shall allow the administrator to view submitted user feedback.
-    
+
 - **FR2.9 Generate Basic Reports:** The system shall allow the administrator to view basic reports, such as a list of inquiries within a date range, a summary of booking statuses, or an overview of feedback received.
-    
+
 - **FR2.10 Manage Notifications:** The system shall allow the administrator to manage pre-defined message templates for notifications (e.g., inquiry received, payment proof acknowledged) and initiate communication via preferred channels—specifically WhatsApp through deep-link triggers, with email as a secondary option.
-    
 
 **FR3: General System Functionalities**
 
 - **FR3.1 Responsive Design:** The system shall be responsive and accessible on common web browsers across various devices (desktops, tablets, smartphones).
-    
+
 - **FR3.2 Secure Data Handling:** The system shall securely handle all user-submitted data, including personal information in inquiries, uploaded payment proofs, and feedback.
-    
+
 - **FR3.3 Notification Generation:** Based on admin configuration and specific system events (e.g., new inquiry, payment proof submission), the system shall generate notifications to be sent to relevant parties (client and/or admin).
-    
 
 ### 4.2.2 Non-Functional Requirements
 
 Non-functional requirements define the quality attributes of the system.
 
 - **NFR1 Performance:** The system should load pages within an acceptable time frame (e.g., 3-5 seconds on a typical internet connection). The interactive calendar should respond promptly to user interactions.
-    
+
 - **NFR2 Usability:** The portal should be intuitive and easy to navigate for both visitors and the administrator. The language used will be primarily Arabic, with an option for English if deemed feasible within the project scope. UI elements should be clear and user-friendly, considering local cultural norms for design.
-    
+
 - **NFR3 Security:**
-    
+
     - **NFR3.1 Admin Authentication:** The admin login shall be protected against common vulnerabilities. Passwords must be hashed.
-        
+
     - **NFR3.2 Data Protection:** User-submitted data and uploaded files (payment proofs) must be protected from unauthorized access.
-        
+
     - **NFR3.3 SSL/TLS:** All communication between the client and server shall be encrypted using HTTPS.
-        
+
 - **NFR4 Reliability:** The system should be available for use with minimal downtime. Database backups should be considered as part of operational reliability.
-    
+
 - **NFR5 Maintainability:** The code should be well-structured, commented, and follow the chosen MVC pattern to facilitate future updates or modifications (relevant for PSM2 and beyond).
-    
+
 - **NFR6 Scalability (Basic):** While not expecting massive concurrent users initially, the system architecture (Spring Boot, chosen database) should be capable of handling a moderate increase in traffic (up to 10,000 monthly visitors as per initial scope) without significant performance degradation.
-    
 
 ### 4.2.3 Use Case Table and Diagram
 
@@ -598,8 +588,8 @@ _Figure 4.1: Use Case Diagram for the Al-Muneer Online Portal_
 |**Use Case Name**|Submit Booking Inquiry|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor is on the Al-Muneer Online Portal and has navigated to the inquiry section/form.|
-|**Normal Flow**|1. Visitor accesses the booking inquiry form.<br><br>  <br><br>2. Visitor fills in required fields (e.g., name, contact, desired date, event type, number of guests, specific requests).<br><br>  <br><br>3. Visitor submits the form.<br><br>  <br><br>4. System validates the input data.<br><br>  <br><br>5. System saves the inquiry details to the database.<br><br>  <br><br>6. System displays a success message to the Visitor.<br><br>  <br><br>7. System triggers a notification to the Administrator about the new inquiry.|
-|**Alternative Flow**|**4a. Invalid Input Data:**<br><br>  <br><br>4a1. System displays an error message indicating the fields with invalid data.<br><br>  <br><br>4a2. Visitor corrects the data and re-submits (back to step 3).<br><br>  <br><br>**7a. Notification Failure:**<br><br>  <br><br>7a1. System logs the notification failure but still saves the inquiry and shows success to the visitor. Admin will see the inquiry upon login.|
+|**Normal Flow**|1. Visitor accesses the booking inquiry form.<br><br>2. Visitor fills in required fields (e.g., name, contact, desired date, event type, number of guests, specific requests).<br><br>3. Visitor submits the form.<br><br>4. System validates the input data.<br><br>5. System saves the inquiry details to the database.<br><br>6. System displays a success message to the Visitor.<br><br>7. System triggers a notification to the Administrator about the new inquiry.|
+|**Alternative Flow**|**4a. Invalid Input Data:**<br><br>4a1. System displays an error message indicating the fields with invalid data.<br><br>4a2. Visitor corrects the data and re-submits (back to step 3).<br><br>**7a. Notification Failure:**<br><br>7a1. System logs the notification failure but still saves the inquiry and shows success to the visitor. Admin will see the inquiry upon login.|
 |**Post-condition(s)**|Booking inquiry is successfully recorded in the system. Administrator is notified of the new inquiry. Visitor receives confirmation that their inquiry has been submitted.|
 
 #### 4.2.3.2 Sequence Diagram (Submit Booking Inquiry - UC005)
@@ -818,23 +808,22 @@ _Figure 4.5: Conceptual Entity-Relationship Diagram (ERD)_
 **Data Components:**
 
 - **AdminUser:** Stores admin credentials and roles.
-    
+
 - **VenueInfo:** General descriptive information about the hall.
-    
+
 - **MediaItem:** Details about uploaded images and videos for the gallery.
-    
+
 - **AvailabilitySlot:** Represents specific dates and their booking status.
-    
+
 - **PricingTier:** Information about different pricing packages or rates.
-    
+
 - **BookingInquiry:** Details of inquiries submitted by visitors.
-    
+
 - **PaymentProof:** Metadata for uploaded payment proof files, linked to inquiries.
-    
+
 - **Feedback:** Stores feedback submitted by users.
-    
+
 - **Notification Template:** Stores message templates for pre-filled admin-triggered WhatsApp notifications.
-    
 
 ## 4.4 Interface Design (Low-Fidelity)
 
@@ -875,29 +864,29 @@ As the Al-Muneer Online Portal project moves from the planning and design phases
 ## REFERENCES
 
 1. Armbrust, M., Fox, A., Griffith, R., Joseph, A. D., Katz, R., Konwinski, A., and Zaharia, M. (2010). A view of cloud computing. Communications of the ACM. 53(4), 50-58.
-    
+
 2. Buhalis, D. and Law, R. (2008). Progress in information technology and tourism management: 20 years on and 10 years after the Internet-The state of e Tourism research. Tourism Management. 29(4), 609-623.
-    
+
 3. Chaffey, D. and Ellis-Chadwick, F. (2019). Digital Marketing. London: Pearson UK.
-    
+
 4. Fowler, M. (2002). Patterns of Enterprise Application Architecture. Boston, MA: Addison-Wesley Professional.
-    
+
 5. Gazzaroli, D., Lee, G., and Morrison, A. M. (2019). The impact of third-party online platforms on the European event industry: A focus on Eventbrite. International Journal of Event and Festival Management. 10(3), 238-253.
-    
+
 6. Kaplan, A. M. and Haenlein, M. (2010). Users of the world, unite! The challenges and opportunities of Social Media. Business Horizons. 53(1), 59-68.
-    
+
 7. Kshetri, N. (2013). Privacy and security issues in cloud computing: The role of institutions and institutional evolution. Telecommunications Policy. 37(4-5), 372-386.
-    
+
 8. Laudon, K. C. and Laudon, J. P. (2016). Management Information Systems: Managing the Digital Firm. Harlow, UK: Pearson.
-    
+
 9. Nielsen, J. (2000). Designing Web Usability. Indianapolis, IN: New Riders Publishing.
-    
+
 10. Odoom, R., Anning-Dorson, T., and Acheampong, G. (2017). Antecedents of social media usage and performance benefits in small and medium-sized enterprises (SMEs). Journal of Enterprise Information Management. 30(3), 383-399.
-    
+
 11. Royce, W. W. (1970). Managing the development of large software systems. Proceedings of IEEE WESCON 26. August, 1-9.
-    
+
 12. Sigala, M., Christou, E., and Gretzel, U. (Eds.). (2012). Social Media in Travel, Tourism and Hospitality: Theory, Practice and Cases. Farnham, UK: Ashgate Publishing, Ltd.
-    
+
 13. W3C. (2018). Web Content Accessibility Guidelines (WCAG) 2.1. Retrieved from https://www.w3.org/TR/WCAG21/
-    
+
 14. Walls, C. (2016). Spring Boot in Action. Shelter Island, NY: Manning Publications.

@@ -53,85 +53,84 @@ _(Note: This Software Design Descriptions (SDD) template is adapted from IEEE Re
 ## Table of Contents
 
 1. Revision Page (1)
-    
+
 2. Introduction (4)
-    
+
     2.1 Purpose (4)
-    
+
     2.2 Scope (4)
-    
+
     2.3 Context (6)
-    
+
     2.4 Summary (6)
-    
+
 3. References (7)
-    
+
 4. Glossary (8)
-    
+
 5. Design Body (10)
-    
+
     5.1 Design Stakeholders and Their Concerns (10)
-    
+
     5.2 Context Viewpoint (12)
-    
+
     5.2.1 Design Concerns (12)
-    
+
     5.2.2 Design View (13)
-    
+
     5.3 Composition Viewpoint (14)
-    
+
     5.3.1 Design Concerns (14)
-    
+
     5.3.2 Design View (16)
-    
+
     5.4 Logical Viewpoint (16)
-    
+
     5.4.1 Design Concerns (17)
-    
+
     5.4.2 Design View (17)
-    
+
     5.5 Information Viewpoint (19)
-    
+
     5.5.1 Design Concerns (19)
-    
+
     5.5.2 Design View (20)
-    
+
     5.6 Interface Viewpoint (24)
-    
+
     5.6.1 Design Concerns (24)
-    
+
     5.7 Structure Viewpoint (28)
-    
+
     5.7.1 Design Concerns (29)
-    
+
     5.7.2 Design View (29)
-    
+
     5.8 Interaction Viewpoint (32)
-    
+
     5.8.1 Design Concerns (32)
-    
+
     5.8.2 Design View (33)
-    
+
     5.9 State Dynamic Viewpoint (35)
-    
+
     5.9.1 Design Concerns (36)
-    
+
     5.9.2 Design View (36)
-    
+
     5.10 Algorithm Viewpoint (39)
-    
+
     5.10.1 Design Concerns (39)
-    
+
     5.10.2 Design View (39)
-    
+
 6. User Interface Design (41)
-    
+
     6.1 Overview of User Interface (42)
-    
+
     6.2 Screen Images (English Version) (43)
-    
+
 7. Appendices (45)
-    
 
 ## 2. Introduction
 
@@ -148,26 +147,24 @@ This SDD describes how the Al-Muneer Online Portal will be structured and built.
 This SDD document covers the design of the "Al-Muneer Online Portal," a web-based application for Al-Muneer Hall for Weddings and Events. The scope of the design encompasses:
 
 - **System Architecture:** The overall structure of the system, including its layers, components, and their interactions.
-    
+
 - **Database Design:** The logical and physical design of the relational database (MySQL/PostgreSQL) that will store the portal's data, including entity definitions and relationships.
-    
+
 - **Component Design:** The design of major software components within the backend (Spring Boot) and frontend, detailing their responsibilities and interfaces.
-    
+
 - **Interface Design:**
-    
+
     - **User Interfaces (UI):** Conceptual design and layout for key user-facing screens for both Visitors and the Administrator.
-        
+
     - **Internal Interfaces:** APIs between the frontend and backend components.
-        
+
 - **Security Design Considerations:** How security requirements (authentication, authorisation, data protection) will be incorporated into the design.
-    
 
 The software product will, as defined in the SRS:
 
 - Allow visitors to view venue information, media, availability, pricing, submit inquiries, upload payment proofs, and provide feedback.
-    
+
 - Enable administrators to manage all content, inquiries, payment statuses, feedback, view basic reports, and configure notifications.
-    
 
 The design will adhere to the constraints identified in the SRS, including the use of the specified technology stack (Spring Boot, relational database, HTML/CSS/JS), deployment on a Cloud VPS, and considerations for the solo developer context and project timeline. This SDD aims to provide sufficient detail to implement a functional, reliable, and maintainable system as per the project's objectives.
 
@@ -190,33 +187,32 @@ This standard (adapted IEEE Std. 1016-1998) is intended for technical and manage
 This SDD document provides a comprehensive overview of the design for the Al-Muneer Online Portal.
 
 - **Section 1-4:** Cover introductory material, references, and glossary.
-    
+
 - **Section 5 (Design Body):** This is the core section, detailing the design from multiple viewpoints as per the IEEE standard structure. It includes:
-    
+
     - Design Stakeholders and Their Concerns (5.1)
-        
+
     - Context Viewpoint (5.2): System boundary and external interactions (Use Case Diagram).
-        
+
     - Composition Viewpoint (5.3): High-level system decomposition into major subsystems/modules (Architecture/Component Diagram).
-        
+
     - Logical Viewpoint (5.4): Detailed class structure within subsystems (Class Diagrams).
-        
+
     - Information Viewpoint (5.5): Persistent data design (ERD, Data Dictionary).
-        
+
     - Interface Viewpoint (5.6): User, hardware, and software interface specifications.
-        
+
     - Structure Viewpoint (5.7): Internal organization of components (Package Diagram).
-        
+
     - Interaction Viewpoint (5.8): Dynamic behavior between components (Sequence Diagrams for key interactions).
-        
+
     - State Dynamic Viewpoint (5.9): State changes of key entities (State Machine Diagrams, if applicable at a detailed level).
-        
+
     - Algorithm Viewpoint (5.10): Logic for complex operations or algorithms (Activity Diagrams for processes).
-        
+
 - **Section 6 (User Interface Design):** Provides conceptual screen layouts and descriptions for key user interfaces.
-    
+
 - **Section 7 (Appendices):** Includes any supporting design information.
-    
 
 This organization aims to present the design in a structured and understandable manner, covering static structures, dynamic behavior, data design, and interface specifications.
 
@@ -225,13 +221,12 @@ This organization aims to present the design in a structured and understandable 
 This section provides a complete list of all documents referenced elsewhere in this SDD.
 
 1. Ahmed Hani Ahmed Ghaleb. (2025). Software Requirements Specification (SRS) - Al-Muneer Online Portal, Version 1.0. Universiti Teknologi Malaysia. (Internal Project Document)
-    
+
 2. Ahmed Hani Ahmed Ghaleb. (2025). FYP1 Progress 2 Report - Al-Muneer Online Portal. Universiti Teknologi Malaysia. (Internal Project Document, containing Chapters 3, 4, 5 of the main report)
-    
+
 3. IEEE. (1998). IEEE Recommended Practice for Software Design Descriptions (IEEE Std 1016-1998). Institute of Electrical and Electronics Engineers.
-    
+
 4. Fowler, M. (2002). Patterns of Enterprise Application Architecture. Addison-Wesley Professional.
-    
 
 Sources for these documents include internal project documentation created as part of the FYP1 process, IEEE standards, established software engineering literature, and official documentation for the chosen technologies.
 
@@ -240,53 +235,52 @@ Sources for these documents include internal project documentation created as pa
 This section provides the definitions of all key terms, acronyms, and abbreviations used in this SDD. Many of these are consistent with those defined in the SRS document.
 
 - **Admin:** Administrator of the Al-Muneer Online Portal.
-    
+
 - **API:** Application Programming Interface.
-    
+
 - **Component Diagram:** A diagram that depicts how components are wired together to form larger components or software systems.
-    
+
 - **CRUD:** Create, Read, Update, Delete.
-    
+
 - **ERD:** Entity-Relationship Diagram.
-    
+
 - **FAQ:** Frequently Asked Questions.
-    
+
 - **FYP:** Final Year Project. (Also PSM)
-    
+
 - **HTML:** Hyper Text Markup Language.
-    
+
 - **IDE:** Integrated Development Environment.
-    
+
 - **IEEE:** Institute of Electrical and Electronics Engineers.
-    
+
 - **JS:** JavaScript.
-    
+
 - **MVC:** Model-View-Controller architectural pattern.
-    
+
 - **PaaS:** Platform as a Service.
-    
+
 - **PSM:** Projek Sarjana Muda (Bachelor's Degree Project).
-    
+
 - **REST:** Representational State Transfer - an architectural style for distributed hypermedia systems.
-    
+
 - **SDD:** System Design Document
-    
+
 - **SRS:** Software Requirements Specification.
-    
+
 - **SQL:** Structured Query Language.
-    
+
 - **SSL/TLS:** Secure Sockets Layer/Transport Layer Security.
-    
+
 - **UC:** Use Case.
-    
+
 - **UI:** User Interface.
-    
+
 - **UML:** Unified Modeling Language.
-    
+
 - **UX:** User Experience.
-    
+
 - **VPS:** Virtual Private Server.
-    
 
 ## 5. Design Body
 
@@ -299,64 +293,62 @@ This section specifies the design stakeholders for the Al-Muneer Online Portal a
 **a) The design stakeholders for the design subject (Al-Muneer Online Portal) are:**
 
 - **Mr. Ahmed Almunajid (Venue Owner/Primary User of Admin Panel):** Concerned with the ease of use of the admin panel, the accuracy of information displayed, the efficiency of managing inquiries and bookings, the reliability of the system, and how well it meets his business needs to reduce manual workload and improve customer interaction.
-    
+
 - **Ahmed Hani Ahmed Ghaleb (Student Developer):** Concerned with the clarity of the design for implementation, the feasibility of building the system with the chosen technologies within the given timeframe, the maintainability of the code, adherence to academic requirements, and the overall technical quality of the solution.
-    
+
 - **Prospective Clients/Visitors:** Concerned with the ease of finding information, the clarity and accuracy of content (availability, pricing, venue details), the simplicity of submitting inquiries and payment proofs, and a positive, trustworthy user experience.
-    
+
 - **Project Supervisor & Academic Examiners:** Concerned with the technical soundness of the design, its completeness in addressing the requirements from the SRS, adherence to good software engineering principles, proper documentation, and the overall quality of the project as an academic endeavor.
-    
 
 **b) The design concerns of each identified design stakeholder include:**
 
 - **Mr. Ahmed Almunajid:**
-    
+
     - **Usability:** How easy will it be for him to update content, manage bookings, and use the admin features daily?
-        
+
     - **Functionality:** Will the system reliably perform all the required tasks (calendar updates, inquiry management, payment proof handling, feedback viewing, report generation, notifications)?
-        
+
     - **Data Integrity & Accuracy:** Will the information shown to visitors be accurate and up-to-date? Will booking and payment information be stored reliably?
-        
+
     - **Efficiency:** Will the portal genuinely save time compared to current manual methods?
-        
+
     - **Security (Admin Access):** Is his access to the admin panel secure?
-        
+
 - **Ahmed Hani Ahmed Ghaleb (Developer):**
-    
+
     - **Clarity & Completeness:** Is the design detailed enough to guide implementation without ambiguity?
-        
+
     - **Modularity & Maintainability:** Is the system designed in a way that is easy to code, test, and potentially modify or extend later?
-        
+
     - **Feasibility:** Can all designed aspects be realistically implemented with the chosen technology stack (Spring Boot, MySQL/PostgreSQL, HTML/CSS/JS) and within the project timeline?
-        
+
     - **Performance:** Will the design support the required response times and handle the anticipated load?
-        
+
     - **Security:** Are appropriate security measures designed into the system (input validation, secure data handling, authentication)?
-        
+
 - **Prospective Clients/Visitors:**
-    
+
     - **Ease of Use:** Can they find what they need quickly and intuitively?
-        
+
     - **Information Quality:** Is the information accurate, comprehensive, and clearly presented?
-        
+
     - **Responsiveness:** Does the site load quickly and respond well on different devices?
-        
+
     - **Trust & Reliability:** Does the site appear professional and trustworthy, especially when submitting personal information for inquiries or payment proofs?
-        
+
     - **Accessibility:** Is the site usable across different browsers and devices?
-        
+
 - **Project Supervisor & Academic Examiners:**
-    
+
     - **Requirement Coverage:** Does the design adequately address all functional and non-functional requirements specified in the SRS?
-        
+
     - **Design Soundness:** Are appropriate architectural patterns, data models, and design principles applied?
-        
+
     - **Documentation Quality:** Is the design well-documented, clear, and consistent?
-        
+
     - **Technical Depth:** Does the design demonstrate a sufficient understanding of software engineering concepts?
-        
+
     - **Adherence to Constraints:** Does the design respect the defined project constraints (technology, timeline, etc.)?
-        
 
 This SDD aims to address these concerns by providing a clear, detailed, and justified design for the Al-Muneer Online Portal.
 
@@ -371,13 +363,12 @@ This section should specify the following:
 a) The purpose of the Context viewpoint is to identify:
 
 - The system (Al-Muneer Online Portal) as a whole.
-    
+
 - The actors that interact with the system (Visitors, Administrator).
-    
+
 - The interactions (services offered/used) between the actors and the system.
-    
+
 - The boundary of the system, distinguishing what is internal and external.
-    
 
 b) The system features from an external "black box" perspective.
 
@@ -390,9 +381,8 @@ The system features, from a context viewpoint, are represented by the services i
 The system features include:
 
 - **For Visitors:** Viewing venue details, browsing the media gallery, checking availability via an interactive calendar, viewing pricing information, submitting booking inquiries, optionally submitting proof of payment, and providing feedback.
-    
+
 - **For the Administrator:** Securely logging in to manage all website content (hall information, media, availability calendar, pricing, FAQs), managing booking inquiries, managing submitted payment proofs and their statuses, reviewing user feedback, viewing basic operational reports, and configuring system notifications.
-    
 
 ```
 @startuml
@@ -462,15 +452,14 @@ The purpose of the composition viewpoint is to define the subsystems that compos
 The system formed by these modules aims to deliver the functionalities outlined in the SRS. For the Al-Muneer Online Portal, we can identify the following major logical subsystems:
 
 1. **Presentation Subsystem (Frontend):** Responsible for all user interaction, rendering information, and capturing user input. This subsystem itself can be seen as having two main parts: the Public-Facing Interface and the Administrator Panel Interface.
-    
+
 2. **Application Logic Subsystem (Backend Core):** Responsible for implementing the core business logic, processing requests from the frontend, interacting with the data layer, and managing application state.
-    
+
 3. **Data Management Subsystem (Backend Persistence):** Responsible for all aspects of data storage and retrieval, ensuring data integrity and consistency.
-    
+
 4. **Notification Subsystem (Backend Service):** Responsible for generating and dispatching notifications to users and administrators.
-    
+
 5. **Reporting Subsystem (Backend Service):** Responsible for generating basic operational reports for the administrator.
-    
 
 #### 5.3.2 Design View
 
@@ -490,14 +479,14 @@ package "Al-Muneer Online Portal System" {
     [Reports\n<<Service>>] as Reports
     [Notifications\n<<Service>>] as Notif
     [File Storage\n<<Utility>>] as File
-    
+
     interface "User Interface" as IF_UI
     interface "API" as IF_API
     interface "DAO" as IF_DAO
     interface "Report IF" as IF_Report
     interface "Notify IF" as IF_Notify
     interface "File IF" as IF_File
-    
+
     UI ..> IF_UI : uses
     UI ..> IF_API : HTTP/S
     Core -up-> IF_API
@@ -630,15 +619,14 @@ _Figure 5.3: Class Diagram for Key Backend Entities and Controllers (Conceptual)
 The backend design primarily follows the Model-View-Controller (MVC) pattern, where Spring Boot facilitates this structure.
 
 - **Controller Classes (e.g., VenueInfoController, InquiryController):** These classes are stereotyped as Spring `@RestController`s. They handle incoming HTTP requests from the Presentation Subsystem (Frontend), parse request data (often mapped to DTOs), delegate business logic processing to Service classes (not explicitly shown in this simplified diagram but implied), and return HTTP responses (often DTOs converted to JSON). Each controller typically corresponds to a major domain entity or functional area.
-    
+
 - **Domain Entity Classes (e.g., VenueInfo, BookingInquiry, PaymentProof):** These are Plain Old Java Objects (POJOs) typically annotated as JPA `@Entity`s. They represent the persistent data structures of the application and are mapped to database tables. They contain attributes corresponding to the data fields. Relationships between entities (e.g., a PaymentProof is associated with a BookingInquiry) are defined here.
-    
+
 - **Data Transfer Objects (DTOs) (e.g., InquiryDTO, PaymentProofDTO):** These are simple objects used to transfer data between layers, particularly between the Controller layer and the client (Frontend), and sometimes between the Service and Controller layers. They help decouple the service layer from the presentation layer and can be tailored to specific API needs, preventing exposure of internal entity structures.
-    
+
 - **Service Classes (Implied, not shown in diagram for brevity):** Stereotyped as Spring `@Service`s, these classes contain the core business logic. Controllers delegate calls to them. For instance, an `InquiryService` would handle the logic for saving a new inquiry, validating its data, and triggering notifications. Services interact with Repository classes.
-    
+
 - **Repository Classes (Implied, not shown in diagram for brevity):** These are interfaces (typically extending Spring Data JPA interfaces like `JpaRepository`) stereotyped as Spring `@Repository`s. They provide an abstraction layer for data access operations (CRUD) on the domain entities, interacting directly with the database.
-    
 
 The relationships shown in the diagram are primarily conceptual associations indicating which controllers manage which entities (via the service and repository layers). The relationship between BookingInquiry and PaymentProof (one-to-one or one-to-zero/one) is an example of a domain entity relationship. The ERD in the Information Viewpoint (Section 5.5) will provide a more database-centric view of these entity relationships. This logical view ensures a separation of concerns, promotes loose coupling, and enhances the maintainability of the backend system.
 
@@ -655,21 +643,20 @@ The major data or system entities are stored in a relational database named `alm
 **Entity Name List (Conceptual):**
 
 1. AdminUser
-    
+
 2. VenueInfo
-    
+
 3. MediaItem
-    
+
 4. AvailabilitySlot
-    
+
 5. PricingTier
-    
+
 6. BookingInquiry
-    
+
 7. PaymentProof
-    
+
 8. Feedback
-    
 
 #### 5.5.2 Design View
 
@@ -926,85 +913,80 @@ This specifies the logical characteristics of each interface between the softwar
 The Al-Muneer Online Portal will feature a web-based graphical user interface (GUI) accessible via standard web browsers.
 
 - **Visitor Interface:**
-    
+
     - **Screen Layouts:** Will consist of clear, well-organized pages for Homepage, Venue Information, Media Gallery, Availability Calendar, Pricing, FAQ, Booking Inquiry, Payment Proof Submission, and Feedback. Navigation will be consistent via a main menu.
-        
+
     - **Content:** Will display textual information, images, videos, an interactive calendar, and forms for user input.
-        
+
     - **Interaction:** Primarily through mouse clicks, touch on touch-enabled devices, and keyboard input for forms.
-        
+
 - **Administrator Interface (Admin Panel):**
-    
+
     - **Screen Layouts:** A secure, dashboard-style interface with sections for managing venue content, availability, pricing, inquiries, payment proofs, feedback, reports, and notification settings. Will heavily utilize forms, tables for data display, and action buttons.
-        
+
     - **Content:** Will display system data in manageable formats, configuration options, and input fields for updates.
-        
+
     - **Interaction:** Secure login required. Interaction via mouse clicks and keyboard input for data entry and management tasks.
-        
 
 **b) Optimizing the Interface:**
 
 - **Simplicity:** Interfaces will be kept clean and uncluttered, avoiding unnecessary complexity, especially for the admin panel to ensure ease of use for Mr. Almunajid.
-    
+
 - **Consistency:** Navigation, terminology, and layout will be consistent across the portal.
-    
+
 - **Feedback:** The system will provide immediate visual feedback for user actions (e.g., successful form submission, error messages). Error messages will be informative.
-    
+
 - **Efficiency:** Forms will be designed to minimize clicks and data entry effort.
-    
+
 - **Language:** Primarily Arabic, with consideration for English in key navigational elements, aligning with user characteristics.
-    
 
 **Hardware Interfaces**
 
 This specifies the logical characteristics of each interface between the software product and the hardware components of the system. For the Al-Muneer Online Portal, a web-based application, there are no direct, custom hardware interfaces designed into the software itself. The system will rely on standard user hardware:
 
 - **Client-side:** User's computer (desktop, laptop), tablet, or smartphone with a web browser and internet connection. Standard input devices (keyboard, mouse, touchscreen) are assumed.
-    
+
 - **Server-side:** The Cloud VPS will have standard server hardware (CPU, RAM, storage, network interface) managed by the hosting provider. The application will interact with this hardware through the operating system and the Java Virtual Machine.
-    
 
 **Software Interfaces**
 
 This specifies the use of other required software products and interfaces with other application systems.
 
 1. **Operating Systems:**
-    
+
     - **Client-Side:** The portal will be accessible from standard operating systems that support modern web browsers (e.g., Windows, macOS, Linux, Android, iOS).
-        
+
     - **Server-Side:** The Cloud VPS will run a common server operating system (e.g., a Linux distribution like Ubuntu).
-        
+
     - **Interface:** Standard interactions via web browser (client) and JVM/OS system calls (server).
-        
+
 2. **Web Server:**
-    
+
     - The Spring Boot application includes an embedded web server (e.g., Tomcat, Jetty, or Undertow by default).
-        
+
     - **Interface:** HTTP/HTTPS protocols for communication with client browsers.
-        
+
 3. **Database Management System (DBMS):**
-    
+
     - MySQL or PostgreSQL.
-        
+
     - **Interface:** The Spring Boot application will interface with the DBMS using JDBC (Java Database Connectivity) and Spring Data JPA for data persistence and retrieval.
-        
+
 4. **Web Browsers (Client-Side):**
-    
+
     - Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge (latest stable versions).
-        
+
     - **Interface:** The system will output HTML, CSS, and JavaScript that these browsers render. It will receive user input via HTTP requests.
-        
 
 **Communication Interfaces**
 
 This specifies the various interfaces to communications such as local network protocols, etc.
 
 - **HTTP/HTTPS:** The primary communication protocol between the client web browser and the web server hosting the Al-Muneer Online Portal. HTTPS will be enforced for secure data transmission.
-    
+
 - **TCP/IP:** The underlying network protocol suite for all internet-based communication.
-    
+
 - **JDBC:** Used for communication between the Java application (Spring Boot backend) and the relational database (MySQL/PostgreSQL).
-    
 
 No other specialized local network protocols are designed for this system beyond these standard web and database communication protocols.
 
@@ -1017,15 +999,14 @@ The Structure Viewpoint is used to document the internal constituents and organi
 The primary design concerns for the Structure Viewpoint are:
 
 - **Modularity:** How the system is broken down into manageable, cohesive, and loosely coupled packages or modules.
-    
+
 - **Dependencies:** The relationships and dependencies between these packages.
-    
+
 - **Organization:** The overall architectural organization of the code within the backend application.
-    
+
 - **Reusability:** Identifying components or packages that might be reusable.
-    
+
 - **Maintainability:** Ensuring the structure supports ease of understanding and modification.
-    
 
 Structure viewpoint informs user and the developer about the interaction between the packages in the system. For the Al-Muneer Online Portal, the backend developed using Spring Boot will be organized into several key packages, each with specific responsibilities, reflecting a layered architecture and separation of concerns.
 
@@ -1096,47 +1077,46 @@ _Figure 5.5: Package Diagram for Al-Muneer Online Portal Backend_
 The backend of the Al-Muneer Online Portal, built with Spring Boot, is organized into the following primary packages:
 
 - **`com.almuneer.portal` (Root Package):** Contains the main application class (AlMuneerPortalApplication) that bootstraps the Spring Boot application.
-    
+
 - **`config`:** This package holds configuration classes for the application.
-    
+
     - `WebSecurityConfig`: Configures Spring Security for authentication, authorization, password hashing, and defining protected routes (e.g., for the admin panel).
-        
+
     - `MvcConfig`: Contains configurations related to Spring MVC, such as view resolvers (if not using pure REST), static resource handling, or interceptors.
-        
+
     - `NotificationConfig`: May contain beans or configurations related to the notification service.
-        
+
 - **`controller` (API Layer):** This package contains REST controller classes that handle incoming HTTP requests from the frontend.
-    
+
     - Each controller (e.g., `InquiryController`, `AdminAuthController`) is responsible for a specific domain or functional area. They receive requests, validate them (often delegating complex validation), call appropriate methods in the service layer, and formulate HTTP responses, typically using DTOs.
-        
+
 - **`service` (Business Logic Layer):** This package contains interfaces defining the business logic contracts and an `impl` sub-package containing their concrete implementations.
-    
+
     - Service interfaces (e.g., `InquiryService`, `PaymentProofService`) define the business operations.
-        
+
     - Implementation classes (e.g., `InquiryServiceImpl`) contain the core business logic, orchestrating calls to repositories, other services, and utility classes to fulfill the use cases. They handle transactions and business rule enforcement.
-        
+
 - **`repository` (Data Access Layer):** This package contains Spring Data JPA repository interfaces (e.g., `InquiryRepository`, `AdminUserRepository`).
-    
+
     - These interfaces extend Spring Data interfaces (like `JpaRepository`) to provide CRUD operations and custom query methods for interacting with the database entities (`model` package) without requiring boilerplate DAO code.
-        
+
 - **`model` (Domain Entities):** This package contains the Plain Old Java Objects (POJOs) that represent the persistent data entities of the application, as defined in the Information Viewpoint (ERD and Data Dictionary).
-    
+
     - These classes (e.g., `BookingInquiry`, `AdminUser`) are typically annotated with JPA (`@Entity`) to map them to database tables.
-        
+
 - **`dto` (Data Transfer Objects):** This package contains classes used to transfer data between layers, especially between the controller and the frontend, and sometimes between service and controller.
-    
+
     - DTOs (e.g., `InquiryDTO`, `LoginRequestDTO`) help decouple the internal domain model from the API structure and can be tailored for specific request/response needs.
-        
+
 - **`util` (Utility Classes):** This package holds common utility classes that provide helper functions used across different parts of the application.
-    
+
     - Examples include `FileUploadUtil` for handling file uploads (like payment proofs), `DateUtil` for date/time manipulations, or `ReportGeneratorUtil` for basic report formatting logic.
-        
+
 - **`security`:** This package contains classes related to application security, primarily for authentication and authorization using Spring Security.
-    
+
     - `JwtTokenProvider` (if using JWT for session management) would handle token generation and validation.
-        
+
     - `UserDetailsServiceImpl` would implement Spring Security's UserDetailsService to load user-specific data (from `AdminUserRepository`) for authentication.
-        
 
 This package structure promotes a clear separation of concerns, modularity, and adherence to common practices in Spring Boot application development, making the system more organized and maintainable. Dependencies are managed such that controllers depend on services, services depend on repositories, and repositories interact with domain models. DTOs are used for data exchange, and utility/configuration/security packages provide cross-cutting concerns.
 
@@ -1149,13 +1129,12 @@ The Interaction Viewpoint defines strategies for interaction among design entiti
 The primary design concerns for the Interaction Viewpoint are:
 
 - **Dynamic Behavior:** How system components and objects interact over time to accomplish tasks.
-    
+
 - **Collaboration:** Understanding the sequence of messages or calls exchanged between different parts of the system.
-    
+
 - **Responsibility Allocation:** Clarifying which component is responsible for initiating an interaction and which component responds.
-    
+
 - **Use Case Realization:** Showing how the interactions realize the use cases defined in the SRS.
-    
 
 The functionalities of the system are given by the help of sequence diagrams. Moreover, it defines strategies for interaction among entities. For the Al-Muneer Online Portal, sequence diagrams are used to model these interactions.
 
@@ -1238,13 +1217,12 @@ Reactive systems and systems whose internal behavior is of interest use this vie
 The primary design concerns for the State Dynamic Viewpoint are:
 
 - **Entity Lifecycles:** Understanding the different states an entity can be in throughout its lifecycle.
-    
+
 - **State Transitions:** Identifying the events or conditions that cause an entity to transition from one state to another.
-    
+
 - **Actions/Activities:** Specifying any actions or activities that occur when entering a state, exiting a state, or during a transition.
-    
+
 - **System Behavior:** Clarifying how key entities respond to various system events and user interactions.
-    
 
 In this section, system behavior and states of the system are given via the state transition diagram. Designers, developers and testers are informed about dynamic view of the system which includes its states, transitions, and the events that trigger these transitions for key entities.
 
@@ -1319,13 +1297,12 @@ The Algorithm Viewpoint provides detailed design descriptions of operations, suc
 The primary design concerns for the Algorithm Viewpoint are:
 
 - **Processing Logic:** Detailing the step-by-step logic for specific operations or functions within the system.
-    
+
 - **Data Manipulation:** How data is transformed, calculated, or processed by algorithms.
-    
+
 - **Decision Points:** Clarifying conditions and branching logic within operations.
-    
+
 - **Clarity for Implementation:** Providing sufficient detail for developers to implement the algorithms correctly.
-    
 
 For the Al-Muneer Online Portal, the core processing logic for most functionalities aligns closely with the realization of the use cases.
 
@@ -1336,24 +1313,22 @@ The detailed step-by-step processing logic for the majority of user-facing and a
 For example:
 
 - The algorithm for a **Visitor Submitting a Booking Inquiry (UC005)** is detailed in its corresponding activity diagram in SRS Section 2.3.5. This includes steps for form access, data input, validation, saving the inquiry, and triggering notifications.
-    
+
 - The algorithm for an **Administrator Managing Payment Status (UC013)** is detailed in its activity diagram in SRS Section 2.3.14. This covers viewing proofs, offline verification, updating status in the system, and notifying the visitor.
-    
 
 Within the backend (Spring Boot application), this logic will primarily be implemented within the Service layer classes (e.g., `InquiryServiceImpl`, `PaymentProofServiceImpl`). These service methods will encapsulate the algorithms depicted in the SRS activity diagrams.
 
 Key algorithmic considerations within these services include:
 
 - **Data Validation:** All user inputs (from inquiry forms, admin content management, etc.) will undergo server-side validation logic as per defined business rules (e.g., mandatory fields, data formats, value ranges) before processing.
-    
+
 - **Availability Checking Logic:** When a visitor checks availability or an admin updates the calendar, the Availability Service will implement logic to query AvailabilitySlot entities for specific dates or date ranges and determine their status.
-    
+
 - **Pricing Calculation (if dynamic options are implemented):** If pricing involves selectable add-ons, the PricingService would contain logic to calculate total estimates based on selected base tiers and additional options.
-    
+
 - **Report Generation Logic:** The ReportService will contain logic to fetch data from various entities (e.g., BookingInquiry, Feedback) based on admin-specified parameters (like date ranges) and then aggregate/format this data into a simple, readable report structure for display. This will primarily involve structured database queries and data mapping.
-    
+
 - **File Handling for Payment Proofs:** The PaymentProofService (utilizing a `FileUploadUtil`) will implement the logic for receiving an uploaded file, validating its type and size, securely storing it in the designated file storage, and associating its path and metadata with the corresponding BookingInquiry.
-    
 
 The detailed design of these specific algorithms, where not fully elaborated by the SRS activity diagrams, will be straightforward implementations of the described business rules within the respective Java service methods, leveraging Spring Boot and JPA functionalities for data access and transaction management. No overly complex or novel algorithms requiring specialized documentation beyond standard procedural logic are anticipated for the core features of this portal.
 
