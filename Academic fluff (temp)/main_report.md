@@ -8,18 +8,6 @@
 
 **Author’s full name:** Ahmed Hani Ahmed Ghaleb **Date of Birth:** 2001/04/19 **Title:** Al-Muneer Hall Reservations **Academic Session:** 24/25 2
 
-I declare that this thesis is classified as: I acknowledged that Universiti Teknologi Malaysia reserves the right as follows:
-
-- The thesis is the property of Universiti Teknologi Malaysia.
-
-- The Library of Universiti Teknologi Malaysia has the right to make copies for the purpose of research only.
-
-- The Library has the right to make copies of the thesis for academic exchange.
-
-_(NOTES: If the thesis is CONFIDENTIAL or RESTRICTED, please attach with the letter from the organization with period and reasons for confidentiality or restriction)_
-
-"I hereby declare that we have read this thesis and in my opinion this thesis is sufficient in term of scope and quality for the award of the degree of Bachelor of Computer Science (Software Engineering)."
-
 **Signature:** **Name of Supervisor:** DR. MUHAMMAD LUQMAN BIN MOHD SHAFIE **Date:** 17 APRIL 2025
 
 ## DECLARATION
@@ -28,15 +16,6 @@ I declare that this thesis entitled "Al-Muneer Hall Reservations" is the result 
 
 **Signature:** **Name:** AHMED HANI GHALEB **Date:** 17 APRIL 2025
 
-## DEDICATION
-
-This thesis is dedicated to my father, who taught me that the best kind of knowledge to have is that which is learned for its own sake. It is also dedicated to my mother, who taught me that even the largest task can be accomplished if it is done one step at a time.
-
-## ACKNOWLEDGEMENT
-
-In preparing this thesis, I was in contact with many people, researchers, academicians, and practitioners. They have contributed towards my understanding and thoughts. In particular, I wish to express my sincere appreciation to my main thesis supervisor, Professor Dr. Muhammad Luqman Bin Mohd Shafie, for encouragement, guidance, criticism and friendship. I am also very thankful to my co-supervisor Professor Dr Sim Hiew Moi and Associate Professor Dr. Shahida Sulaiman for their guidance, advice and motivation. Without their continued support and interest, this thesis would not have been the same as presented here.
-
-My fellow students should also be recognised for their support. My sincere appreciation also extends to all my colleagues and others who have provided assistance on various occasions. Their views and tips are useful indeed. Unfortunately, it is not possible to list all of them in this limited space. I am grateful to all my family members.
 
 ## ABSTRACT
 
