@@ -224,7 +224,7 @@ The Al-Muneer Online Portal is designed as a web-based application to serve as t
 
 The system features are illustrated in the Use Case Diagram (Figure 2.1) below. The detailed description of each module (grouped by primary actor) and its functions (use cases) will be elaborated in Section 2.3.
 
-```
+```plantuml
 @startuml
 left to right direction
 actor Visitor
@@ -301,7 +301,7 @@ _Figure 2.1: Use Case Diagram for Al-Muneer Online Portal_
 
 The domain model illustrating the key entities and their attributes within the Al-Muneer Online Portal is shown in Figure 2.2. This model focuses on the data aspects of the system from a requirements perspective.
 
-```
+```plantuml
 @startuml
 class AdminUser {
   userId
@@ -407,7 +407,7 @@ This section provides detailed descriptions for each use case identified for the
 |**Exception Flow(s) - EF**|EF1: Content Not Found:<br><br>1. If the specific venue information content is missing or not configured in the database (e.g., after a faulty admin update), the system displays a "Content not available" message or redirects to a relevant section of the homepage.|
 |**Post-condition(s)**|Visitor has viewed the venue information.<br><br>The system state remains unchanged for other users.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Navigates to Venue Info Section;
@@ -427,7 +427,7 @@ stop
 
 _Figure 2.3: Activity Diagram for View Venue Information_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -462,7 +462,7 @@ _Figure 2.4: Sequence Diagram for View Venue Information_
 |**Exception Flow(s) - EF**|EF1: Error Loading Gallery Data:<br><br>1. If the system encounters an error while trying to retrieve the list of media items (e.g., database error), it displays a general error message to the Visitor.|
 |**Post-condition(s)**|Visitor has viewed the media gallery and potentially individual media items.<br><br>The system state remains unchanged for other users.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Navigates to Media Gallery Section;
@@ -490,7 +490,7 @@ stop
 
 _Figure 2.5: Activity Diagram for View Media Gallery_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -527,7 +527,7 @@ _Figure 2.6: Sequence Diagram for View Media Gallery_
 |**Exception Flow(s) - EF**|EF1: Error Loading Calendar Data:<br><br>1. If the system encounters a persistent error while trying to retrieve booking status data (e.g., database connection error), it displays a general error message to the Visitor, suggesting they try again later or contact the hall directly.|
 |**Post-condition(s)**|Visitor has viewed the availability status of the hall for the selected period(s).<br><br>The system state remains unchanged for other users.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Navigates to Availability Section;
@@ -555,7 +555,7 @@ stop
 
 _Figure 2.7: Activity Diagram for Check Availability_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -597,7 +597,7 @@ _Figure 2.8: Sequence Diagram for Check Availability (Initial Load & Month Navig
 |**Exception Flow(s) - EF**|EF1: Error Loading Pricing Data:<br><br>1. If the system encounters an error while trying to retrieve pricing information (e.g., database error), it displays a general error message to the Visitor.|
 |**Post-condition(s)**|Visitor has viewed the pricing information for Al-Muneer Hall.<br><br>The system state remains unchanged for other users.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Navigates to Pricing Section;
@@ -623,7 +623,7 @@ stop
 
 _Figure 2.9: Activity Diagram for View Pricing Panel_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -658,7 +658,7 @@ _Figure 2.10: Sequence Diagram for View Pricing Panel_
 |**Exception Flow(s) - EF**|EF1: Database Save Error:<br><br>1. If the database fails to save the data, the system will display an error submitting the inquiry message.|
 |**Post-condition(s)**|The booking inquiry is successfully recorded in the system's database.<br><br>The Administrator is (ideally) notified of the new inquiry.<br><br>The Visitor receives an on-screen confirmation of submission.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Accesses Inquiry Form;
@@ -683,7 +683,7 @@ repeat while
 
 _Figure 2.11: Activity Diagram for Submit Booking Inquiry_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -726,7 +726,7 @@ _Figure 2.12: Sequence Diagram for Submit Booking Inquiry_
 |**Exception Flow(s) - EF**|EF1: Error Saving Data:<br><br>1. If the system encounters an error while trying to save the updated information to the database (e.g., database connection error), it displays a general error message (e.g., "Failed to update information. Please try again.").|
 |**Post-condition(s)**|Hall information displayed on the public portal is updated (after successful update).<br><br>Database reflects the changes.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Content Management Section;
@@ -753,7 +753,7 @@ repeat while
 
 _Figure 2.13: Activity Diagram for Manage Hall Information (Update Flow)_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI AdminPanel)" as UI
@@ -800,7 +800,7 @@ _Figure 2.14: Sequence Diagram for Manage Hall Information (Update Flow)_
 |**Exception Flow(s) - EF**|EF1: Upload Failure:<br><br>1. If file upload fails due to server error (NF2.6), system displays an error message.<br><br>  <br><br>EF2: Database Save/Delete Failure:<br><br>1. If saving/deleting metadata fails (NF2.7 or NF3.5), system displays an error. May require manual cleanup if file operation succeeded but DB failed.|
 |**Post-condition(s)**|Media gallery content is updated (new item added or existing item removed).<br><br>Public gallery reflects changes.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Gallery Management;
@@ -832,7 +832,7 @@ repeat while
 
 _Figure 2.15: Activity Diagram for Manage Media Gallery (Upload Flow)_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -875,7 +875,7 @@ _Figure 2.16: Sequence Diagram for Manage Media Gallery (Upload Flow)_
 |**Exception Flow(s) - EF**|EF1: Database Error (Save/Update/Delete):<br><br>1. If a database operation fails, display a general error message.|
 |**Post-condition(s)**|Pricing information is updated in the database.<br><br>Public pricing page reflects changes.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Pricing Management;
@@ -902,7 +902,7 @@ repeat while
 
 _Figure 2.17: Activity Diagram for Manage Pricing Panel (Add New Tier Flow)_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -942,7 +942,7 @@ _Figure 2.18: Sequence Diagram for Manage Pricing Panel (Add New Tier Flow)_
 |**Exception Flow(s) - EF**|EF1: Database Error (Saving Calendar/Inquiry Status):<br><br>1. If a database operation fails, display a general error message.|
 |**Post-condition(s)**|Availability calendar is updated.<br><br>Status of inquiries may be updated.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Calendar Management;
@@ -963,7 +963,7 @@ stop
 
 _Figure 2.19: Activity Diagram for Manage Calendar (Update Manually)_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -998,7 +998,7 @@ _Figure 2.20: Sequence Diagram for Manage Calendar (Update Manually)_
 |**Exception Flow(s) - EF**|EF1: Error Retrieving Log Data:<br><br>1. If the system encounters an error while trying to access any stored log files or simple analytic data, it displays a general error message.|
 |**Post-condition(s)**|Administrator has viewed the available basic traffic analytics or the status of this feature.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Analytics Section;
@@ -1018,7 +1018,7 @@ stop
 
 _Figure 2.21: Activity Diagram for View Traffic Analytics_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -1053,7 +1053,7 @@ _Figure 2.22: Sequence Diagram for View Traffic Analytics (Conceptual)_
 |**Exception Flow(s) - EF**|EF1: File Upload Failure:<br><br>1. If the system fails to upload the file to storage due to a server-side error (Step 7), it displays a general error message (e.g., "Failed to upload payment proof. Please try again.").<br><br>  <br><br>EF2: Database Save Failure:<br><br>1. If the system fails to save the payment proof metadata to the database (Step 8), it displays an error. This might require reconciliation if the file was uploaded but DB record failed.|
 |**Post-condition(s)**|Payment proof file is uploaded and its metadata is stored in the system, linked to the relevant booking inquiry.<br><br>Administrator is notified of the new submission.<br><br>Visitor receives confirmation of submission.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Navigates to Payment Proof Submission Page;
@@ -1085,7 +1085,7 @@ repeat while
 
 _Figure 2.23: Activity Diagram for Submit Payment Proof_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -1131,7 +1131,7 @@ _Figure 2.24: Sequence Diagram for Submit Payment Proof_
 |**Exception Flow(s) - EF**|EF1: System Failure to Save Feedback:<br><br>1. If the system encounters an error while saving feedback to the database (Step 7), it displays a general error message to the Visitor.|
 |**Post-condition(s)**|Feedback is successfully recorded in the system.<br><br>Administrator may be notified.|
 
-```
+```plantuml
 @startuml
 start
 :Visitor Navigates to Feedback Form;
@@ -1158,7 +1158,7 @@ repeat while
 
 _Figure 2.25: Activity Diagram for Submit Feedback_
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -1201,7 +1201,7 @@ _Figure 2.26: Sequence Diagram for Submit Feedback_
 |**Exception Flow(s) - EF**|EF1: Error Viewing Image File:<br><br>1. If the uploaded image file is corrupted or cannot be accessed, the system displays an error. Admin may need to contact visitor for re-submission.<br><br>  <br><br>EF2: Database Update Failure:<br><br>1. If the system fails to save the updated status to the database, it displays an error message.|
 |**Post-condition(s)**|The verification status of the payment proof is updated in the system.<br><br>The status of the associated booking inquiry may also be updated.<br><br>Visitor may be notified of the outcome.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Payment Proofs Section;
@@ -1230,7 +1230,7 @@ stop
 
 _Figure 2.27: Activity Diagram for Manage Payment Status_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -1272,7 +1272,7 @@ _Figure 2.28: Sequence Diagram for Manage Payment Status_
 |**Exception Flow(s) - EF**|EF1: Error Generating Report:<br><br>1. If the system encounters an error while retrieving data or generating the report (e.g., complex query fails, unexpected data format), it displays a general error message.|
 |**Post-condition(s)**|Administrator has viewed the generated report.<br><br>System data remains unchanged by report generation.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Reports Section;
@@ -1297,7 +1297,7 @@ stop
 
 _Figure 2.29: Activity Diagram for View/Generate Reports_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -1333,7 +1333,7 @@ _Figure 2.30: Sequence Diagram for View/Generate Reports_
 |**Exception Flow(s) - EF**|EF1: Database Update Failure:<br><br>1. If the system fails to save changes to a feedback entry (e.g., updated review status), it displays an error message.|
 |**Post-condition(s)**|Administrator has reviewed user feedback.<br><br>Review status or notes for feedback entries may be updated in the system.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Feedback Management;
@@ -1360,7 +1360,7 @@ stop
 
 _Figure 2.31: Activity Diagram for Manage Feedback_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
@@ -1397,7 +1397,7 @@ _Figure 2.32: Sequence Diagram for Manage Feedback (Reviewing and Updating Statu
 |**Exception Flow(s) - EF**|EF1: Error Saving Configuration:<br><br>1. If the system fails to save the updated configurations to the database, it displays an error message.|
 |**Post-condition(s)**|System notification templates are updated according to the new configurations and are ready to be generated as pre-filled links.|
 
-```
+```plantuml
 @startuml
 start
 :Admin Navigates to Notification Templates;
@@ -1422,7 +1422,7 @@ repeat while
 
 _Figure 2.33: Activity Diagram for Configure/Manage Notifications_
 
-```
+```plantuml
 @startuml
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI

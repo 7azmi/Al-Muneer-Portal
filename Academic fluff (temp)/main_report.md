@@ -284,7 +284,7 @@ Waterfall-style life cycles would normally be preferred in those projects where 
 
 ### 3.2.1 Waterfall Model Process Diagram
 
-```
+```plantuml
 @startuml
 skinparam handwritten false
 skinparam backgroundColor white
@@ -363,7 +363,7 @@ The development lifecycle for the Al-Muneer Online Portal, following the Waterfa
 
 ### 3.3.1 Gantt Chart for PSM1
 
-```
+```plantuml
 @startgantt
 Project starts 2025-03-04
 [Project Proposal & Initiation] starts 2025-03-04 and ends 2025-03-28
@@ -380,7 +380,8 @@ _Figure 3.2: Gantt Chart for PSM1 Activities_
 
 ### 3.3.2 Gantt Chart for PSM2
 
-```
+
+```plantuml
 @startgantt
 Project starts 2026-03-01
 [PSM2 Official Start / Planning] starts 2026-03-01 and ends 2026-03-15
@@ -505,7 +506,7 @@ Non-functional requirements define the quality attributes of the system.
 
 ### 4.2.3 Use Case Table and Diagram
 
-```
+```plantuml
 @startuml
 left to right direction
 actor Visitor
@@ -573,7 +574,7 @@ _Figure 4.1: Use Case Diagram for the Al-Muneer Online Portal_
 
 #### 4.2.3.2 Sequence Diagram (Submit Booking Inquiry - UC005)
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Frontend (WebUI)" as UI
@@ -605,7 +606,7 @@ _Figure 4.2: Sequence Diagram for 'Submit Booking Inquiry' (UC005)_
 
 #### 4.2.3.3 Activity Diagram (Submit Booking Inquiry - UC005)
 
-```
+```plantuml
 @startuml
 start
 :Visitor Accesses Inquiry Form;
@@ -630,7 +631,7 @@ The Al-Muneer Online Portal utilizes a Model-View-Controller (MVC) architectural
 
 The diagram presented below depicts the overarching Model-View-Controller (MVC) architecture utilized by the Al-Muneer Online Portal. Within this unified framework, the Spring Boot application is responsible for managing both the business logic and the rendering of the user interface, thereby establishing a coherent and sustainable system.
 
-```
+```plantuml
 @startuml
 node "Web Browser" as browser
 
@@ -669,7 +670,7 @@ _Figure 4.4: System Architecture Diagram (MVC)_
 
 A relational database model is selected because of the organized characteristics of the data. The subsequent illustration is a basic conceptual Entity-Relationship Diagram (ERD). Primary Keys (PK) and Foreign Keys (FK) will be specified in a comprehensive design.
 
-```
+```plantuml
 @startuml
 hide circle
 skinparam linetype ortho

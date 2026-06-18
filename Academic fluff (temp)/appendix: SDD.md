@@ -384,7 +384,7 @@ The system features include:
 
 - **For the Administrator:** Securely logging in to manage all website content (hall information, media, availability calendar, pricing, FAQs), managing booking inquiries, managing submitted payment proofs and their statuses, reviewing user feedback, viewing basic operational reports, and configuring system notifications.
 
-```
+```plantuml
 @startuml
 left to right direction
 actor Visitor
@@ -467,7 +467,7 @@ This section develops a component model and explains the relationships between t
 
 The Al-Muneer Online Portal is decomposed into the following major subsystems/components, which collaborate to deliver the required functionalities. Figure 5.2 provides a high-level component diagram illustrating these major subsystems and their primary interactions.
 
-```
+```plantuml
 @startuml
 actor Visitor
 actor Administrator
@@ -525,7 +525,7 @@ The purpose of the logical viewpoint is to elaborate the implementation of class
 
 This design view includes a class diagram representing key classes within the respective subsystems/packages, particularly focusing on the controller and domain entity classes for the Al-Muneer Online Portal's backend. The Spring Boot framework encourages a layered architecture often comprising Controller, Service, and Repository layers for each primary domain entity.
 
-```
+```plantuml
 @startuml
 package "Controllers (REST API) <<Spring Component>>" {
     class VenueInfoController {
@@ -779,7 +779,7 @@ Manages administrator login credentials and roles.
 
 **Entity Relationship Diagram (ERD)**
 
-```
+```plantuml
 @startuml
 hide circle
 skinparam linetype ortho
@@ -1014,7 +1014,7 @@ Structure viewpoint informs user and the developer about the interaction between
 
 This section includes the overall package diagram of the system, primarily focusing on the backend (Spring Boot application) structure. The navigation visibility is based on the dependency among classes in the design class diagram (Logical Viewpoint).
 
-```
+```plantuml
 @startuml
 package "com.almuneer.portal" {
     package "config" {
@@ -1146,7 +1146,7 @@ This section of the SDD will therefore focus on providing a higher-level view of
 
 **a) SD001: High-Level Sequence Diagram for Visitor Submitting a Booking Inquiry and Initial Admin Notification**
 
-```
+```plantuml
 @startuml
 actor Visitor
 participant "Presentation Subsystem (Frontend)" as UI
@@ -1178,7 +1178,7 @@ The Visitor initiates the process by submitting the booking inquiry form via the
 
 **b) SD002: High-Level Sequence Diagram for Administrator Managing Payment Proof Status**
 
-```
+```plantuml
 @startuml
 actor Administrator
 participant "Presentation Subsystem (Frontend) - Admin Panel" as UI
@@ -1230,7 +1230,7 @@ In this section, system behavior and states of the system are given via the stat
 
 State transition diagrams are included here for key entities in the Al-Muneer Online Portal whose behavior involves distinct and significant state changes.
 
-```
+```plantuml
 @startuml
 [*] --> New : Visitor Submits Inquiry
 state New {
@@ -1266,7 +1266,7 @@ _Figure 5.8: State Machine Diagram for BookingInquiry Entity_
 
 The BookingInquiry entity transitions through several states from its creation to its resolution. It begins in a `New` state upon submission. An administrator action moves it to `Viewed` and then potentially `Contacted`. If discussions lead to a tentative agreement, it moves to `Payment_Pending`. Successful verification of payment (from the PaymentProof entity) transitions it to `Confirmed`. The inquiry can be `Cancelled` by either the visitor or admin at various stages. After the event date, a `Confirmed` booking moves to `Completed`.
 
-```
+```plantuml
 @startuml
 [*] --> Pending_Verification : Visitor Submits Proof (UC012)
 state Pending_Verification {
