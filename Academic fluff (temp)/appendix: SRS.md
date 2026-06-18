@@ -8,7 +8,7 @@
 
 **Al-Muneer Online Portal**
 
-**Version 1.1**
+**Version 1.2**
 
 **Prepared by:** Ahmed Ghaleb
 
@@ -37,6 +37,7 @@ The target audience for this SRS document includes:
 |**Version**|**Primary Author(s)**|**Description of Version**|**Date Completed**|
 |1.0|Ahmed Hani Ahmed Ghaleb|Initial complete draft of SRS document for FYP1 Progress 2.|30/05/2025|
 |1.1|Ahmed Hani Ahmed Ghaleb|Use case 6 "Admin Login" removed as instructed|06/08/2025|
+|1.2|Ahmed Hani Ahmed Ghaleb|AI advisor features integrated into UC010, UC014, and UC015; redundant steps removed; diagrams synced with implementation.|18/06/2026|
 
 _(Note: This Software Requirements Specification (SRS) template is adapted from IEEE Recommended Practice for Software Requirements Specification (SRS) (IEEE Std. 830-1998) that is simplified and customized to meet the need of SECJ3203 FYP1 SE course at Faculty of Computing, UTM. Examples of models are from Arlow and Neustadt (2002) and other sources stated accordingly. This template is tailored for SRS in a plan-driven software development approach.)_
 
@@ -64,7 +65,7 @@ The software product to be produced is the "Al-Muneer Online Portal," a web-base
 
 - Provide a public-facing interface for visitors to view detailed venue information, browse a media gallery, check event availability via an interactive calendar, view pricing tiers, read FAQs, submit booking inquiries, optionally upload proof of payment (e.g., transfer screenshots), and provide feedback.
 
-- Provide a secure administrator panel for the venue owner to manage all content (venue details, media, FAQs, pricing), manage the availability calendar, view and manage booking inquiries, view and update payment proof statuses, review user feedback, generate basic operational reports, and configure system notifications (WhatsApp focused).
+- Provide a secure administrator panel for the venue owner to manage all content (venue details, media, FAQs, pricing), manage the availability calendar, view and manage booking inquiries, view and update payment proof statuses, review user feedback, generate basic operational reports with visual charts and AI-generated business insights, view traffic analytics with AI funnel advice, and configure system notifications (WhatsApp focused).
 
 **The Al-Muneer Online Portal will not:**
 
@@ -76,7 +77,7 @@ The software product to be produced is the "Al-Muneer Online Portal," a web-base
 
 - Offer advanced event management or Customer Relationship Management (CRM) functionalities beyond the scope defined.
 
-- Provide advanced, customizable analytics; reporting will be basic.
+- Provide advanced, customizable analytics beyond the AI-enhanced reports and funnel advisor implemented in the project scope.
 
 - Support multiple languages beyond Arabic and potentially basic English translations for navigation, unless explicitly expanded later.
 
@@ -89,6 +90,10 @@ The software product is a custom-developed web application, encompassing both fr
 Definitions of all terms, acronyms and abbreviation used are to be defined here.
 
 - **Admin:** Administrator; refers to the owner or authorized manager of Al-Muneer Hall who has privileged access to the system's management features.
+
+- **AI Advisor:** An optional, asynchronous insight panel powered by a generative AI service (Gemini) that analyses portal data and presents concise, actionable recommendations to the Administrator.
+
+- **GenAI / Gemini:** Google's generative artificial intelligence service accessed through the official Google GenAI Java SDK; used by the system for optional business, feedback, and traffic insights.
 
 - **API:** Application Programming Interface.
 
@@ -293,10 +298,10 @@ _Figure 2.1: Use Case Diagram for Al-Muneer Online Portal_
 ||UC007: Manage Media Gallery|Allows the admin to upload, delete, or modify media items in the gallery.|
 ||UC008: Manage Pricing Panel|Enables the admin to set and update pricing structures and package details.|
 ||UC009: Manage Calendar & Inquiries|Allows the admin to update the availability calendar and view/manage submitted inquiries.|
-||UC010: View Traffic Analytics|Provides the admin with basic insights into website visitor traffic (conceptual, very basic implementation).|
+||UC010: View Traffic Analytics|Provides the admin with interactive traffic charts and an AI-generated funnel advisor that suggests concrete conversion improvements.|
 ||UC013: Manage Payment Status|Enables the admin to view uploaded payment proofs and update booking confirmation statuses.|
-||UC014: View/Generate Reports|Allows the admin to access basic reports on inquiries, bookings, and feedback.|
-||UC015: Manage Feedback|Enables the admin to view and manage user-submitted feedback.|
+||UC014: View/Generate Reports|Allows the admin to access visual reports on inquiries, bookings, and feedback, augmented by an AI-generated business advisor.|
+||UC015: Manage Feedback|Enables the admin to view and manage user-submitted feedback, supported by an AI feedback advisor that highlights complaints and positives.|
 ||UC016: Configure/Manage Notifications|Allows the admin to set up or manage templates/triggers for system notifications.|
 
 The domain model illustrating the key entities and their attributes within the Al-Muneer Online Portal is shown in Figure 2.2. This model focuses on the data aspects of the system from a requirements perspective.
@@ -990,27 +995,33 @@ _Figure 2.20: Sequence Diagram for Manage Calendar (Update Manually)_
 |**Attribute**|**Description**|
 |**Use Case ID**|UC010|
 |**Use Case Name**|View Traffic Analytics|
-|**Description**|This use case allows the Administrator to view very basic website traffic analytics or visit counts. This feature is conceptual for PSM1 and may involve simple logging or a placeholder for future integration with a basic analytics tool.|
+|**Description**|This use case allows the Administrator to view website traffic analytics through interactive Chart.js visualisations and to receive an AI-generated traffic funnel advisor that analyses Home → Gallery → Pricing → Inquiry visit counts and suggests concrete conversion improvements.|
 |**Actor(s)**|Administrator|
-|**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Analytics" or "Site Statistics" section in the admin panel.<br><br>2. System retrieves basic logged data (e.g., total page visits for key pages like homepage, gallery, inquiry page, if such logging is implemented) or displays a placeholder for this feature.<br><br>3. System displays the basic analytics data or a message indicating the feature's status (e.g., "Basic visit count logging active" or "Advanced analytics planned for future").|
-|**Alternative Flow(s) - AF**|AF1: No Data Logged Yet:<br><br>1. If no traffic data has been logged (e.g., new system, logging not fully active), the system displays "No traffic data available yet."|
-|**Exception Flow(s) - EF**|EF1: Error Retrieving Log Data:<br><br>1. If the system encounters an error while trying to access any stored log files or simple analytic data, it displays a general error message.|
-|**Post-condition(s)**|Administrator has viewed the available basic traffic analytics or the status of this feature.|
+|**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>Page visit data has been logged by the system.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Analytics" section in the admin panel.<br><br>2. System retrieves logged page-visit data for the last 30 days.<br><br>3. System displays a bar chart of top pages and a line chart of daily traffic trends.<br><br>4. System asynchronously requests an AI funnel insight based on the retrieved traffic data.<br><br>5. System displays the AI-generated funnel insight when it becomes available.|
+|**Alternative Flow(s) - AF**|AF1: No Data Logged Yet:<br><br>1. If no traffic data has been logged, the system displays "No traffic data available yet."<br><br>AF2: AI Service Unavailable:<br><br>1. If the AI advisor request fails or returns no insight, the system displays a graceful fallback message (e.g., "AI insight temporarily unavailable; charts are still up to date.") without delaying the rest of the page.|
+|**Exception Flow(s) - EF**|EF1: Error Retrieving Log Data:<br><br>1. If the system encounters an error while retrieving analytics data, it displays a general error message.|
+|**Post-condition(s)**|Administrator has viewed the available traffic analytics and any AI-generated insight.|
 
 ```plantuml
 @startuml
 start
 :Admin Navigates to Analytics Section;
-:System Attempts to Retrieve Basic Log/Analytics Data;
+:System Retrieves Page-Visit Data (last 30 days);
 if (Data Retrieval Successful?) then (Yes)
   if (Data Available?) then (Yes)
-    :System Displays Basic Analytics Data;
+    :Display Traffic Charts (Top Pages + Daily Trends);
+    :Asynchronously Request AI Funnel Insight;
+    if (AI Insight Available?) then (Yes)
+      :Display AI Funnel Recommendation;
+    else (No / Error)
+      :Display Graceful Fallback Message;
+    endif
   else (No Data Yet)
     :Display "No Traffic Data Available Yet";
   endif
-else (No - Retrieval Error or Feature Placeholder)
-  :Display "Analytics Feature Status" or Error Message;
+else (No - Retrieval Error)
+  :Display Error Message;
 endif
 stop
 @enduml
@@ -1023,18 +1034,25 @@ _Figure 2.21: Activity Diagram for View Traffic Analytics_
 actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - AnalyticsController)" as App
-database "LogStorage/SimpleAnalyticsDB (Conceptual)" as DB
+database "Database (DB - PageVisit)" as DB
+participant "GeminiService" as AI
 
 Admin -> UI : Navigates to Analytics Section
-UI -> App : GET /api/admin/analytics/basic-traffic
-App -> DB : GetBasicTrafficData()
-DB --> App : TrafficData (or status)
-App --> UI : AnalyticsResponse (TrafficData/Status)
-UI --> Admin : Displays Basic Analytics or Feature Status
+UI -> App : GET /api/admin/analytics
+App -> DB : GetTrafficData(last 30 days)
+DB --> App : TrafficData
+App --> UI : AnalyticsResponse (Charts Data)
+UI --> Admin : Displays Traffic Charts
+
+UI -> App : GET /api/admin/analytics/ai-insight (async)
+App -> AI : AnalyseFunnel(TrafficData)
+AI --> App : FunnelInsight (HTML bullets)
+App --> UI : AIInsightResponse
+UI --> Admin : Displays AI Funnel Advisor Panel
 @enduml
 ```
 
-_Figure 2.22: Sequence Diagram for View Traffic Analytics (Conceptual)_
+_Figure 2.22: Sequence Diagram for View Traffic Analytics_
 
 #### 2.3.11 UC011: Use Case
 
@@ -1048,33 +1066,27 @@ _Figure 2.22: Sequence Diagram for View Traffic Analytics (Conceptual)_
 |**Description**|This use case allows a Visitor, typically after making a booking inquiry and arranging an offline payment (e.g., local bank transfer), to upload a proof of payment (e.g., screenshot of transfer receipt) to the portal.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has made a booking inquiry (UC005).<br><br>Visitor has been instructed by the Administrator to submit payment proof, or a booking has reached a stage where payment proof is expected.<br><br>Visitor has an image file of the payment proof.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to a designated "Submit Payment Proof" page or a link provided (e.g., in an email/message from admin, or on their inquiry status page if available).<br><br>2. System may require Visitor to input their Inquiry ID or other identifying information if not already session-based or link-specific.<br><br>3. System presents a file upload form.<br><br>4. Visitor selects the payment proof image file from their device.<br><br>5. Visitor clicks "Upload Proof" or "Submit".<br><br>6. System validates the file (e.g., file type JPG/PNG, file size limit).<br><br>7. System uploads the file to a secure storage location.<br><br>8. System records the metadata of the uploaded proof (filename, path, timestamp, associated Inquiry ID) in the database.<br><br>9. System displays a success message to the Visitor (e.g., "Payment proof submitted successfully. We will verify it shortly.").<br><br>10. System triggers a notification to the Administrator about the new payment proof submission.|
-|**Alternative Flow(s) - AF**|AF1: Invalid File Type/Size:<br><br>1. If file validation fails (Step 6), the system displays an error message specifying the issue (e.g., "Invalid file format. Please upload JPG or PNG.", "File size exceeds limit.").<br><br>2. Visitor remains on the form to select a valid file.<br><br>  <br><br>AF2: Invalid Inquiry ID (if required):<br><br>1. If an Inquiry ID is required and the one entered is invalid or not found (Step 2), the system displays an error message.|
-|**Exception Flow(s) - EF**|EF1: File Upload Failure:<br><br>1. If the system fails to upload the file to storage due to a server-side error (Step 7), it displays a general error message (e.g., "Failed to upload payment proof. Please try again.").<br><br>  <br><br>EF2: Database Save Failure:<br><br>1. If the system fails to save the payment proof metadata to the database (Step 8), it displays an error. This might require reconciliation if the file was uploaded but DB record failed.|
-|**Post-condition(s)**|Payment proof file is uploaded and its metadata is stored in the system, linked to the relevant booking inquiry.<br><br>Administrator is notified of the new submission.<br><br>Visitor receives confirmation of submission.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the payment proof upload page from their inquiry status page.<br><br>2. System presents a file upload form pre-linked to the visitor's inquiry.<br><br>3. Visitor selects the payment proof image file (JPG/PNG, within size limit).<br><br>4. Visitor clicks "Upload Proof".<br><br>5. System validates the file and uploads it to secure storage.<br><br>6. System records the proof metadata (filename, path, timestamp, inquiry link) in the database.<br><br>7. System displays a success message and notifies the Administrator.|
+|**Alternative Flow(s) - AF**|AF1: Invalid File Type/Size:<br><br>1. If file validation fails, the system displays an error message specifying the issue. Visitor remains on the form to select a valid file.|
+|**Exception Flow(s) - EF**|EF1: File Upload Failure:<br><br>1. If the system fails to upload the file to storage due to a server-side error, it displays a general error message.<br><br>EF2: Database Save Failure:<br><br>1. If the system fails to save the payment proof metadata, it displays an error message.|
+|**Post-condition(s)**|Payment proof file is uploaded and its metadata is stored, linked to the relevant booking inquiry.<br><br>Administrator is notified of the new submission.<br><br>Visitor receives confirmation of submission.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Payment Proof Submission Page;
-:Optional - Visitor Enters Inquiry ID;
+:Visitor Navigates to Payment Proof Upload Page;
 repeat
-  :System Displays File Upload Form;
   :Visitor Selects Payment Proof File;
   :Visitor Clicks "Upload Proof";
   if (Validate File (Type, Size)) then (Valid)
     :System Uploads File to Storage;
-    if (File Upload Successful?) then (Yes)
-      :System Saves Proof Metadata to DB (links to inquiry);
-      if (DB Save Successful?) then (Yes)
-        :System Triggers Notification to Admin;
-        :Display "Proof Submitted Successfully" Message to Visitor;
-        stop
-      else (No - DB Save Error)
-        :Display "Error Saving Proof Information" Message;
-      endif
-    else (No - File Storage Error)
-      :Display "File Upload Failed" Message;
+    :System Saves Proof Metadata to DB;
+    if (Save Successful?) then (Yes)
+      :Notify Administrator;
+      :Display "Proof Submitted Successfully" Message;
+      stop
+    else (No - Save Error)
+      :Display "Error Saving Proof Information" Message;
     endif
   else (Invalid File)
     :Display File Validation Error Message;
@@ -1196,10 +1208,10 @@ _Figure 2.26: Sequence Diagram for Submit Feedback_
 |**Description**|This use case allows the Administrator to view submitted payment proofs and update the verification status of a payment, thereby confirming or rejecting a booking associated with it.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>One or more payment proofs have been submitted by visitors (UC011).|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Payment Proofs" or "Booking Management" section in the admin panel.<br><br>2. System retrieves and displays a list of submitted payment proofs, typically showing associated Inquiry ID, visitor name, upload date, and current verification status (e.g., "Pending Verification").<br><br>3. Administrator selects a specific payment proof to review.<br><br>4. System displays the details of the payment proof, including a link to view/download the uploaded image file.<br><br>5. Administrator views the image and verifies the payment offline (e.g., checks their bank account or local transfer records).<br><br>6. Administrator updates the verification status in the system (e.g., to "Verified" or "Rejected").<br><br>7. Administrator may add internal notes regarding the verification.<br><br>8. Administrator saves the changes.<br><br>9. System updates the payment proof status and potentially the associated booking inquiry status in the database.<br><br>10. System displays a success message.<br><br>11. System may trigger a notification to the Visitor about their payment verification status (e.g., "Your payment has been confirmed!").|
-|**Alternative Flow(s) - AF**|AF1: No Payment Proofs Submitted:<br><br>1. If no payment proofs are pending review, the system displays a message like "No new payment proofs to verify."|
-|**Exception Flow(s) - EF**|EF1: Error Viewing Image File:<br><br>1. If the uploaded image file is corrupted or cannot be accessed, the system displays an error. Admin may need to contact visitor for re-submission.<br><br>  <br><br>EF2: Database Update Failure:<br><br>1. If the system fails to save the updated status to the database, it displays an error message.|
-|**Post-condition(s)**|The verification status of the payment proof is updated in the system.<br><br>The status of the associated booking inquiry may also be updated.<br><br>Visitor may be notified of the outcome.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Payment Proofs" section in the admin panel.<br><br>2. System retrieves and displays submitted payment proofs with status and inquiry link.<br><br>3. Administrator selects a proof to review; system displays the uploaded image.<br><br>4. Administrator verifies the payment offline and updates the status (Verified/Rejected), optionally adding notes.<br><br>5. Administrator saves the changes.<br><br>6. System updates the payment proof status, cascades the status to the linked booking inquiry and availability slot, and displays a success message.<br><br>7. System notifies the Visitor of the verification outcome.|
+|**Alternative Flow(s) - AF**|AF1: No Payment Proofs Submitted:<br><br>1. If no payment proofs are pending review, the system displays "No new payment proofs to verify."|
+|**Exception Flow(s) - EF**|EF1: Error Viewing Image File:<br><br>1. If the uploaded image cannot be accessed, the system displays an error.<br><br>EF2: Database Update Failure:<br><br>1. If the system fails to save the updated status, it displays an error message.|
+|**Post-condition(s)**|The verification status of the payment proof is updated.<br><br>The linked booking inquiry and availability slot statuses are cascaded accordingly.<br><br>Visitor is notified of the outcome.|
 
 ```plantuml
 @startuml
@@ -1208,17 +1220,15 @@ start
 :System Displays List of Submitted Payment Proofs;
 if (Payment Proofs Exist?) then (Yes)
   :Admin Selects a Payment Proof;
-  :System Displays Proof Details & Image Link;
-  :Admin Views/Downloads Proof Image;
+  :System Displays Proof Image;
   :Admin Verifies Payment Offline;
-  :Admin Updates Verification Status (Verified/Rejected) in System;
-  :[Optional] Admin Adds Notes;
+  :Admin Updates Status (Verified/Rejected) and Adds Notes;
   :Admin Clicks "Save Status";
-  :System Updates Payment Proof & Booking Status in DB;
+  :System Updates Proof, Inquiry, and Slot Statuses;
   if (Save Successful?) then (Yes)
-    :[Optional] System Triggers Notification to Visitor;
+    :Notify Visitor;
     :Display "Status Updated Successfully" Message;
-  else (No - DB Save Error)
+  else (No - DB Error)
     :Display "Error Updating Status" Message;
   endif
 else (No Proofs)
@@ -1236,16 +1246,16 @@ actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - PaymentController)" as App
 database "Database (DB)" as DB
-participant "NotificationService (Optional)" as NS
+participant "NotificationService" as NS
 
 Admin -> UI : Navigates to Payment Proofs, Selects a Proof
-UI --> Admin : Displays Proof Details (incl. image link from previous load)
-Admin -> UI : Shows Proof image (Admin views it)
+UI --> Admin : Displays Proof Details and Image
 Admin -> UI : Updates Status (Verified/Rejected) & Clicks Save
-UI -> App : PUT /api/admin/payment-proofs/{proofId}/status (NewStatus)
+UI -> App : PUT /api/admin/payment-proofs/{proofId}/status
 App -> DB : UpdatePaymentProofStatus(ProofID, NewStatus)
-DB --> App : UpdateSuccess
 App -> DB : UpdateBookingInquiryStatus(AssociatedInquiryID)
+App -> DB : UpdateAvailabilitySlotStatus(AssociatedSlotID)
+DB --> App : UpdateSuccess
 App -> NS : SendPaymentStatusNotification(Visitor, ProofID, NewStatus)
 NS --> App : NotificationSentStatus
 App --> UI : StatusUpdateSuccessResponse
@@ -1264,27 +1274,30 @@ _Figure 2.28: Sequence Diagram for Manage Payment Status_
 |**Attribute**|**Description**|
 |**Use Case ID**|UC014|
 |**Use Case Name**|View/Generate Reports|
-|**Description**|This use case allows the Administrator to view or generate basic predefined reports related to portal activities, such as summaries of booking inquiries, booking statuses (based on payment verification), or an overview of feedback received.|
+|**Description**|This use case allows the Administrator to view operational reports with interactive visual charts and to receive an AI-generated business advisor that computes conversion and cancellation rates and suggests number-backed action bullets.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>Data (inquiries, payment proofs, feedback) exists in the system.|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Reports" section in the admin panel.<br><br>2. System displays a list of available predefined report types (e.g., "Inquiry Summary," "Booking Confirmation Status," "Feedback Overview").<br><br>3. Administrator selects a report type.<br><br>4. Administrator may specify parameters if applicable (e.g., date range for the report).<br><br>5. Administrator clicks "Generate Report" or "View Report".<br><br>6. System retrieves the relevant data from the database based on the report type and parameters.<br><br>7. System processes the data and generates the report in a simple display format (e.g., a table on the web page, or a simple list).<br><br>8. System displays the generated report to the Administrator.|
-|**Alternative Flow(s) - AF**|AF1: No Data for Report:<br><br>1. If no data matches the selected report type or parameters (e.g., no inquiries in the specified date range), the system displays a message like "No data available for this report."|
-|**Exception Flow(s) - EF**|EF1: Error Generating Report:<br><br>1. If the system encounters an error while retrieving data or generating the report (e.g., complex query fails, unexpected data format), it displays a general error message.|
-|**Post-condition(s)**|Administrator has viewed the generated report.<br><br>System data remains unchanged by report generation.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Reports" section in the admin panel.<br><br>2. System displays available report types and a date-range filter.<br><br>3. Administrator selects a report type and optionally specifies a date range.<br><br>4. System retrieves the relevant data from the database.<br><br>5. System displays the report using visual charts (e.g., pie charts for inquiry/payment status, bar chart for feedback ratings).<br><br>6. System asynchronously requests an AI business insight based on the report data.<br><br>7. System displays the AI-generated action bullets when available.|
+|**Alternative Flow(s) - AF**|AF1: No Data for Report:<br><br>1. If no data matches the selected report type or date range, the system displays "No data available for this report."<br><br>AF2: AI Service Unavailable:<br><br>1. If the AI advisor request fails, the system displays a graceful fallback message without blocking the report view.|
+|**Exception Flow(s) - EF**|EF1: Error Generating Report:<br><br>1. If the system encounters an error while retrieving data or generating the report, it displays a general error message.|
+|**Post-condition(s)**|Administrator has viewed the generated report and any AI-generated insight.<br><br>System data remains unchanged by report generation.|
 
 ```plantuml
 @startuml
 start
 :Admin Navigates to Reports Section;
-:System Displays Available Report Types;
-:Admin Selects Report Type;
-:[Optional] Admin Specifies Report Parameters (e.g., Date Range);
-:Admin Clicks "Generate Report";
-:System Retrieves Data from DB based on Report Type & Parameters;
+:System Displays Report Types and Date Filter;
+:Admin Selects Report Type and Date Range;
+:System Retrieves Data from DB;
 if (Data Retrieval Successful?) then (Yes)
-  if (Data Exists for Report?) then (Yes)
-    :System Processes Data and Generates Report;
-    :Display Generated Report to Admin;
+  if (Data Exists?) then (Yes)
+    :Display Report with Visual Charts;
+    :Asynchronously Request AI Business Insight;
+    if (AI Insight Available?) then (Yes)
+      :Display AI Action Bullets;
+    else (No / Error)
+      :Display Graceful Fallback Message;
+    endif
   else (No Data)
     :Display "No Data Available for Report" Message;
   endif
@@ -1303,14 +1316,20 @@ actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - ReportController)" as App
 database "Database (DB)" as DB
+participant "GeminiService" as AI
 
-Admin -> UI : Navigates to Reports, Selects Report Type & Parameters, Clicks Generate
-UI -> App : GET /api/admin/reports/{reportType} (Parameters)
-App -> DB : FetchReportData(ReportType, Parameters)
+Admin -> UI : Navigates to Reports, Selects Type & Date Range
+UI -> App : GET /api/admin/reports/{reportType}?fromDate=...&toDate=...
+App -> DB : FetchReportData(ReportType, DateRange)
 DB --> App : ReportData
-App -> App : ProcessDataAndFormatReport(ReportData)
-App --> UI : ReportResponse (FormattedReport)
-UI --> Admin : Displays Generated Report
+App --> UI : ReportResponse (Charts Data)
+UI --> Admin : Displays Report with Charts
+
+UI -> App : GET /api/admin/reports/ai-insight (async)
+App -> AI : GenerateBusinessInsight(ReportData)
+AI --> App : Insight (HTML bullets)
+App --> UI : AIInsightResponse
+UI --> Admin : Displays AI Business Advisor Panel
 @enduml
 ```
 
@@ -1325,31 +1344,31 @@ _Figure 2.30: Sequence Diagram for View/Generate Reports_
 |**Attribute**|**Description**|
 |**Use Case ID**|UC015|
 |**Use Case Name**|Manage Feedback|
-|**Description**|This use case allows the Administrator to view submitted user feedback, and potentially mark it as reviewed or take internal notes.|
+|**Description**|This use case allows the Administrator to view submitted user feedback, mark it as reviewed, add internal notes, and receive an AI-generated feedback advisor that separates low-rating complaints from positive highlights and recommends what to address first.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>User feedback may have been submitted (UC012).|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Feedback Management" section in the admin panel.<br><br>2. System retrieves and displays a list of submitted feedback entries (e.g., showing submission date, visitor name if provided, part of the message, current review status).<br><br>3. Administrator selects a feedback entry to view its full details.<br><br>4. System displays the complete feedback message, contact details (if any), rating (if any), and submission timestamp.<br><br>5. Administrator can optionally mark the feedback as "Reviewed" or add internal notes regarding any action taken or observations.<br><br>6. Administrator saves any changes (e.g., review status, notes).<br><br>7. System updates the feedback entry in the database.<br><br>8. System displays a success message.|
-|**Alternative Flow(s) - AF**|AF1: No Feedback Submitted:<br><br>1. If no feedback entries exist, the system displays a message like "No user feedback submitted yet."|
-|**Exception Flow(s) - EF**|EF1: Database Update Failure:<br><br>1. If the system fails to save changes to a feedback entry (e.g., updated review status), it displays an error message.|
-|**Post-condition(s)**|Administrator has reviewed user feedback.<br><br>Review status or notes for feedback entries may be updated in the system.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Feedback Management" section in the admin panel.<br><br>2. System retrieves submitted feedback entries.<br><br>3. System asynchronously requests an AI feedback analysis based on the feedback data.<br><br>4. System displays the feedback list together with the AI advisor panel highlighting complaints and positives.<br><br>5. Administrator selects a feedback entry to view its full details.<br><br>6. Administrator marks the feedback as "Reviewed" or adds internal notes.<br><br>7. Administrator saves the changes.<br><br>8. System updates the feedback entry and displays a success message.|
+|**Alternative Flow(s) - AF**|AF1: No Feedback Submitted:<br><br>1. If no feedback entries exist, the system displays "No user feedback submitted yet."<br><br>AF2: AI Service Unavailable:<br><br>1. If the AI advisor request fails, the system displays a graceful fallback message while still showing the feedback list.|
+|**Exception Flow(s) - EF**|EF1: Database Update Failure:<br><br>1. If the system fails to save changes to a feedback entry, it displays an error message.|
+|**Post-condition(s)**|Administrator has reviewed user feedback and any AI-generated insight.<br><br>Review status or notes for feedback entries may be updated in the system.|
 
 ```plantuml
 @startuml
 start
 :Admin Navigates to Feedback Management;
-:System Displays List of Submitted Feedback;
+:System Retrieves Feedback Entries;
 if (Feedback Entries Exist?) then (Yes)
+  :Asynchronously Request AI Feedback Analysis;
+  :Display Feedback List and AI Advisor Panel;
   :Admin Selects a Feedback Entry;
   :System Displays Full Feedback Details;
-  :[Optional] Admin Marks as Reviewed or Adds Notes;
-  if (Admin Made Changes to Status/Notes?) then (Yes)
-    :Admin Clicks "Save Changes";
-    :System Updates Feedback Entry in DB;
-    if (Save Successful?) then (Yes)
-      :Display "Feedback Updated" Message;
-    else (No - DB Error)
-      :Display "Error Updating Feedback" Message;
-    endif
+  :Admin Marks as Reviewed or Adds Notes;
+  :Admin Clicks "Save Changes";
+  :System Updates Feedback Entry in DB;
+  if (Save Successful?) then (Yes)
+    :Display "Feedback Updated" Message;
+  else (No - DB Error)
+    :Display "Error Updating Feedback" Message;
   endif
 else (No Feedback)
   :Display "No Feedback Submitted Yet" Message;
@@ -1366,11 +1385,23 @@ actor Administrator as Admin
 participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - FeedbackController)" as App
 database "Database (DB - Feedback)" as DB
+participant "GeminiService" as AI
 
-Admin -> UI : Navigates to Feedback, Selects an Entry
-UI --> Admin : Displays Full Feedback Details
-Admin -> UI : Marks as Reviewed, Clicks Save
-UI -> App : PUT /api/admin/feedback/{feedbackId}/status (NewStatus, Notes)
+Admin -> UI : Navigates to Feedback Management
+UI -> App : GET /api/admin/feedback
+App -> DB : GetFeedbackList()
+DB --> App : FeedbackList
+App --> UI : FeedbackListResponse
+UI --> Admin : Displays Feedback List
+
+UI -> App : GET /api/admin/feedback/ai-insight (async)
+App -> AI : AnalyseFeedback(FeedbackList)
+AI --> App : FeedbackInsight (complaints / positives / priority)
+App --> UI : AIInsightResponse
+UI --> Admin : Displays AI Feedback Advisor Panel
+
+Admin -> UI : Selects Entry, Marks Reviewed, Clicks Save
+UI -> App : PUT /api/admin/feedback/{feedbackId}/status
 App -> DB : UpdateFeedbackEntry(FeedbackID, NewStatus, Notes)
 DB --> App : UpdateSuccess
 App --> UI : FeedbackUpdateSuccessResponse
@@ -1378,7 +1409,7 @@ UI --> Admin : Displays Success Message
 @enduml
 ```
 
-_Figure 2.32: Sequence Diagram for Manage Feedback (Reviewing and Updating Status)_
+_Figure 2.32: Sequence Diagram for Manage Feedback_
 
 #### 2.3.16 UC016: Use Case <Configure/Manage Notifications>
 
@@ -1389,13 +1420,10 @@ _Figure 2.32: Sequence Diagram for Manage Feedback (Reviewing and Updating Statu
 |**Attribute**|**Description**|
 |**Use Case ID**|UC016|
 |**Use Case Name**|Configure/Manage Notifications|
-|**Description**|This use case allows the Administrator to manage settings related to system notifications, specifically editing template content and placeholders for pre-filled WhatsApp messages to facilitate direct client communication.|
+|**Description**|This use case allows the Administrator to create, read, update, and delete notification templates for dynamic WhatsApp messages. Templates include placeholders (e.g., [ClientName], [Date]) that are resolved client-side before generating a `wa.me` deep-link on the inquiry or payment detail pages.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Notification Settings" or "Message Templates" section.<br><br>2. System displays current message templates (e.g., "New Inquiry Acknowledgment," "Payment Proof Verified").<br><br>3. For each event, system provides an option to "Edit Template".<br><br>4. Administrator modifies the template text (e.g., adding dynamic placeholders like [ClientName] or [Date] for the pre-filled WhatsApp message).<br><br>5. Administrator saves the changes.<br><br>6. System validates the template changes (e.g., checking for valid placeholder syntax and URL-safe characters for WhatsApp deep linking).<br><br>7. System saves the updated templates to the database.<br><br>8. System displays a success message.|
-|**Alternative Flow(s) - AF**|AF1: Template Validation Error:<br><br>1. If edited template content contains invalid syntax (Step 6), system displays an error and prevents saving until corrected.|
-|**Exception Flow(s) - EF**|EF1: Error Saving Configuration:<br><br>1. If the system fails to save the updated configurations to the database, it displays an error message.|
-|**Post-condition(s)**|System notification templates are updated according to the new configurations and are ready to be generated as pre-filled links.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Message Templates" section.<br><br>2. System displays current WhatsApp message templates.<br><br>3. Administrator creates a new template, edits an existing template, or deletes a template.<br><br>4. System validates the template text and placeholders.<br><br>5. System saves the changes to the database and displays a success message.<br><br>6. When viewing an inquiry or payment proof, Administrator selects a template from a dropdown; system resolves placeholders and generates a pre-filled WhatsApp deep-link.|<br>|**Alternative Flow(s) - AF**|AF1: Template Validation Error:<br><br>1. If template content contains invalid syntax, the system displays an error and prevents saving until corrected.|<br>|**Exception Flow(s) - EF**|EF1: Error Saving Configuration:<br><br>1. If the system fails to save template changes, it displays an error message.|<br>|**Post-condition(s)**|Notification templates are updated and available for selection when sending WhatsApp messages to visitors.|
 
 ```plantuml
 @startuml
@@ -1429,11 +1457,11 @@ participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - NotificationTemplateController)" as App
 database "Database (TemplateConfig)" as DB
 
-Admin -> UI : Navigates to Notification Templates, Modifies Text, Clicks Save
-UI -> App : POST /api/admin/notifications/templates (NewTemplateData)
-App -> App : Validate(NewTemplateData)\ne.g., check placeholder syntax\nand URL-safe character limits
+Admin -> UI : Navigates to Templates, Creates/Edits/Deletes Template, Clicks Save
+UI -> App : POST /admin/templates (TemplateData)
+App -> App : Validate(TemplateData)
 alt Valid
-  App -> DB : SaveTemplateConfiguration(NewTemplateData)
+  App -> DB : SaveTemplate(TemplateData)
   DB --> App : SaveSuccess
   App --> UI : TemplateUpdateSuccessResponse
   UI --> Admin : Displays Success Message
@@ -1441,6 +1469,13 @@ else Invalid
   App --> UI : TemplateValidationErrorResponse
   UI --> Admin : Displays Validation Error Message
 end
+
+Admin -> UI : Selects Template on Inquiry/Payment Detail Page
+UI -> App : GET /admin/templates/{id}
+App -> DB : GetTemplate(TemplateID)
+DB --> App : TemplateData
+App --> UI : TemplateResponse
+UI --> Admin : Displays Resolved Message Preview and wa.me Deep-Link
 @enduml
 ```
 
@@ -1469,6 +1504,8 @@ This section specifies the non-functional requirements that describe how the Al-
 - The system shall be available for use at least 99% of the time, excluding scheduled maintenance periods.
 
 - In the event of an error during data submission (e.g., inquiry, feedback, payment proof), the system shall provide an appropriate error message and prevent data loss where possible (e.g., by allowing the user to retry or by preserving entered form data if feasible).
+
+- AI advisor panels shall load asynchronously and degrade gracefully: if the external GenAI service is unavailable or returns an error, the rest of the admin page must continue to function normally and a user-friendly fallback message shall be displayed.
 
 - The system's database operations should ensure data integrity. Regular (e.g., daily) backups of the database and uploaded files (payment proofs) should be planned as an operational procedure to prevent data loss in case of system failure.
 
@@ -1569,6 +1606,8 @@ This section outlines any constraints that limit the design choices for the Al-M
 - **Communication Preferences:** The preference for WhatsApp for notifications over email in the target user environment (Yemen) influences the design of the notification module, favoring simpler or more readily available integration options for these channels.
 
 - **No Direct Payment Integration:** A core constraint is that the system will not integrate with online payment gateways or banks due to the local business context (cash and local transfers are king) and project complexity. Only proof of offline payment will be handled.
+
+- **AI Integration:** AI advisor features rely on the external Google GenAI service (Gemini) accessed through the `google-genai` Java SDK. The system must be designed so that AI insights are optional and asynchronous; all core admin functionality must work without the AI service being available. The Gemini API key shall be configurable via `application.properties` and must not be hard-coded.
 
 ## Appendix A: Evidence of Requirements Elicitation Artefacts
 
