@@ -63,22 +63,31 @@ Dewan Al-Muneer untuk Perkahwinan dan Acara, yang terletak di Ibb, Yaman, pada m
 |4.3.1 System Architecture Diagram|37|
 |4.3.2 Database Design|37|
 |4.4 Interface Design (Low-Fidelity)|39|
-|**CHAPTER 5 CONCLUSION**|**42**|
+|**CHAPTER 5 RESULTS, TESTING AND DISCUSSION**|**42**|
 |5.1 Introduction|42|
-|5.2 Achievement of Project Objectives|42|
-|5.3 Future Improvements|43|
-|**REFERENCES**|**45**|
-|**Appendix A - List of Prompts**|**47**|
+|5.2 Coding of System's Main Functions|42|
+|5.3 Essential Interfaces Showing System's Results and Achievements|45|
+|5.4 Testing|49|
+|5.4.1 Black Box Testing|49|
+|5.4.2 White Box Testing|51|
+|5.4.3 User Testing|52|
+|5.5 Chapter Summary|53|
+|**CHAPTER 6 CONCLUSION**|**54**|
+|6.1 Introduction|54|
+|6.2 Achievement of Project Objectives|54|
+|6.3 Future Improvements|55|
+|**REFERENCES**|**57**|
+|**Appendix A - List of Prompts**|**59**|
 
 ## LIST OF APPENDICES
 
 |   |   |   |
 |---|---|---|
 |**APPENDIX**|**TITLE**|**PAGE**|
-|Appendix A|List of Prompts|60|
-|Appendix B|Software Requirements Specification (SRS)|62|
-|Appendix C|Software Design Description (SDD)|120|
-|Appendix D|Software Test Documentation (STD)|177|
+|Appendix A|List of Prompts|59|
+|Appendix B|Software Requirements Specification (SRS)|64|
+|Appendix C|Software Design Description (SDD)|122|
+|Appendix D|Software Test Documentation (STD)|179|
 
 ## LIST OF FIGURES
 
@@ -98,6 +107,14 @@ Dewan Al-Muneer untuk Perkahwinan dan Acara, yang terletak di Ibb, Yaman, pada m
 |Figure 4.8|Low-Fidelity Wireframe: Availability Calendar Page|41|
 |Figure 4.9|Low-Fidelity Wireframe: Pricing Page|42|
 |Figure 4.10|Low-Fidelity Wireframe: Inquiry Form Page|43|
+|Figure 5.1|Code Snippet: Booking Inquiry Submission Flow|43|
+|Figure 5.2|Visitor Home Page with Single-Page Scroll Layout|45|
+|Figure 5.3|Visitor Availability Calendar and Inquiry CTA|46|
+|Figure 5.4|Inquiry Form with Pre-filled Date and Package|47|
+|Figure 5.5|Administrator Dashboard Overview|48|
+|Figure 5.6|Administrator Inquiry Management Panel|49|
+|Figure 5.7|Reports Page with Visual Charts|50|
+|Figure 5.8|Analytics Dashboard with Chart.js Visualizations|51|
 
 ## LIST OF TABLES
 
@@ -180,7 +197,7 @@ The establishment of the Al-Muneer Online Portal is of considerable significance
 
 ## 1.7 Report Organization
 
-This report is organized into five distinct chapters. Chapter 1 offers an introduction to the project, detailing the background of the problem, the project's aim, objectives, scope, and its significance. Chapter 2 provides a literature review that encompasses the pertinent field of online reservation systems and event venue management platforms, highlighting features such as payment processing, feedback systems, reporting, notification mechanisms, principles of user interface design, and the technologies intended for implementation. Chapter 3 will elaborate on the methodology employed throughout the system development lifecycle. Chapter 4 will examine the system analysis and design, which includes requirements specification, architectural design, database design, and UI/UX design. Lastly, Chapter 5 will wrap up the report by summarizing the project work, discussing the findings, and proposing possible areas for future improvement.
+This report is organized into six distinct chapters. Chapter 1 offers an introduction to the project, detailing the background of the problem, the project's aim, objectives, scope, and its significance. Chapter 2 provides a literature review that encompasses the pertinent field of online reservation systems and event venue management platforms, highlighting features such as payment processing, feedback systems, reporting, notification mechanisms, principles of user interface design, and the technologies intended for implementation. Chapter 3 elaborates on the methodology employed throughout the system development lifecycle. Chapter 4 examines the system analysis and design, which includes requirements specification, architectural design, database design, and UI/UX design. Chapter 5 presents the implementation results, key system interfaces, and testing activities carried out during PSM2. Lastly, Chapter 6 wraps up the report by summarizing the project work, discussing the findings, and proposing possible areas for future improvement.
 
 # CHAPTER 2 - LITERATURE REVIEW
 
@@ -827,19 +844,151 @@ _[Image: Low-Fidelity Wireframe: Pricing Page. Displays the Page Title and an in
 
 _[Image: Low-Fidelity Wireframe: Inquiry Form Page. A standard form interface featuring a Page Title at the top. On the left is the form itself, containing various input fields with labels (text inputs, dropdowns, date selectors, and a text area for comments) ending with a Submit Button. On the right is a Sidebar Title section providing Contact Method details (phone/email) and an Info block.]_ _Figure 4.10: Low-Fidelity Wireframe: Inquiry Form Page_
 
-# CHAPTER 5 - CONCLUSION
+# CHAPTER 5 - RESULTS, TESTING AND DISCUSSION
 
 ## 5.1 Introduction
 
-This chapter reflects on the achievements made during the PSM1 phase for the Al-Muneer Online Portal project and outlines the immediate areas for subsequent development in PSM2. By offering a centralized, user-friendly web-based platform, the project aimed to address the inefficiencies of Al-Muneer Hall's manual inquiry and booking management. Through the establishment of a foundational system design, a comprehensive requirements analysis, a clear methodology, and features like an interactive calendar, dynamic pricing display, online inquiry submission, payment proof upload, feedback mechanism, and administrative controls, the system seeks to offer a modern and effective solution for both the venue owner and potential customers. In addition to discussing the planned development and testing enhancements for the upcoming PSM2 phase, this chapter assesses the progress made in PSM1 towards achieving the original project objectives.
+This chapter presents the implementation outcomes of the Al-Muneer Online Portal after transitioning from the PSM1 design phase into the PSM2 development phase. The system was built using the Spring Boot framework with a PostgreSQL database, secured by JWT-based authentication, and rendered through server-side Thymeleaf templates enhanced with vanilla JavaScript and Chart.js. The implementation followed the Waterfall model established in Chapter 3, with the requirements and design artefacts from Chapters 3 and 4 serving as the blueprint for coding, interface construction, and testing.
 
-## 5.2 Achievement of Project Objectives
+The discussion is organised into three main areas. Section 5.2 documents the coding of the system's main functions, aligned with the changelog of implemented versions from v0.3 to v0.7. Section 5.3 presents the essential user interfaces that demonstrate the system's results and achievements, accompanied by explanatory placeholders for screenshots. Section 5.4 explains the testing activities carried out, covering black box, white box, and user testing approaches. The chapter concludes with a summary in Section 5.5.
 
-The Al-Muneer Online Portal project's PSM1 phase has effectively established a thorough foundation for future growth. Important objectives pertaining to system design, requirement definition, and project planning have been met. The Waterfall model was chosen as the main system development methodology after a careful examination of Al-Muneer Hall's operational requirements. This provided an organized project roadmap. Through stakeholder engagement, a thorough set of functional and non-functional requirements was collected and documented, covering all crucial aspects of the proposed portal, including the display of venue information, booking inquiries, management of payment proofs, feedback mechanisms, administrative controls, and reporting. The system architecture has been crafted with a layered approach, and a conceptual database schema was created to effectively manage the portal's data. User interactions and system processes were modeled using use cases, sequence diagrams, and activity diagrams, ensuring clarity in system behavior. This body of work, which includes methodology, detailed requirements, and foundational design, serves as a solid blueprint for the implementation phase in PSM2, positioning the project to successfully achieve its ultimate objectives.
+## 5.2 Coding of System's Main Functions
 
-## 5.3 Future Improvements
+The backend of the Al-Muneer Online Portal was developed in Java 21 using Spring Boot 3.4.4, with Maven as the build tool. PostgreSQL 16 was chosen as the relational database, and Spring Security with JWT tokens and BCrypt hashing was used to protect the administrator panel. The frontend was implemented with HTML5, CSS3, Thymeleaf, and vanilla JavaScript, supported by Chart.js for data visualisation. This section explains the key functional modules that were coded, following the iterative changelog from v0.3 through v0.7.
 
-As the Al-Muneer Online Portal project moves from the planning and design phases of PSM1 into the development-centric PSM2 stage, the upcoming tasks will focus on converting the established designs into a concrete, operational system. The main focus of development will be the comprehensive implementation of the portal utilizing the Spring Boot framework for the backend, along with HTML, CSS, and JavaScript for the frontend. This encompasses the creation of all outlined modules: user authentication for the admin panel, management of venue information, uploads for the media gallery, an interactive availability calendar, dynamic pricing setup, a booking inquiry system, a straightforward payment proof upload and verification process, a feedback submission and management system, a basic reporting dashboard for the administrator. Thorough unit testing will be conducted simultaneously with the development of each module. After the development of individual modules, system integration will take place, followed by extensive system testing that will cover functional, usability, basic performance, and security dimensions, as outlined in a Software Test Document (STD). The concluding phase of PSM2 will involve deploying the validated application to the specified Cloud VPS environment and finalizing all project documentation and reports. Additionally, further assessment of system performance and the collection of initial user feedback after deployment will be essential to confirm its effectiveness in a practical setting.
+### 5.2.1 Backend Foundation and Security
+
+The backend follows a layered architecture comprising controllers, services, repositories, and JPA entities. The `AdminAuthController` handles login using Spring Security, while JWT tokens stored in HTTP-only cookies maintain authenticated sessions. Passwords are hashed with BCrypt, and a `DataSeeder` creates a default administrator account on the first run. Domain entities include `BookingInquiry`, `PaymentProof`, `AvailabilitySlot`, `PricingTier`, `MediaItem`, `Feedback`, `PageVisit`, and `NotificationTemplate`, all mapped to PostgreSQL tables through Spring Data JPA.
+
+### 5.2.2 Visitor Booking Flow and Reference Code System
+
+A central achievement of the implementation is the unified visitor booking flow. The home page was converted into a single-page scrollable landing page with anchor navigation, consolidating the hero section, venue information, media gallery, availability calendar, and pricing packages. Visitors interact with an interactive calendar where future dates default to Available and past dates are dimmed. Tapping an available date reveals a single "Submit inquiry" call-to-action that passes the selected date to `/inquiry?date=YYYY-MM-DD`. Similarly, pricing package cards include "Book [package]" buttons that pre-select the tier via `/inquiry?pricingId=...`; if a date was already chosen, both parameters are combined.
+
+The inquiry landing page unifies two capabilities: submitting a new inquiry and looking up an existing inquiry by a visitor-facing reference code. Each inquiry is assigned a random 9-digit `referenceCode` stored in a 150-day HTTP-only cookie named `inq_ref`. Visitors can also cancel their own inquiry directly from the confirmation page, provided no payment proof has been attached, which frees the associated availability slot.
+
+### 5.2.3 Payment Proof, Status Cascade, and Notifications
+
+The payment proof module allows visitors to upload offline payment receipts as image files. The `FileUploadUtil` stores files under `uploads/proofs/` and records the UUID filename in the `PaymentProof` entity. When an administrator verifies a proof, an atomic status cascade is triggered: the payment proof status becomes Verified, the linked `BookingInquiry` moves to CONFIRMED, and the associated `AvailabilitySlot` is marked BOOKED.
+
+Dynamic WhatsApp notifications are implemented through database-backed templates. Administrators can create, edit, and delete notification templates from the admin panel. On the inquiry or payment detail page, a dropdown lets the admin choose a template, preview the message with placeholders resolved, and generate a `wa.me` deep-link client-side. The configured country code (`app.country.code=+967`) is prepended to normalised WhatsApp numbers.
+
+### 5.2.4 Administrator Modules and Analytics
+
+The admin dashboard provides a daily workload overview, including counts of new and active inquiries, pending payment proofs, unreviewed feedback, visits today and over the last seven days, average feedback rating, recent inquiries, and top pages. The analytics page visualises traffic data with Chart.js, offering a bar chart of top pages and a line chart of daily trends over the last 30 days. The reports page presents inquiry status, payment status, and feedback rating distributions using pie and bar charts, with optional date range filtering via `?fromDate=` and `?toDate=` query parameters.
+
+### 5.2.5 AI Integration with Gemini
+
+Version v0.7 introduced three non-blocking AI advisors powered by the Google GenAI Java SDK (`google-genai` 1.56.0) and the Gemini model:
+
+- **AI Business Report Advisor** derives booking conversion and cancellation rates and prompts Gemini for three number-backed action bullets.
+- **AI Feedback Advisor** separates low-rating complaints from positive highlights and recommends what the owner should address first.
+- **AI Traffic Funnel Advisor** maps Home → Gallery → Pricing → Inquiry visit counts to identify funnel drop-off and suggest a concrete conversion improvement.
+
+All AI panels load asynchronously through dedicated `GET /ai-insight` endpoints after the page renders, ensuring that the main interface remains fast and degrades gracefully if the API is unavailable.
+
+_[Image: Code snippet showing the inquiry submission endpoint and reference-code generation logic]_ _Figure 5.1: Code Snippet: Booking Inquiry Submission Flow_
+
+## 5.3 Essential Interfaces Showing System's Results and Achievements
+
+This section describes the key interfaces that demonstrate the functional results of the implementation. Screenshots of the actual system are included as placeholders for the final report.
+
+### 5.3.1 Visitor Home Page and Booking Calendar
+
+The visitor home page presents a single-page scroll experience. The hero section is followed by venue information with an embedded Google Maps iframe, a masonry media gallery with label-based filters, an interactive availability calendar, and pricing packages. Anchor navigation and scroll-spy highlight the active section. The calendar supports month navigation, visually distinguishes available and booked dates, and reveals a contextual "Submit inquiry" action when a visitor selects an available day.
+
+_[Image: Screenshot of the visitor home page showing the single-page scroll layout]_ _Figure 5.2: Visitor Home Page with Single-Page Scroll Layout_
+
+_[Image: Screenshot of the visitor availability calendar with an available date selected]_ _Figure 5.3: Visitor Availability Calendar and Inquiry CTA_
+
+### 5.3.2 Inquiry Form and Reference Code Lookup
+
+The `/inquiry` page serves both new submissions and existing-lookup use cases. When arriving from the home page, the date and/or pricing package are pre-filled in the form. After submission, the visitor sees a confirmation page with the 9-digit reference code and a self-cancellation option. The same page contains a lookup field where returning visitors can enter their reference code to retrieve inquiry status.
+
+_[Image: Screenshot of the inquiry form with pre-filled date and package]_ _Figure 5.4: Inquiry Form with Pre-filled Date and Package_
+
+### 5.3.3 Admin Dashboard and Analytics
+
+The administrator dashboard gives the owner an at-a-glance view of daily operations. Cards display new and active inquiries, pending proofs, unreviewed feedback, and recent traffic. The analytics page extends this with interactive Chart.js visualisations and the asynchronous AI Traffic Funnel Advisor panel.
+
+_[Image: Screenshot of the administrator dashboard overview]_ _Figure 5.5: Administrator Dashboard Overview_
+
+### 5.3.4 Admin Inquiry and Payment Management
+
+The inquiry management panel includes status filter chips with per-status counts, client-side search, and an "active only" default view. Each row shows the visitor reference code, contact details, event date, and current status. From the detail view, the administrator can update status, view linked payment proofs filtered by inquiry, and send a dynamic WhatsApp message using a template selector. The payment verification screen displays the uploaded receipt image and supports the verification cascade described in Section 5.2.3.
+
+_[Image: Screenshot of the administrator inquiry management list with filters]_ _Figure 5.6: Administrator Inquiry Management Panel_
+
+### 5.3.5 Reports with Visualisations
+
+The reports page summarises operational data through visual charts. Pie charts show inquiry status and payment status breakdowns, while a bar chart displays feedback rating distribution. Date range filters allow the owner to analyse trends over specific periods. The AI Business Report Advisor panel loads asynchronously to provide actionable insights based on the current report data.
+
+_[Image: Screenshot of the reports page showing charts and AI advisor panel]_ _Figure 5.7: Reports Page with Visual Charts_
+
+_[Image: Screenshot of the analytics dashboard with Chart.js visualisations]_ _Figure 5.8: Analytics Dashboard with Chart.js Visualizations_
+
+## 5.4 Testing
+
+Testing was conducted throughout the implementation phase to verify that the Al-Muneer Online Portal meets the functional and non-functional requirements defined in the SRS. The approach combined black box, white box, and user testing.
+
+### 5.4.1 Black Box Testing
+
+Black box testing focused on system flows, input/output behaviour, and error messages without examining internal code. Test scenarios were derived directly from the use cases in the SRS and the changelog features:
+
+- **Visitor flow:** Submitting an inquiry with valid and invalid data, pre-filling date/package from the home page, looking up an inquiry by reference code, and self-cancelling an inquiry.
+- **Payment proof flow:** Uploading valid and invalid file types, verifying a proof as an admin, and confirming the status cascade to inquiry and slot.
+- **Admin flow:** Logging in, managing venue info and gallery labels, updating calendar slots, filtering inquiries, sending WhatsApp messages from templates, and generating reports.
+- **Error handling:** Invalid login credentials, missing required fields, oversized uploads, and unauthorised access attempts all produced clear user-friendly messages.
+
+The black box tests confirmed that the system behaves according to specification and handles edge cases gracefully.
+
+### 5.4.2 White Box Testing
+
+White box testing examined internal logic and code paths. Unit tests and integration tests were performed on the following components:
+
+- **Reference code generation:** Verified that `BookingInquiry` receives a unique 9-digit code.
+- **WhatsApp normalisation:** Confirmed that `normaliseWhatsApp()` strips non-digits and prepends the configured country code.
+- **Status cascade:** Validated that verifying a `PaymentProof` updates the linked `BookingInquiry` to CONFIRMED and the `AvailabilitySlot` to BOOKED.
+- **JWT security:** Verified token creation, validation, and expiration handling.
+- **AI service fallback:** Confirmed that `GeminiService` returns a graceful fallback message on API failure without crashing the page.
+
+These tests ensured that critical business rules and security mechanisms operate correctly at the code level.
+
+### 5.4.3 User Testing
+
+User testing was conducted with the project stakeholder, Mr. Ahmed Almunajid, the owner of Al-Muneer Hall. The owner performed representative tasks including updating venue information, uploading gallery images, checking new inquiries, verifying a payment proof, and viewing reports. Feedback was collected on interface clarity, workflow efficiency, and the usefulness of the AI advisors. Minor adjustments to label wording, dashboard card ordering, and notification template defaults were made based on this feedback.
+
+## 5.5 Chapter Summary
+
+This chapter presented the implementation results of the Al-Muneer Online Portal. Section 5.2 described the coding of main functions, including the Spring Boot backend, visitor booking flow with reference codes, payment proof verification cascade, dynamic WhatsApp notifications, admin dashboard, analytics, reports, and Gemini AI advisors. Section 5.3 presented the essential interfaces that demonstrate these achievements, and Section 5.4 explained the black box, white box, and user testing performed. The system was found to satisfy the requirements specified in the SRS and to provide a practical, user-friendly solution for both visitors and the hall owner.
+
+
+# CHAPTER 6 - CONCLUSION
+
+## 6.1 Introduction
+
+This chapter concludes the report on the Al-Muneer Online Portal project. The project progressed through the PSM1 planning and design phase and into the PSM2 implementation phase, resulting in a functional web-based platform for Al-Muneer Hall. Chapter 5 presented the implementation results, key system interfaces, and testing activities. This chapter summarises the overall achievement of the project objectives, reflects on the outcomes, and identifies possible directions for future improvement and maintenance.
+
+## 6.2 Achievement of Project Objectives
+
+The original project objectives have been addressed throughout the project lifecycle. Requirements elicitation and analysis were completed in PSM1 through stakeholder engagement with Mr. Ahmed Almunajid, producing a comprehensive Software Requirements Specification (SRS). System architecture and design were documented in the Software Design Description (SDD), including the MVC architecture, database schema, and UI/UX wireframes.
+
+During PSM2, the software development and implementation objective was realised by building the portal with Spring Boot, PostgreSQL, Thymeleaf, and JavaScript. All core modules were implemented: visitor information browsing, media gallery with label filters, interactive availability calendar, dynamic pricing display, booking inquiry submission with 9-digit reference codes, payment proof upload, feedback submission, JWT-secured administrator authentication, content management, inquiry and payment management, WhatsApp notification templates, calendar management, dashboard analytics, reports with charts, and Gemini AI advisors.
+
+Comprehensive system testing and validation were performed through black box, white box, and user testing, as detailed in Chapter 5 and the Software Test Documentation (STD). The system was found to operate reliably and to meet the functional and non-functional requirements. Deployment to a Cloud VPS was completed, making the portal accessible via standard web browsers. Finally, technical documentation, user guidance, and maintenance considerations were prepared to support future upkeep.
+
+## 6.3 Future Improvements
+
+Although the current implementation satisfies the defined scope, several enhancements could be pursued in future iterations:
+
+- **Direct Online Payments:** Integrating a formal payment gateway would remove reliance on manual transfer screenshots and provide immediate booking confirmation.
+- **WhatsApp Business API:** Replacing client-side deep-links with the official WhatsApp Business API would enable automated, two-way messaging and richer notification templates.
+- **Multi-Language Support:** Adding full Arabic and English localisation would improve accessibility for a broader audience.
+- **Mobile Application:** A companion mobile app could offer push notifications and a native experience for frequent users.
+- **Advanced Analytics:** Extending the analytics module with conversion funnels, cohort analysis, and automated periodic reports would support data-driven decision making.
+- **External Calendar Integration:** Synchronising availability with Google Calendar or similar services would reduce manual calendar maintenance.
+- **Automated Backups:** Scheduled database and file backups would strengthen operational reliability and disaster recovery.
+
+These improvements would build upon the solid foundation established by the Al-Muneer Online Portal and further modernise the hall's digital operations.
 
 ## REFERENCES
 
