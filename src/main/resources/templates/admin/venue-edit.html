@@ -59,6 +59,30 @@
                            placeholder="https://www.google.com/maps/embed?... or ?q=...&output=embed">
                     <small class="text-muted">From Google Maps → Share → Embed a map. Update when the venue moves.</small>
                 </div>
+
+                <div class="form-group faq-admin-section">
+                    <label class="form-label">Frequently Asked Questions</label>
+                    <p class="text-muted" style="font-size:0.8rem; margin-bottom:0.75rem;">
+                        Shown on the home page FAQ section. Leave question blank to skip a row.
+                    </p>
+                    <div id="faq-rows">
+                        <div class="faq-editor-row" th:each="faq, stat : ${faqs}">
+                            <div class="faq-editor-row-header">
+                                <span class="faq-editor-row-label" th:text="|FAQ #${stat.index + 1}|">FAQ #1</span>
+                                <button type="button" class="btn btn-outline btn-sm faq-remove-btn"
+                                        aria-label="Remove FAQ">Remove</button>
+                            </div>
+                            <input type="text" name="faqQuestion" class="form-input faq-question-input"
+                                   th:value="${faq.question}" placeholder="Question">
+                            <textarea name="faqAnswer" class="form-textarea faq-answer-input" rows="2"
+                                      th:text="${faq.answer}" placeholder="Answer"></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" id="faq-add-btn" style="margin-top:0.75rem;">
+                        + Add FAQ
+                    </button>
+                </div>
+
                 <button type="submit" class="btn btn-primary" id="save-venue-btn">Save Changes</button>
             </form>
         </div>
@@ -102,67 +126,146 @@
             </a>
         </div>
     </div>
-</div>
 
-<style>
-    .venue-admin-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        align-items: start;
-    }
-    .venue-preview-panel { position: sticky; top: 1rem; }
-    .venue-preview-desc {
-        color: var(--color-text-muted);
-        line-height: 1.7;
-        margin-bottom: 1.25rem;
-        font-size: 0.95rem;
-    }
-    .venue-info-row--preview { margin-bottom: 1rem; }
-    .map-embed-wrap--preview { min-height: 220px; }
-    .map-embed-wrap--preview .map-embed { min-height: 220px; }
-    @media (max-width: 1000px) {
-        .venue-admin-grid { grid-template-columns: 1fr; }
-        .venue-preview-panel { position: static; }
-    }
-</style>
-<script>
-    (function () {
-        const desc = document.getElementById('description');
-        const services = document.getElementById('services');
-        const cap = document.getElementById('capacity');
-        const contact = document.getElementById('contactInfo');
-        const loc = document.getElementById('location');
-        const mapShare = document.getElementById('mapsShareUrl');
-        const mapEmbed = document.getElementById('mapsEmbedUrl');
-        const previewEmbed = document.getElementById('preview-map-embed');
-        const previewShare = document.getElementById('preview-map-share');
-        function sync() {
-            if (desc) document.getElementById('preview-desc').textContent = desc.value || '—';
-            if (cap) document.getElementById('preview-capacity').textContent =
-                cap.value ? cap.value + ' Guests' : '—';
-            if (contact) document.getElementById('preview-contact').textContent = contact.value || '—';
-            if (loc) document.getElementById('preview-location').textContent = loc.value || '—';
-            const sw = document.getElementById('preview-services-wrap');
-            const st = document.getElementById('preview-services');
-            if (services && sw && st) {
-                const v = services.value.trim();
-                sw.style.display = v ? '' : 'none';
-                st.textContent = v;
-            }
-            if (mapEmbed && previewEmbed) {
-                const embed = mapEmbed.value.trim();
-                if (embed) previewEmbed.src = embed;
-            }
-            if (mapShare && previewShare) {
-                const share = mapShare.value.trim();
-                if (share) previewShare.href = share;
-            }
+    <style>
+        .venue-admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
         }
-        [desc, services, cap, contact, loc, mapShare, mapEmbed].forEach(el => {
-            if (el) el.addEventListener('input', sync);
+        .venue-preview-panel { position: sticky; top: 1rem; }
+        .venue-preview-desc {
+            color: var(--color-text-muted);
+            line-height: 1.7;
+            margin-bottom: 1.25rem;
+            font-size: 0.95rem;
+        }
+        .venue-info-row--preview { margin-bottom: 1rem; }
+        .map-embed-wrap--preview { min-height: 220px; }
+        .map-embed-wrap--preview .map-embed { min-height: 220px; }
+        .faq-admin-section {
+            border-top: 1px solid var(--color-border);
+            padding-top: 1.25rem;
+            margin-top: 0.5rem;
+        }
+        .faq-editor-row {
+            background: var(--color-surface-2);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .faq-editor-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .faq-editor-row-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+        }
+        .faq-question-input { margin-bottom: 0.5rem; }
+        @media (max-width: 1000px) {
+            .venue-admin-grid { grid-template-columns: 1fr; }
+            .venue-preview-panel { position: static; }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const desc = document.getElementById('description');
+            const services = document.getElementById('services');
+            const cap = document.getElementById('capacity');
+            const contact = document.getElementById('contactInfo');
+            const loc = document.getElementById('location');
+            const mapShare = document.getElementById('mapsShareUrl');
+            const mapEmbed = document.getElementById('mapsEmbedUrl');
+            const previewEmbed = document.getElementById('preview-map-embed');
+            const previewShare = document.getElementById('preview-map-share');
+
+            function syncPreview() {
+                if (desc) document.getElementById('preview-desc').textContent = desc.value || '—';
+                if (cap) document.getElementById('preview-capacity').textContent =
+                    cap.value ? cap.value + ' Guests' : '—';
+                if (contact) document.getElementById('preview-contact').textContent = contact.value || '—';
+                if (loc) document.getElementById('preview-location').textContent = loc.value || '—';
+                const sw = document.getElementById('preview-services-wrap');
+                const st = document.getElementById('preview-services');
+                if (services && sw && st) {
+                    const v = services.value.trim();
+                    sw.style.display = v ? '' : 'none';
+                    st.textContent = v;
+                }
+                if (mapEmbed && previewEmbed) {
+                    const embed = mapEmbed.value.trim();
+                    if (embed) previewEmbed.src = embed;
+                }
+                if (mapShare && previewShare) {
+                    const share = mapShare.value.trim();
+                    if (share) previewShare.href = share;
+                }
+            }
+
+            [desc, services, cap, contact, loc, mapShare, mapEmbed].forEach(function (el) {
+                if (el) el.addEventListener('input', syncPreview);
+            });
+
+            const faqRows = document.getElementById('faq-rows');
+            const faqAddBtn = document.getElementById('faq-add-btn');
+
+            function renumberFaqRows() {
+                if (!faqRows) return;
+                faqRows.querySelectorAll('.faq-editor-row').forEach(function (row, i) {
+                    const label = row.querySelector('.faq-editor-row-label');
+                    if (label) label.textContent = 'FAQ #' + (i + 1);
+                });
+            }
+
+            function createFaqRow(question, answer) {
+                const row = document.createElement('div');
+                row.className = 'faq-editor-row';
+                row.innerHTML =
+                    '<div class="faq-editor-row-header">' +
+                    '<span class="faq-editor-row-label">FAQ #1</span>' +
+                    '<button type="button" class="btn btn-outline btn-sm faq-remove-btn" aria-label="Remove FAQ">Remove</button>' +
+                    '</div>' +
+                    '<input type="text" name="faqQuestion" class="form-input faq-question-input" placeholder="Question">' +
+                    '<textarea name="faqAnswer" class="form-textarea faq-answer-input" rows="2" placeholder="Answer"></textarea>';
+                if (question) row.querySelector('.faq-question-input').value = question;
+                if (answer) row.querySelector('.faq-answer-input').value = answer;
+                return row;
+            }
+
+            function addFaqRow(question, answer) {
+                if (!faqRows) return;
+                faqRows.appendChild(createFaqRow(question, answer));
+                renumberFaqRows();
+            }
+
+            if (faqRows) {
+                faqRows.addEventListener('click', function (e) {
+                    const removeBtn = e.target.closest('.faq-remove-btn');
+                    if (!removeBtn) return;
+                    e.preventDefault();
+                    const row = removeBtn.closest('.faq-editor-row');
+                    if (row) row.remove();
+                    if (faqRows.children.length === 0) addFaqRow();
+                    renumberFaqRows();
+                });
+
+                if (faqRows.children.length === 0) addFaqRow();
+            }
+
+            if (faqAddBtn) {
+                faqAddBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    addFaqRow();
+                });
+            }
         });
-    })();
-</script>
+    </script>
+</div>
 </body>
 </html>

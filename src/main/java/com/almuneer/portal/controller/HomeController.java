@@ -4,6 +4,7 @@ import com.almuneer.portal.model.VenueInfo;
 import com.almuneer.portal.service.MediaItemService;
 import com.almuneer.portal.service.PricingTierService;
 import com.almuneer.portal.service.VenueInfoService;
+import com.almuneer.portal.util.FaqJsonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,9 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("venue", venueInfoService.getVenueInfo());
+        VenueInfo venue = venueInfoService.getVenueInfo();
+        model.addAttribute("venue", venue);
+        model.addAttribute("faqs", FaqJsonUtil.parse(venue.getFaqJson()));
         model.addAttribute("mediaItems", mediaItemService.getAllMedia());
         model.addAttribute("tiers", pricingTierService.getActiveTiers());
         LocalDate now = LocalDate.now();
@@ -34,6 +37,12 @@ public class HomeController {
     @GetMapping("/venue")
     public String venueInfo() {
         return "redirect:/#venue";
+    }
+
+    /** Legacy /faq URL → home FAQ section */
+    @GetMapping("/faq")
+    public String faq() {
+        return "redirect:/#faq";
     }
 }
 

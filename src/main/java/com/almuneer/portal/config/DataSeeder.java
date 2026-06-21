@@ -1,6 +1,7 @@
 package com.almuneer.portal.config;
 
 import com.almuneer.portal.model.AdminUser;
+import com.almuneer.portal.model.FaqItem;
 import com.almuneer.portal.model.GalleryLabel;
 import com.almuneer.portal.model.NotificationTemplate;
 import com.almuneer.portal.model.VenueInfo;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.almuneer.portal.util.FaqJsonUtil;
 
 import java.util.List;
 
@@ -58,7 +61,24 @@ public class DataSeeder implements CommandLineRunner {
                     .contactInfo("+967-XXX-XXX-XXX")
                     .mapsShareUrl(defaultMapsShareUrl)
                     .mapsEmbedUrl(defaultMapsEmbedUrl)
-                    .faqJson("[]")
+                    .faqJson(FaqJsonUtil.serialize(List.of(
+                            FaqItem.builder()
+                                    .question("What is the maximum capacity of the hall?")
+                                    .answer("Al-Muneer Hall can accommodate up to 500 guests. Contact us if your event size differs.")
+                                    .build(),
+                            FaqItem.builder()
+                                    .question("How do I book a date?")
+                                    .answer("Check availability on our home page calendar, then submit a booking inquiry. We will confirm via WhatsApp.")
+                                    .build(),
+                            FaqItem.builder()
+                                    .question("How is payment handled?")
+                                    .answer("We do not process online payments. After your inquiry is accepted, upload a bank transfer receipt on the payment proof page for manual verification.")
+                                    .build(),
+                            FaqItem.builder()
+                                    .question("Can I cancel my inquiry?")
+                                    .answer("Yes — you can cancel from your inquiry confirmation page using your 9-digit reference code, as long as no payment proof has been uploaded yet.")
+                                    .build()
+                    )))
                     .build();
             venueInfoRepository.save(venue);
             log.info("Default venue info record created");
@@ -71,6 +91,28 @@ public class DataSeeder implements CommandLineRunner {
                 }
                 if (venue.getMapsEmbedUrl() == null || venue.getMapsEmbedUrl().isBlank()) {
                     venue.setMapsEmbedUrl(defaultMapsEmbedUrl);
+                    changed = true;
+                }
+                if (venue.getFaqJson() == null || venue.getFaqJson().isBlank()
+                        || "[]".equals(venue.getFaqJson().trim())) {
+                    venue.setFaqJson(FaqJsonUtil.serialize(List.of(
+                            FaqItem.builder()
+                                    .question("What is the maximum capacity of the hall?")
+                                    .answer("Al-Muneer Hall can accommodate up to 500 guests. Contact us if your event size differs.")
+                                    .build(),
+                            FaqItem.builder()
+                                    .question("How do I book a date?")
+                                    .answer("Check availability on our home page calendar, then submit a booking inquiry. We will confirm via WhatsApp.")
+                                    .build(),
+                            FaqItem.builder()
+                                    .question("How is payment handled?")
+                                    .answer("We do not process online payments. After your inquiry is accepted, upload a bank transfer receipt on the payment proof page for manual verification.")
+                                    .build(),
+                            FaqItem.builder()
+                                    .question("Can I cancel my inquiry?")
+                                    .answer("Yes — you can cancel from your inquiry confirmation page using your 9-digit reference code, as long as no payment proof has been uploaded yet.")
+                                    .build()
+                    )));
                     changed = true;
                 }
                 if (changed) {
