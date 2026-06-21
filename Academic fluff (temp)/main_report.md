@@ -955,7 +955,7 @@ These tests ensured that critical business rules and security mechanisms operate
 
 ### 5.4.3 User Testing
 
-User testing was conducted with the project stakeholder, Mr. Ahmed Almunajid, the owner of Al-Muneer Hall. The owner performed representative tasks including updating venue information, uploading gallery images, checking new inquiries, verifying a payment proof, and viewing reports. Feedback was collected on interface clarity, workflow efficiency, and the usefulness of the AI advisors. Minor adjustments to label wording, dashboard card ordering, and notification template defaults were made based on this feedback.
+User testing was conducted with the project stakeholder, Mr. Ahmed Almunajid, the owner of Al-Muneer Hall. The owner performed representative tasks for the English version of the website, including updating venue information, uploading gallery images, checking new inquiries, verifying a payment proof, and viewing reports. Feedback was collected on interface clarity, workflow efficiency, and the usefulness of the AI advisors. Minor adjustments to dashboard card ordering, and notification template defaults were made based on this feedback.
 
 ## 5.5 Chapter Summary
 
