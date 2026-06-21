@@ -10,7 +10,7 @@
 
 **Project:** Al-Muneer Online Portal
 
-**Version:** 1.1
+**Version:** 1.2
 
 **Prepared by:** Ahmed Ghaleb
 
@@ -20,1047 +20,843 @@
 
 ### a. Overview
 
-This document is Version 1.0 of the Software Test Documentation (STD) for the Al-Muneer Online Portal. It outlines the strategy, scope, resources, and schedule of intended testing activities. This document provides the necessary information about testing activities, including test descriptions for various modules and functionalities of the system, based on the requirements specified in the Software Requirements Specification (SRS) Version 1.0 and the design detailed in the Software Design Description (SDD) Version 1.0. Test results are not included in this version as per course guidelines; the focus is on test case design.
+This document is Version 1.2 of the Software Test Documentation (STD) for the Al-Muneer Online Portal. It defines the testing strategy, scope, and test case design for verifying that the implemented system matches the Software Requirements Specification (SRS) Version 1.2 and Software Design Description (SDD) Version 1.2.
+
+Version 1.2 syncs all test cases with the **actual implemented system**: single-page visitor home, 9-digit inquiry reference codes, WhatsApp-based contact fields, WhatsApp notification **templates** (not toggle settings), Chart.js dashboards, and asynchronous Gemini AI advisor panels. Test execution results are out of scope per course guidelines.
 
 ### b. Target Audience
 
-The target audience for this STD document includes:
-
-- **The project developer** (Ahmed Hani Ahmed Ghaleb), as a guide for executing tests during and after development.
-
-- **The project supervisor** (Dr. Muhammad Luqman bin Mohd Shafie), for review and assess the testing strategy and coverage.
-
-- **Examiners**, for evaluation purposes of the planned testing approach.
+- **The project developer** (Ahmed Hani Ahmed Ghaleb), as a guide for executing manual tests.
+- **The project supervisor** (Dr. Muhammad Luqman bin Mohd Shafie), for review of testing coverage.
+- **Examiners**, for evaluation of the planned testing approach.
 
 ### c. Project Team Members
 
-The project is being undertaken by a single student developer responsible for all aspects, including testing.
+Single developer responsible for all modules:
 
 - **Team Member:** Ahmed Hani Ahmed Ghaleb
-
 - **Assigned Module(s) for Testing:** All modules of the Al-Muneer Online Portal.
 
 ### d. Version Control History
 
-|   |   |   |   |
-|---|---|---|---|
-|**Version**|**Primary Author(s)**|**Description of Version**|**Date Completed**|
-|1.0|Ahmed Hani Ahmed Ghaleb|Initial draft of STD document, including test case design.|30/05/2025|
-|1.1|Ahmed Hani Ahmed Ghaleb|Use case 6 removed|30/05/2025|
+| Version | Primary Author(s) | Description of Version | Date Completed |
+|---------|-------------------|------------------------|----------------|
+| 1.0 | Ahmed Hani Ahmed Ghaleb | Initial draft of STD document, including test case design. | 30/05/2025 |
+| 1.1 | Ahmed Hani Ahmed Ghaleb | Use case 6 removed. | 30/05/2025 |
+| 1.2 | Ahmed Hani Ahmed Ghaleb | Synced with implementation (SRS/SDD v1.2): single-page home, reference-code booking flow, FAQ section, corrected field names/enums, removed non-existent features, added AI advisor and inquiry lifecycle tests. | 21/06/2026 |
+
+### e. Sync Change Log (v1.2)
+
+**Removed** (features not implemented or not testable as written):
+
+- TC_V_001_03, TC_V_003_03 — simulated REST API 500 errors (`/api/venue-info`, `/api/availability` do not exist).
+- TC_V_004_03 — interactive pricing calculator with add-ons.
+- TC_A_006_02 — server-side validation blocking empty venue description (not implemented).
+- TC_A_016_01 — notification enable/disable toggles (replaced by WhatsApp template CRUD).
+
+**Rewritten** to match code:
+
+- Visitor navigation: separate pages → **home page anchor sections** (`/#venue`, `/#gallery`, etc.).
+- Inquiry contact: email/phone → **9-digit WhatsApp number** with `+967` prefix.
+- Inquiry IDs: `INQ12345` → **9-digit reference code** (e.g. `472918305`).
+- Slot statuses: `pending_confirmation` → **`PENDING`** (`AVAILABLE`, `PENDING`, `BOOKED`).
+- Payment verification: `pending` / `Verified` → **`PENDING_VERIFICATION`** / **`VERIFIED`**.
+- Analytics & reports: placeholder text → **Chart.js charts + async AI advisors**.
+- UC016: notification settings → **WhatsApp notification template management** at `/admin/templates`.
+
+**Added:**
+
+- FAQ accordion on home page + admin FAQ editor (UC001 / UC006).
+- Inquiry confirmation page, reference-code lookup, visitor self-cancellation.
+- Calendar date → inquiry deep link; pricing package → inquiry deep link.
+- Payment proof file validation; payment rejection; admin inquiry status management.
+- Admin JWT login test case.
 
 ## Table of Contents
 
-1. Introduction 1.1 Purpose 1.2 Scope 1.3 Definitions, Acronyms and Abbreviations 1.4 References 1.5 System Overview
+1. Introduction
+   - 1.1 Purpose
+   - 1.2 Scope
+   - 1.3 Definitions, Acronyms and Abbreviations
+   - 1.4 References
+   - 1.5 System Overview
+2. Test Cases, Data and Expected Results
+   - 2.0 TC_A_000 — Admin Login (cross-cutting)
+   - 2.1 TC_V_001 — View Venue Information & FAQ (UC001)
+   - 2.2 TC_V_002 — View Media Gallery (UC002)
+   - 2.3 TC_V_003 — Check Availability (UC003)
+   - 2.4 TC_V_004 — View Pricing Panel (UC004)
+   - 2.5 TC_V_005 — Submit Booking Inquiry (UC005)
+   - 2.6 TC_A_006 — Manage Hall Information & FAQ (UC006)
+   - 2.7 TC_A_007 — Manage Media Gallery (UC007)
+   - 2.8 TC_A_008 — Manage Pricing Panel (UC008)
+   - 2.9 TC_A_009 — Manage Calendar & Inquiries (UC009)
+   - 2.10 TC_A_010 — View Traffic Analytics (UC010)
+   - 2.11 TC_V_011 — Submit Payment Proof (UC011)
+   - 2.12 TC_V_012 — Submit Feedback (UC012)
+   - 2.13 TC_A_013 — Manage Payment Status (UC013)
+   - 2.14 TC_A_014 — View/Generate Reports (UC014)
+   - 2.15 TC_A_015 — Manage Feedback (UC015)
+   - 2.16 TC_A_016 — Configure/Manage Notifications (UC016)
 
-2. Test Cases, Data and Expected Results 2.1 Test TC_V_001 for Module : <View Venue Information (UC001)> 2.2 Test TC_V_002 for Module : <View Media Gallery (UC002)> 2.3 Test TC_V_003 for Module : <Check Availability (UC003)> 2.4 Test TC_V_004 for Module : <View Pricing Panel (UC004)> 2.5 Test TC_V_005 for Module : <Submit Booking Inquiry (UC005)> 2.6 Test TC_A_006 for Module : <Manage Hall Information (UC006)> 2.7 Test TC_A_007 for Module : <Manage Media Gallery (UC007)> 2.8 Test TC_A_008 for Module : <Manage Pricing Panel (UC008)> 2.9 Test TC_A_009 for Module : <Manage Calendar & Inquiries (UC009)> 2.10 Test TC_A_010 for Module : <View Traffic Analytics (UC010)> 2.11 Test TC_V_011 for Module : <Submit Payment Proof (UC011)> 2.12 Test TC_V_012 for Module : <Submit Feedback (UC012)> 2.13 Test TC_A_013 for Module : <Manage Payment Status (UC013)> 2.14 Test TC_A_014 for Module : <View/Generate Reports (UC014)> 2.15 Test TC_A_015 for Module : <Manage Feedback (UC015)> 2.16 Test TC_A_016 for Module : <Configure/Manage Notifications (UC016)>
+---
 
 ## 1. Introduction
 
 ### 1.1 Purpose
 
-The purpose of this Software Test Documentation (STD) for the Al-Muneer Online Portal is to define the scope, approach, resources, and schedule of all testing activities. This document provides the necessary information about testing activities that include test descriptions (test cases) designed to verify and validate that the Al-Muneer Online Portal system functions as specified in the Software Requirements Specification (SRS Version 1.0) and is implemented according to the Software Design Description (SDD Version 1.0). It aims to ensure that the developed system is robust, reliable, and meets the stakeholder's and users' needs.
-
-This STD provides a comprehensive plan for various levels of testing, including unit, integration, and system testing (with a focus on functional and usability aspects). Note: For the scope of this software engineering course, actual test results and execution logs are not included in this document; the primary focus is on the planning and design of test cases.
+The purpose of this STD is to define the scope, approach, and test cases for the Al-Muneer Online Portal. It verifies that the system functions as specified in SRS v1.2 and is implemented per SDD v1.2. Actual test results and execution logs are excluded per course requirements; this document focuses on test case **design**.
 
 ### 1.2 Scope
 
-This STD covers the testing of all functional and key non-functional aspects of the Al-Muneer Online Portal. The software product is a web-based application designed to provide information, facilitate booking inquiries, and enable administrative management for Al-Muneer Hall.
+**Visitor functionalities:**
 
-The scope of testing includes:
+- Single-page home: venue info, Google Maps embed, FAQ accordion, gallery with category filters, availability calendar, pricing packages.
+- Booking inquiry with 9-digit reference code, confirmation page, lookup, and self-cancellation.
+- Payment proof upload (JPG/PNG, max 5 MB).
+- Feedback form with required rating and message.
 
-**Visitor Functionalities:**
+**Administrator functionalities:**
 
-- Viewing venue information, media gallery, availability calendar, and pricing.
+- JWT-based login at `/admin/login`.
+- Venue content management including FAQs (`faqJson`), gallery (images + YouTube videos + labels), pricing tiers, calendar slots, inquiries, payment proofs, feedback, reports (Chart.js), analytics (Chart.js), and WhatsApp notification templates.
+- Three asynchronous Gemini AI advisor panels (analytics, reports, feedback).
 
-- Submitting booking inquiries.
+**Non-functional (representative manual checks):**
 
-- Submitting payment proofs.
+- Basic usability on visitor and admin UIs.
+- Admin route protection (unauthenticated access redirected to login).
+- Browser compatibility (Chrome, Firefox).
+- Page load and form submission responsiveness on broadband.
 
-- Submitting feedback.
+**Out of scope:**
 
-**Administrator Functionalities:**
-
-- Secure login to the admin panel.
-
-- Management of venue content (information, media, FAQs, pricing).
-
-- Management of the availability calendar.
-
-- Viewing and managing booking inquiries.
-
-- Viewing and managing payment proof statuses.
-
-- Viewing and managing user feedback.
-
-- Generation and viewing of basic reports.
-
-- Configuration of system notifications.
-
-**Non-Functional Aspects:**
-
-- Basic usability testing for both Visitor and Administrator interfaces.
-
-- Security testing related to admin authentication and basic input validation.
-
-- Performance testing concerning page load times and form submission response times (as defined in NFRs).
-
-- Compatibility testing across major web browsers.
-
-**Out of Scope for this STD (unless explicitly stated otherwise in test cases):**
-
-- Full-scale stress testing or load testing beyond basic performance checks.
-
-- Automated GUI testing tool implementation (manual testing is assumed primarily).
-
-- Exhaustive testing of all possible data combinations; focus will be on representative and boundary value cases.
-
-- Actual test execution results (as per course guidelines).
-
-This will provide the basis for the brief description of your product testing strategy. The software product is the Al-Muneer Online Portal, a custom web application. The goals of testing are to identify defects, ensure compliance with requirements, and provide confidence in the quality of the delivered system. The objectives are to achieve adequate test coverage for all critical functionalities and to verify key non-functional attributes. The benefits include early defect detection, reduced risk of system failure post-deployment, and ultimately, a higher quality product for the stakeholder.
+- Stress/load testing beyond basic performance observation.
+- Automated GUI test scripts.
+- Exhaustive combinatorial input testing.
+- Actual test execution results.
 
 ### 1.3 Definitions, Acronyms and Abbreviations
 
-Definitions of all terms, acronyms, and abbreviations that might exist to properly interpret the STD are defined here. Many of these are consistent with those defined in the SRS and SDD documents.
-
-- **Admin:** Administrator of the Al-Muneer Online Portal.
-
-- **API:** Application Programming Interface.
-
-- **CSS:** Cascading Style Sheets.
-
-- **DB:** Database.
-
-- **ERD:** Entity-Relationship Diagram.
-
-- **FAQ:** Frequently Asked Questions.
-
-- **FR:** Functional Requirement.
-
-- **FYP:** Final Year Project.
-
-- **GUI:** Graphical User Interface.
-
-- **HTML:** HyperText Markup Language.
-
-- **HTTP:** Hypertext Transfer Protocol.
-
-- **HTTPS:** Hypertext Transfer Protocol Secure.
-
-- **JS:** JavaScript.
-
-- **NFR:** Non-Functional Requirement.
-
-- **PSM:** Projek Sarjana Muda (Bachelor's Degree Project).
-
-- **SDD:** System Design Document.
-
-- **SRS:** Software Requirements Specification.
-
-- **STD:** Software Test Documentation.
-
-- **TC:** Test Case.
-
-- **UC:** Use Case.
-
-- **UI:** User Interface.
-
-- **UX:** User Experience.
-
-- **UTM:** Universiti Teknologi Malaysia.
-
-- **VPS:** Virtual Private Server.
+| Term | Definition |
+|------|------------|
+| Admin | Administrator of the Al-Muneer Online Portal |
+| FAQ | Frequently Asked Questions stored as JSON in `venue_info.faqJson` |
+| FR | Functional Requirement |
+| JWT | JSON Web Token used for admin session authentication |
+| Reference Code | Visitor-facing 9-digit numeric inquiry identifier |
+| SDD | Software Design Description |
+| SRS | Software Requirements Specification |
+| STD | Software Test Documentation |
+| TC | Test Case |
+| UC | Use Case |
 
 ### 1.4 References
 
-This subsection lists any documents which were used as sources of information for this STD. a) Ahmed Hani Ahmed Ghaleb. (2025). Software Requirements Specification (SRS) Al-Muneer Online Portal, Version 1.0. Universiti Teknologi Malaysia. (Internal Project Document) b) Ahmed Hani Ahmed Ghaleb. (2025). Software Design Description (SDD) - Al-Muneer Online Portal, Version 1.0. Universiti Teknologi Malaysia. (Internal Project Document) c) IEEE. (2008). IEEE Standard for Software Test Documentation (IEEE Std 829-2008). Institute of Electrical and Electronics Engineers. (Adaptations made for course requirements) d) Al-Muneer Online Portal FYP1 Progress 2 Report (Containing Chapters 3, 4, 5 of the main report). Ahmed Hani Ahmed Ghaleb. May 2025. (Internal Project Document)
+a) Ahmed Hani Ahmed Ghaleb. (2026). Software Requirements Specification (SRS) Al-Muneer Online Portal, Version 1.2. UTM. (Internal)
+
+b) Ahmed Hani Ahmed Ghaleb. (2026). Software Design Description (SDD) Al-Muneer Online Portal, Version 1.2. UTM. (Internal)
+
+c) IEEE Std 829-2008 (adapted for course requirements).
+
+d) Al-Muneer Online Portal — Core Specifications and README (implementation reference).
 
 ### 1.5 System Overview
 
-This subsection describes what the rest of the STD contains and explains how the STD is organised.
+- **Section 1** — purpose, scope, definitions, references.
+- **Section 2** — test cases grouped by use case. Each case lists ID, description, prerequisites, test data, steps, and expected results.
+- Tests assume **manual execution** in a browser against a running instance (local or deployed) with PostgreSQL seeded.
 
-a) This Software Test Documentation (STD) is organized to provide a clear plan for testing the Al-Muneer Online Portal.
+**Visitor URL model:** The public site is primarily one scrollable page at `/`. Legacy paths (`/venue`, `/gallery`, `/calendar`, `/pricing`, `/faq`) redirect to the matching `/#section` anchor.
 
-- **Section 1 (Introduction):** Defines the purpose, scope, definitions, references, and overview of this STD document.
-
-- **Section 2 (Test Cases, Data and Expected Results):** This is the core section containing detailed test cases for various modules and functionalities of the system. Each test case will specify its ID, name, description, preconditions, input data, steps, and expected results. Test cases are grouped by system modules and their corresponding use cases.
-
-- **Section 3 (Appendices):** Includes supplementary information, such as a Traceability Matrix linking test cases back to requirements.
-
-b) The STD is organized to allow the developer and supervisor to understand the testing planned for each part of the Al-Muneer Online Portal. Section 2 provides a structured breakdown of test cases, categorized for clarity and to ensure comprehensive coverage of the system's features as outlined in the SRS and SDD.
+---
 
 ## 2. Test Cases, Data and Expected Results
 
-### 2.1 Test TC_V_001 for Module : <View Venue Information (UC001)>
+### 2.0 Test TC_A_000 for Module: Admin Login (cross-cutting)
 
-This section covers tests for verifying the functionality of viewing venue information as described in Use Case UC001. This test suite contains the following test cases:
+| ID | Name |
+|----|------|
+| TC_A_000_01 | Verify successful admin login with valid credentials |
+| TC_A_000_02 | Verify failed login with invalid credentials |
 
-- **TC_V_001_01:** Verify successful display of complete venue information.
+#### TC_A_000_01: Verify successful admin login with valid credentials
 
-- **TC_V_001_02:** Verify system behavior when venue information content is missing or not configured.
+**Test Case ID:** TC_A_000_01
 
-- **TC_V_001_03:** Verify system behavior when there is a temporary error retrieving venue information.
+**Description:** Administrator can log in and reach the dashboard.
 
-#### 2.1.1 TC_V_001_01: Verify successful display of complete venue information.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Portal deployed; default admin seeded | Username: `admin`, Password: `admin123` |
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Navigate to `/admin/login` | Login form displayed |
+| 2 | Enter valid username and password; submit | Redirect to `/admin/dashboard`; dashboard loads |
+| 3 | Attempt to access `/admin/inquiries` | Inquiry management page loads (not redirected to login) |
+
+#### TC_A_000_02: Verify failed login with invalid credentials
+
+**Test Case ID:** TC_A_000_02
+
+**Description:** Invalid credentials are rejected without granting admin access.
+
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Portal deployed | Username: `admin`, Password: `wrongpassword` |
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Navigate to `/admin/login` | Login form displayed |
+| 2 | Enter valid username with wrong password; submit | Error message shown; remains on login page |
+| 3 | Navigate directly to `/admin/dashboard` without logging in | Redirected to `/admin/login` |
+
+---
+
+### 2.1 Test TC_V_001 for Module: View Venue Information & FAQ (UC001)
+
+| ID | Name |
+|----|------|
+| TC_V_001_01 | Verify venue section and FAQ accordion on home page |
+| TC_V_001_02 | Verify FAQ section hidden when no FAQs configured |
+
+#### TC_V_001_01: Verify venue section and FAQ accordion on home page
 
 **Test Case ID:** TC_V_001_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Visitor sees venue details, Google Maps embed, and expandable FAQ items on the home page.
 
-**Test Case Description:** To ensure that when a visitor navigates to the venue information page, all configured details (description, services, location, contact) are displayed accurately and completely.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Portal deployed | `venue_info` has description, services, capacity, location, contactInfo, maps URLs, and at least 2 FAQ entries in `faqJson` |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Venue Information" page.|
-|2|Venue information (description, services, location, contact details) has been configured in the database by the Administrator.|2|Database State: VenueInfo table contains complete and accurate data for description, services, location, contactInfo, and faqJson.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/` | Home page loads |
+| 2 | Scroll to `#venue` (or click **Venue** in nav) | Description, capacity, contact, location, services, embedded map, and **Open in Google Maps** link displayed |
+| 3 | Scroll to `#faq` (or click **FAQ** in nav) | FAQ section visible with question summaries |
+| 4 | Click a FAQ question | Answer expands in accordion; first item may be open by default |
+| 5 | Open `/faq` in address bar | Redirects to `/#faq` |
 
-**Test Conditions:** Test with various browsers (Chrome, Firefox) to ensure consistent display. Ensure all sections of the venue information (description, services, location, contact) are populated.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Venue Information" (or "About Us", "القاعة" etc.).|The browser navigates to the Venue Information page.|
-|3|Observe the displayed content on the Venue Information page.|Main description of the hall.<br><br>List of services offered.<br><br>Hall capacity (if specified).<br><br>Physical location/address.<br><br>Contact information (phone number, etc.).|
-
-#### 2.1.2 TC_V_001_02: Verify system behavior when venue information content is missing or not configured.
+#### TC_V_001_02: Verify FAQ section hidden when no FAQs configured
 
 **Test Case ID:** TC_V_001_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** When `faqJson` is empty (`[]`), the FAQ section is not shown.
 
-**Test Case Description:** To ensure the system handles gracefully and displays an appropriate message if the venue information content is not found in the database (e.g., admin deleted it or it was never set up).
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin sets all FAQ rows blank and saves | `faqJson` = `[]` |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Venue Information" page.|
-|2|The VenueInfo table in the database has no record, or the relevant fields (description, services, etc.) are empty or NULL.|2|Database State: VenueInfo table has no record for infoId=1. OR the description, services, location, contactInfo fields are left blank or NULL/empty.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/` and scroll past pricing | No `#faq` section rendered; **FAQ** nav link may still appear but section absent |
+| 2 | Navigate to `/#faq` | No FAQ content; page does not error |
 
-**Test Conditions:** Test scenario where the specific content is intentionally deleted by an admin.
+---
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Venue Information".|The browser navigates to the Venue Information page.|
-|3|Observe the content displayed on the Venue Information page.|The page should display a user-friendly message indicating that the content is not currently available (e.g., "Venue information is currently unavailable," or "Content not found."). The page should not crash or show a technical error/stack trace.|
+### 2.2 Test TC_V_002 for Module: View Media Gallery (UC002)
 
-#### 2.1.3 TC_V_001_03: Verify system behavior when there is a temporary error retrieving venue information.
+| ID | Name |
+|----|------|
+| TC_V_002_01 | Verify gallery display, filters, and lightbox |
+| TC_V_002_02 | Verify empty gallery message |
 
-**Test Case ID:** TC_V_001_03
-
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
-
-**Test Case Description:** To ensure that if there's a temporary backend or database connectivity issue preventing retrieval of venue information, the system displays a user-friendly error message rather than crashing.
-
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Venue Information" page.|
-|2|The backend service responsible for fetching venue information is simulated to return an error (e.g., database connection timeout, 500 server error).|2|System State: Simulate a condition where the backend API endpoint `/api/venue-info` returns a server-side error status (e.g., 500, 503).|
-
-**Test Conditions:** This test might require simulating a backend failure condition (e.g., temporarily stopping the database service if testing locally, or mocking an error response from the API endpoint).
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Venue Information".|The browser attempts to navigate to the Venue Information page.|
-|3|Observe the displayed content on the Venue Information page.|The page should display a user-friendly error message indicating a temporary problem (e.g., "Information is temporarily unavailable. Please try again shortly," or "A system error occurred."). The page should not crash or show a technical error/stack trace to the user.|
-
-### 2.2 Test TC_V_002 for Module : <View Media Gallery (UC002)>
-
-This section covers tests for verifying the functionality of viewing the media gallery as described in Use Case UC002. This test suite contains the following test cases:
-
-- **TC_V_002_01:** Verify successful display of media gallery with items.
-
-- **TC_V_002_02:** Verify system behavior when the media gallery is empty.
-
-- **TC_V_002_03:** Verify viewing a specific media item (image/video).
-
-#### 2.2.1 TC_V_002_01: Verify successful display of media gallery with items.
+#### TC_V_002_01: Verify gallery display, filters, and lightbox
 
 **Test Case ID:** TC_V_002_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Gallery shows masonry layout with category filters and full-screen lightbox.
 
-**Test Case Description:** To ensure that when a visitor navigates to the media gallery page, all configured media items (images/videos) are displayed correctly as thumbnails or previews.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| At least 3 media items with different gallery labels | Mix of images and at least one YouTube video |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Media Gallery" page.|
-|2|Several media items (e.g., 3 images, 1 video) have been uploaded and configured in the gallery by the Administrator.|2|Database State: MediaItem table contains multiple records with valid file paths, types (image/video), and captions.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/` and scroll to `#gallery` | Thumbnails/previews displayed in masonry layout |
+| 2 | Click a category filter button | Grid filters to matching label; **All** restores full set |
+| 3 | Click an image thumbnail | Lightbox opens with full-size image |
+| 4 | Close lightbox | Returns to gallery grid |
+| 5 | Click a video item | Video plays in lightbox/player |
 
-**Test Conditions:** Test with different numbers of media items to check layout.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Media Gallery" (or "الصور والفيديو" etc.).|The browser navigates to the Media Gallery page.|
-|3|Observe the content displayed on the Media Gallery page.|The page should display all configured media items, typically as a grid of thumbnails for images and placeholders/previews for videos. Each item should be identifiable.|
-
-#### 2.2.2 TC_V_002_02: Verify system behavior when the media gallery is empty.
+#### TC_V_002_02: Verify empty gallery message
 
 **Test Case ID:** TC_V_002_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Empty gallery shows friendly placeholder.
 
-**Test Case Description:** To ensure the system displays an appropriate message if no media items have been uploaded to the gallery by the administrator.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| `media_items` table empty | No media records |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Media Gallery" page.|
-|2|No media items are configured in the MediaItem table in the database.|2|Database State: MediaItem table is empty.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/#gallery` | Message such as "Gallery coming soon" displayed; no crash |
 
-**Test Conditions:** Scenario where an admin has not yet uploaded any media.
+---
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Media Gallery".|The browser navigates to the Media Gallery page.|
-|3|Observe the displayed content on the Media Gallery page.|The page should display a user-friendly message indicating that the gallery is empty or being updated (e.g., "Our gallery is currently being updated. Please check back soon!").|
+### 2.3 Test TC_V_003 for Module: Check Availability (UC003)
 
-#### 2.2.3 TC_V_002_03: Verify viewing a specific media item (image/video).
+| ID | Name |
+|----|------|
+| TC_V_003_01 | Verify calendar statuses and past-date styling |
+| TC_V_003_02 | Verify month navigation and date-to-inquiry flow |
 
-**Test Case ID:** TC_V_002_03
-
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
-
-**Test Case Description:** To ensure that when a visitor clicks on a media item thumbnail/preview in the gallery, the full-size image is displayed or the video plays correctly.
-
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Clicks on specific image and video items within the gallery.|
-|2|At least one image and one video are configured and displayed in the media gallery.|2|Database State: MediaItem table contains records for at least one valid image and one valid video, with correct filePath and mediaType.|
-|3|The media files exist at their specified paths and are not corrupted.|3|File System State: The actual image and video files exist at the paths specified in the database and are accessible by the web server.|
-
-**Test Conditions:** Test for both image types (e.g., JPG, PNG) and video playback.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the Media Gallery page (as per TC_V_002_01).|Media gallery with items is displayed.|
-|2|Click on an image thumbnail from the gallery.|The full-size image should be displayed, typically in a lightbox overlay or a dedicated viewer. The image should be clear and correctly rendered.|
-|3|Close the image viewer/lightbox.|The user should be returned to the gallery view.|
-|4|If a video item is present, click on its preview/placeholder.|The video should start playing, either in a lightbox, an embedded player, or a dedicated view. Video controls (play, pause, volume) should be functional if provided by the player.|
-|5|Close the video player/lightbox.|The user should be returned to the gallery view.|
-
-### 2.3 Test TC_V_003 for Module : <Check Availability (UC003)>
-
-This test contains the following test cases:
-
-- **TC_V_003_01:** Verify successful display of availability calendar with correct date statuses.
-
-- **TC_V_003_02:** Verify navigation through calendar months/years and correct data refresh.
-
-- **TC_V_003_03:** Verify system behavior when availability data cannot be retrieved.
-
-#### 2.3.1 TC_V_003_01: Verify successful display of availability calendar with correct date statuses.
+#### TC_V_003_01: Verify calendar statuses and past-date styling
 
 **Test Case ID:** TC_V_003_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Calendar reflects slot statuses; future dates without DB rows default to available.
 
-**Test Case Description:** To ensure that the interactive calendar correctly displays dates as "available," "booked," or "pending_confirmation" based on data configured by the administrator.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin configured slots for current month | e.g. `2026-07-10` = `BOOKED`, `2026-07-15` = `PENDING`; other future dates have no row |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Availability" page.|
-|2|The Administrator has configured various dates in the AvailabilitySlot table with different statuses (e.g., some available, some booked, some pending).|2|Database State: AvailabilitySlot table contains records for the current/default display month with a mix of status values (e.g., '2025-07-10' is 'booked', '2025-07-15' is 'available', '2025-07-20' is 'pending_confirmation').|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/#availability` | Interactive calendar for current month |
+| 2 | Observe configured dates | `BOOKED` and `PENDING` dates visually distinct from `AVAILABLE` |
+| 3 | Observe past dates | Past dates dimmed / not selectable |
+| 4 | Observe unconfigured future date | Treated as **AVAILABLE** (green/clickable) |
 
-**Test Conditions:** Test with a month that contains a mix of available, booked, and pending dates.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Availability" or "Calendar" (التقويم etc.).|The browser navigates to the Availability page.|
-|3|Observe the displayed interactive calendar for the current/default month.|The calendar should display, with dates visually differentiated according to their status (e.g., different colors or icons for "available," "booked," "pending_confirmation"). Dates should match the statuses set in the database.|
-
-#### 2.3.2 TC_V_003_02: Verify navigation through calendar months/years and correct data refresh.
+#### TC_V_003_02: Verify month navigation and date-to-inquiry flow
 
 **Test Case ID:** TC_V_003_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Month navigation refreshes data; selecting an available date enables inquiry submission with pre-filled date.
 
-**Test Case Description:** To ensure that when a visitor navigates to previous/next months or years in the interactive calendar, the display updates correctly with the availability statuses for the newly selected period.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Slots exist in adjacent months | At least one `AVAILABLE` future date |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: User clicks on calendar navigation controls (next month, previous month, select year/month).|
-|2|Availability statuses are configured in the database for multiple months/years.|2|Database State: AvailabilitySlot table has records with various statuses spread across several consecutive and non-consecutive months/years.|
-|3|The availability calendar page (as per TC_V_003_01) is currently displayed.|||
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Click **Next month** on calendar | Calendar updates; statuses match DB for that month |
+| 2 | Click an **AVAILABLE** future date | Date highlighted; **Submit inquiry** action appears |
+| 3 | Click **Submit inquiry** | Navigates to `/inquiry?date=YYYY-MM-DD` with event date pre-filled |
 
-**Test Conditions:** Test navigation to both past and future months/years where data exists.
+---
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|On the displayed availability calendar, click the "Next Month" navigation control.|The calendar should update to display the next month. The availability statuses (available, booked, pending) shown for the dates in this new month should accurately reflect the data configured in the database for that specific month.|
-|2|Click the "Previous Month" navigation control.|The calendar should update to display the previous month. Availability statuses should be accurate for this month.|
-|3|(If year navigation is available) Navigate to a different year.|The calendar should update to display the selected year and month. Availability statuses should be accurate.|
+### 2.4 Test TC_V_004 for Module: View Pricing Panel (UC004)
 
-#### 2.3.3 TC_V_003_03: Verify system behavior when availability data cannot be retrieved.
+| ID | Name |
+|----|------|
+| TC_V_004_01 | Verify active pricing tiers and Book links |
+| TC_V_004_02 | Verify pricing section hidden when no active tiers |
 
-**Test Case ID:** TC_V_003_03
-
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
-
-**Test Case Description:** To ensure that if there's an error fetching availability data (e.g., backend/database issue), the system displays a user-friendly error message.
-
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Availability" page.|
-|2|The backend service for fetching availability data is simulated to return an error.|2|System State: Simulate a condition where the backend API endpoint `/api/availability` returns a server-side error status (e.g., 500).|
-
-**Test Conditions:** Simulate a server-side error when the frontend requests calendar data.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Availability" or "Calendar".|The browser attempts to load the Availability page and fetch calendar data.|
-|3|Observe the displayed content on the Availability page.|The page (or calendar area) should display a user-friendly error message (e.g., "Could not load availability data. Please try again later."). The page should not crash or show technical error details.|
-
-### 2.4 Test TC_V_004 for Module : <View Pricing Panel (UC004)>
-
-This test contains the following test cases:
-
-- **TC_V_004_01:** Verify successful display of configured pricing tiers and package details.
-
-- **TC_V_004_02:** Verify system behavior when no specific pricing is configured (e.g., "Contact for Quote").
-
-- **TC_V_004_03:** Verify display of interactive pricing elements if designed (e.g., price updates based on selections - conceptual).
-
-#### 2.4.1 TC_V_004_01: Verify successful display of configured pricing tiers and package details.
+#### TC_V_004_01: Verify active pricing tiers and Book links
 
 **Test Case ID:** TC_V_004_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Active tiers shown with name, price (YER), description, and inquiry deep link.
 
-**Test Case Description:** To ensure that when a visitor navigates to the pricing page, all active and configured pricing tiers, package names, base prices, and descriptions are displayed accurately.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| At least 2 active tiers and 1 inactive tier | Inactive tier has `isActive=false` |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Pricing" page.|
-|2|Several pricing tiers/packages (e.g., "Standard Wedding Package," "VIP Package") have been configured with details (name, price, description, isActive=TRUE) in the Pricing Tier table by the Administrator.|2|Database State: Pricing Tier table contains multiple records.<br><br>Example:<br><br>Tier1: Name="Standard", Price=1000.00, Description="Basic setup", isActive=TRUE.<br><br>Tier2: Name="Premium", Price=2000.00, Description="Full service", isActive=TRUE.<br><br>Tier3: Name="Old Package", Price=500.00, isActive=FALSE.|
-|3|At least one pricing tier is marked as inactive (isActive=FALSE).|||
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/#pricing` | Active tiers displayed with correct name, price, description |
+| 2 | Verify inactive tier | Inactive tier **not** shown |
+| 3 | Click **Book [package name]** | Navigates to `/inquiry?pricingId={id}` with package pre-selected on form |
 
-**Test Conditions:** Ensure data includes various details like different price points and descriptions.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Pricing" or "Packages" (etc., "الأسعار").|The browser navigates to the Pricing Information page.|
-|3|Observe the displayed content on the Pricing Information page.|The page should display all active pricing tiers/packages. For each active tier, its name, base price, and description should be clearly visible and match the database records. Inactive tiers should not be displayed on the public pricing page.|
-
-#### 2.4.2 TC_V_004_02: Verify system behavior when no specific pricing is configured.
+#### TC_V_004_02: Verify pricing section hidden when no active tiers
 
 **Test Case ID:** TC_V_004_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** No pricing section when all tiers inactive or table empty.
 
-**Test Case Description:** To ensure the system displays an appropriate message or a "Contact for Quote" prompt if no active pricing tiers are configured by the administrator.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| All tiers `isActive=false` or no tiers | — |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Pricing" page.|
-|2|The Pricing Tier table in the database is empty, or all existing tiers are marked as inactive (isActive=FALSE).|2|Database State: PricingTier table is empty OR all records have isActive set to FALSE.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/` and scroll to where pricing would be | `#pricing` section not rendered |
 
-**Test Conditions:** Ensure data includes various details like different price points and descriptions.
+---
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Click on the navigation link for "Pricing" or "Packages".|The browser navigates to the Pricing Information page.|
-|3|Observe the displayed content on the Pricing Information page.|The page should display a user-friendly message indicating that specific pricing is not listed and to contact the hall for a custom quote (e.g., "Please contact us for current pricing and custom packages.").|
+### 2.5 Test TC_V_005 for Module: Submit Booking Inquiry (UC005)
 
-#### 2.4.3 TC_V_004_03: Verify display of interactive pricing elements if designed (conceptual).
+| ID | Name |
+|----|------|
+| TC_V_005_01 | Verify successful inquiry submission and reference code |
+| TC_V_005_02 | Verify validation for missing required fields |
+| TC_V_005_03 | Verify invalid WhatsApp number rejected |
+| TC_V_005_04 | Verify inquiry rejected for unavailable date |
+| TC_V_005_05 | Verify lookup by reference code and visitor cancellation |
 
-**Test Case ID:** TC_V_004_03
-
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
-
-**Test Case Description:** To ensure that if the pricing page is designed with interactive elements (e.g., selecting optional add-on services), the estimated price updates dynamically and correctly based on user selections. (This is a conceptual test case as complex interactive pricing might be out of initial scope; if only static display, this TC might be simplified or N/A).
-
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: User interacts with checkboxes, dropdowns, or quantity fields on the pricing page.|
-|2|The pricing page is designed with interactive elements (e.g., checkboxes for add-on services, quantity selectors) that affect the total price. Base prices and add-on prices are configured.|2|System Configuration: Predefined prices for base packages and each selectable add-on service.<br><br>Example: Base Package = 1000; Add-on A = 200; Add-on B = 150.|
-
-**Test Conditions:** Applicable only if the design includes dynamic price calculation based on user choices on the page.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the Pricing page (as per TC_V_004_01).|Pricing page with interactive elements is displayed. An initial base price or total estimated price is shown.|
-|2|Select an optional add-on service (e.g., check a box for "Premium Decoration").|The displayed total estimated price should update immediately and accurately reflect the cost of the base package plus the selected add-on service.|
-|3|Deselect the add-on service.|The displayed total estimated price should revert to the previous value (base package price).|
-|4|If quantity selectors are present (e.g., for extra number of chairs), change the quantity.|The total estimated price should update based on the new quantity and per-item cost.|
-
-### 2.5 Test TC_V_005 for Module : <Submit Booking Inquiry (UC005)>
-
-This test contains the following test cases:
-
-- **TC_V_005_01:** Verify successful submission of a booking inquiry with all valid required and optional data.
-
-- **TC_V_005_02:** Verify system behavior when submitting an inquiry with missing required fields.
-
-- **TC_V_005_03:** Verify system behavior when submitting an inquiry with invalid data formats (e.g., incorrect email, phone format).
-
-#### 2.5.1 TC_V_005_01: Verify successful submission of a booking inquiry with all valid required and optional data.
+#### TC_V_005_01: Verify successful inquiry submission and reference code
 
 **Test Case ID:** TC_V_005_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Valid inquiry creates DB record, shows confirmation with 9-digit reference code, and sets cookie.
 
-**Test Case Description:** To ensure that a visitor can successfully fill out and submit the booking inquiry form with all fields (required and optional) correctly populated, and the inquiry is recorded in the system and admin is notified.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Future date is `AVAILABLE` | Name: `Test Visitor`, WhatsApp: `772629404`, Event date: future `AVAILABLE` date, optional event type/guests/message |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input:<br><br>- Full Name: "Test Visitor Name"<br><br>- Contact Number: "+967 XXX XXXXXX" (Valid Yemeni format)<br><br>- Email: "test.visitor@example.com" (Valid email format)<br><br>- Event Date: A future date (e.g., "2025-12-15")<br><br>- Event Type: "Wedding"<br><br>- Number of Guests: 150<br><br>- Message: "Interested in booking for a wedding ceremony."|
-|2|The booking inquiry form is available on the portal.|2|Database State (Post-Test): A new record should exist in the BookingInquiry table matching the input data, with status "new".|
-|3|Admin notification system is configured to receive alerts.|||
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/inquiry` | Inquiry form displayed |
+| 2 | Fill required fields; submit | Redirect to `/inquiry/confirmation/{9-digit-code}` |
+| 3 | Observe confirmation page | Shows reference code, visitor name, event date, status `NEW` |
+| 4 | Check database | `booking_inquiries` row with matching data and `reference_code` |
+| 5 | Revisit `/inquiry` | Existing inquiry surfaced via cookie (if within 150 days) |
 
-**Test Conditions:** Ensure all data entered is valid according to specified formats.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Open a web browser and navigate to the Al-Muneer Online Portal homepage.|Homepage loads successfully.|
-|2|Navigate to the "Booking Inquiry" page.|The booking inquiry form is displayed.|
-|3|Fill in all required fields (e.g., Full Name, Contact Number, Event Date, Event Type) and optional fields (e.g., Email, Number of Guests, Message) with valid data.|All fields accept valid input.|
-|4|Click the "Submit Inquiry" button.|The system should process the form.<br><br>A success message (e.g., "Your inquiry has been successfully submitted. We will contact you shortly.") should be displayed to the visitor.<br><br>The inquiry data should be saved to the BookingInquiry table in the database.|
-
-#### 2.5.2 TC_V_005_02: Verify system behavior when submitting an inquiry with missing required fields.
+#### TC_V_005_02: Verify validation for missing required fields
 
 **Test Case ID:** TC_V_005_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Inquiry form open | Leave Full Name or WhatsApp empty |
 
-**Test Case Description:** To ensure that the system performs validation and prevents submission if mandatory fields in the booking inquiry form are left empty, displaying appropriate error messages.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Leave **Full Name** empty; submit | Browser HTML5 validation prevents submit |
+| 2 | Fill name; leave **WhatsApp** empty; submit | Submit blocked; required-field indication |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input (Scenario 1):<br><br>Full Name: (empty)<br><br>Contact Number: "+967 XXX XXXXXX"<br><br>Event Date: "2025-12-15"|
-|2|The booking inquiry form is displayed, with fields like "Full Name" and "Contact Number" marked as required.|2|Input (Scenario 2):<br><br>Full Name: (empty)<br><br>Contact Number: (empty)<br><br>Event Date: "2025-12-15"|
-
-**Test Conditions:** Test by leaving one required field empty, then multiple required fields empty.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Booking Inquiry" page.|The booking inquiry form is displayed.|
-|2|Fill in some optional fields but leave a required field (e.g., "Full Name") empty.|The form should not submit.<br><br>An error message should be displayed next to or near the "Full Name" field (e.g., "Full Name is required.").<br><br>The data entered in other fields should persist.<br><br>No inquiry record should be created in the database.|
-|3|Click the "Submit Inquiry" button.|(Action covered in expected result of step 2)|
-|4|Now leave both "Full Name" and "Contact Number" empty and click "Submit Inquiry".|The form should not submit.<br><br>Error messages should appear for both "Full Name" and "Contact Number."|
-
-#### 2.5.3 TC_V_005_03: Verify system behavior when submitting an inquiry with invalid data formats.
+#### TC_V_005_03: Verify invalid WhatsApp number rejected
 
 **Test Case ID:** TC_V_005_03
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Inquiry form open | WhatsApp: `abc` or fewer than 9 digits |
 
-**Test Case Description:** To ensure the system validates data formats for fields like contact number or email (if provided) and displays appropriate error messages if the format is incorrect.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Enter non-numeric or wrong-length WhatsApp; submit | Pattern validation blocks submit (`[0-9]{9}`) |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input (Scenario 1 - Invalid Contact):<br><br>Full Name: "Valid Name"<br><br>Contact Number: "InvalidPhone123"<br><br>Event Date: "2025-12-15"|
-|2|The booking inquiry form is displayed. Validation rules for contact number/email formats are implemented.|2|Input (Scenario 2 - Invalid Email):<br><br>Full Name: "Valid Name"<br><br>Contact Number: "+967 XXX XXXXXX"<br><br>Email: "invalid-email"<br><br>Event Date: "2025-12-15"|
+#### TC_V_005_04: Verify inquiry rejected for unavailable date
 
-**Test Conditions:** Ensure all data entered is valid according to specified formats.
+**Test Case ID:** TC_V_005_04
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Booking Inquiry" page.|Homepage loads successfully.|
-|2|Fill in all required fields correctly, but enter an invalid contact number (e.g., "abcdef" or "123").||
-|3|Click the "Submit Inquiry" button.|The form should not submit.<br><br>An error message should be displayed next to the "Contact Number" field (e.g., "Please enter a valid phone number.").<br><br>No inquiry record created.|
-|4|Correct the contact number. Now enter an invalid email address in the optional email field (e.g., "test@domain" or "test.com").||
-|5|Click the "Submit Inquiry" button.|The form should not submit.<br><br>An error message should be displayed next to the "Email" field (e.g., "Please enter a valid email address.").|
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Date marked `BOOKED` or `PENDING` in admin calendar | That date selected on form |
 
-### 2.6 Test TC_A_006 for Module : <Manage Hall Information (UC006)>
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Submit inquiry for booked/pending date | Error flash: date not available; no new inquiry created |
 
-This test contains the following test cases:
+#### TC_V_005_05: Verify lookup by reference code and visitor cancellation
 
-- **TC_A_006_01:** Verify successful update of existing hall information.
+**Test Case ID:** TC_V_005_05
 
-- **TC_A_006_02:** Verify input validation for managing hall information (e.g., preventing empty essential content if applicable).
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Existing inquiry with no payment proofs | Known 9-digit reference code |
 
-#### 2.6.1 TC_A_006_01: Verify successful update of existing hall information.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | On `/inquiry`, use **Look up** with valid reference code | Redirect to confirmation page for that inquiry |
+| 2 | Click **Cancel inquiry** on confirmation page | Success message; inquiry status `CANCELLED_BY_VISITOR`; slot returns to `AVAILABLE` |
+| 3 | Attempt cancel on inquiry **with** payment proof uploaded | Cancellation blocked with error message |
+
+---
+
+### 2.6 Test TC_A_006 for Module: Manage Hall Information & FAQ (UC006)
+
+| ID | Name |
+|----|------|
+| TC_A_006_01 | Verify update of venue information and map URLs |
+| TC_A_006_02 | Verify add, edit, and remove FAQ items |
+
+#### TC_A_006_01: Verify update of venue information and map URLs
 
 **Test Case ID:** TC_A_006_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in | New description: `Updated hall description`; updated maps share/embed URLs |
 
-**Test Case Description:** To ensure that the administrator can successfully modify and save changes to the hall's descriptive content (e.g., main description, services list, contact details, FAQs).
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Navigate to `/admin/venue` | Editable venue form and live preview |
+| 2 | Update description and map URLs; save | Success flash; DB updated |
+| 3 | Open `/#venue` on public site | Updated description and map embed reflect changes |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin modifies text in description field to "New Updated Hall Description Test".|
-|2|Administrator is successfully logged into the admin panel (as per TC_A_006_01).|2|Database State (Initial): VenueInfo table has existing data, e.g., description="Old Hall Description".|
-|3|Existing hall information is present in the VenueInfo table (or equivalent content management section).|3|Database State (Post-Test): VenueInfo table description field should now contain "New Updated Hall Description Test".|
-
-**Test Conditions:** Test updating different fields (e.g., description, then contact info).
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Venue Information" or "Content Management" section within the admin panel.|The current hall information is displayed in editable fields/text areas.|
-|2|Modify the content of one or more fields (e.g., update the main hall description with new text "New Updated Hall Description Test").|The changes are reflected in the input fields.|
-|3|Click the "Save Changes" or "Update Information" button.|The system should process the update.<br><br>A success message (e.g., "Venue information updated successfully.") should be displayed.<br><br>The VenueInfo table in the database should reflect the "New Updated Hall Description Test" and any other changes.<br><br>The public-facing venue information page should display the updated content.|
-
-#### 2.6.2 TC_A_006_02: Verify input validation for managing hall information.
+#### TC_A_006_02: Verify add, edit, and remove FAQ items
 
 **Test Case ID:** TC_A_006_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in | New FAQ: Q=`Parking available?`, A=`Yes, on-site parking for guests.` |
 
-**Test Case Description:** To ensure that if certain content fields (e.g., main description, contact number) are considered essential and have validation (e.g., not empty), the system prevents saving empty or invalid data and provides appropriate error messages.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | On `/admin/venue`, click **+ Add FAQ** | New FAQ row appears |
+| 2 | Enter question and answer; save | Success message; `faqJson` updated in DB |
+| 3 | Open `/#faq` | New FAQ visible in accordion |
+| 4 | Edit answer in admin; save | Public FAQ shows updated answer |
+| 5 | Remove FAQ row; save | FAQ removed from public page |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin clears the "Hall Description" text area.|
-|2|Administrator is logged into the admin panel.|2|System Validation Rule: The 'description' field in VenueInfo is configured with server-side "not empty" validation.|
-|3|The system has defined validation rules for certain essential hall information fields (e.g., 'description' cannot be empty).|||
+---
 
-**Test Conditions:** Test by attempting to save after clearing a field that has a "not empty" validation rule.
+### 2.7 Test TC_A_007 for Module: Manage Media Gallery (UC007)
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Venue Information" or "Content Management" section.|Current hall information is displayed in editable fields.|
-|2|Clear the content of an essential field (e.g., delete all text from the "Hall Description" field, assuming it's validated as non-empty).|The input field for "Hall Description" is now empty.|
-|3|Click the "Save Changes" or "Update Information" button.|The system should prevent the update.<br><br>An error message should be displayed indicating that the "Hall Description" (or the specific validated field) cannot be empty.<br><br>The database should not be updated with the empty value. The previously existing data should remain.|
+| ID | Name |
+|----|------|
+| TC_A_007_01 | Verify image upload appears in admin and public gallery |
+| TC_A_007_02 | Verify add YouTube video and delete media item |
+| TC_A_007_03 | Verify rejection of invalid file type or oversized image |
 
-### 2.7 Test TC_A_007 for Module : <Manage Media Gallery (UC007)>
-
-This test contains the following test cases:
-
-- **TC_A_007_01:** Verify successful upload of a new valid media item (image).
-
-- **TC_A_007_02:** Verify successful deletion of an existing media item.
-
-- **TC_A_007_03:** Verify system behavior when attempting to upload an invalid file type or oversized file.
-
-#### 2.7.1 TC_A_007_01: Verify successful upload of a new valid media item (image).
+#### TC_A_007_01: Verify image upload appears in admin and public gallery
 
 **Test Case ID:** TC_A_007_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in | Valid JPG/PNG ≤ 5 MB, caption optional |
 
-**Test Case Description:** To ensure the administrator can successfully upload a new image file (e.g., JPG, PNG) to the media gallery, with an optional caption, and it appears in the gallery list and on the public site.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Go to `/admin/gallery`; upload image | Success message; item in admin list |
+| 2 | Open `/#gallery` | New image visible in masonry grid |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input:<br><br>File: "hall_image_1.jpg" (valid image, e.g., 800KB, JPG format)<br><br>Caption: "Main Hall View"|
-|2|Administrator is logged into the admin panel.|2|Database State (Post-Test): A new record in MediaItem table with details of "hall_image_1.jpg", its server path, type "image", and caption.|
-|3|A valid image file (e.g., "hall_image_1.jpg", within size limits) is available on the administrator's local machine.|||
-
-**Test Conditions:** Test with a common image format like JPG.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Media Gallery Management" section in the admin panel.|The existing media gallery items (if any) are displayed. An option to "Upload New Media" is visible.|
-|2|Click the "Upload New Media" button/link.|A file upload form/dialog appears, allowing file selection and an input field for an optional caption.|
-|3|Select the valid image file (e.g., "hall_image_1.jpg") and optionally enter a caption (e.g., "Main Hall View").|The file name appears in the selection field, and caption is entered.|
-|4|Click the "Upload" or "Save" button.|The system should process the upload.<br><br>A success message (e.g., "Media uploaded successfully.") should be displayed.<br><br>The new image (with caption, if provided) should be added to the MediaItem table in the database.<br><br>The uploaded image should appear in the admin gallery management list.<br><br>The new image should be visible on the public-facing media gallery page.|
-
-#### 2.7.2 TC_A_007_02: Verify successful deletion of an existing media item.
+#### TC_A_007_02: Verify add YouTube video and delete media item
 
 **Test Case ID:** TC_A_007_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Valid YouTube URL | e.g. `https://www.youtube.com/watch?v=...` |
 
-**Test Case Description:** To ensure the administrator can successfully select and delete an existing media item from the gallery, and it is removed from the system (database and file storage) and the public site.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Add video via admin gallery form | Video appears in admin list and public gallery |
+| 2 | Delete a media item; confirm | Removed from DB, admin list, and public gallery |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin selects a specific existing media item (e.g., mediaId=5) for deletion and confirms.|
-|2|Administrator is logged into the admin panel.|2|Database State (Initial): Record with mediaId=5 exists in MediaItem. Corresponding file exists.|
-|3|At least one media item exists in the gallery and MediaItem table, with corresponding file in storage.|3|Database State (Post-Test): Record with mediaId=5 is removed from MediaItem. Corresponding file is deleted.|
-
-**Test Conditions:** Ensure the item to be deleted is clearly identifiable.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Media Gallery Management" section in the admin panel.|The list of existing media gallery items is displayed.|
-|2|Identify a specific media item to delete and click its "Delete" icon/button.|A confirmation prompt/dialog should appear (e.g., "Are you sure you want to delete this item?").|
-|3|Confirm the deletion (e.g., click "Yes" or "Confirm Delete").|The system should process the deletion.<br><br>A success message (e.g., "Media item deleted successfully.") should be displayed.<br><br>The record for the item should be removed from the MediaItem table.<br><br>The physical media file should be deleted from server storage.<br><br>The item should no longer appear in the admin gallery list or on the public gallery page.|
-
-#### 2.7.3 TC_A_007_03: Verify system behavior when attempting to upload an invalid file type or oversized file.
+#### TC_A_007_03: Verify rejection of invalid file type or oversized image
 
 **Test Case ID:** TC_A_007_03
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in | `document.pdf` or image > 5 MB |
 
-**Test Case Description:** To ensure the system validates uploaded files and rejects those that are not of an accepted type (e.g., not JPG/PNG/MP4) or exceed the defined maximum file size, displaying an appropriate error.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Upload PDF | Error: only JPG/PNG allowed; no DB record |
+| 2 | Upload oversized JPG | Error: exceeds 5 MB limit |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input (Scenario A): File "document.pdf"|
-|2|Administrator is logged into the admin panel.|2|Input (Scenario B): File="large_image.jpg" (10MB, assuming 5MB limit for images)|
-|3|System has defined validation rules for accepted file types (e.g., JPG, PNG for images; MP4 for videos) and a maximum file size (e.g., 5MB for images, 50MB for videos).|3|System Config: Accepted image types: JPG, PNG. Max image size: 5MB.<br><br>Accepted video types: MP4. Max video size: 50MB.|
-|4|An invalid file (e.g., "document.pdf") and an oversized valid file (e.g., "large_image.jpg" > 5MB) are available.|||
+---
 
-**Test Conditions:** Test both invalid file type and oversized file scenarios.
+### 2.8 Test TC_A_008 for Module: Manage Pricing Panel (UC008)
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to "Media Gallery Management" and click "Upload New Media".|File upload form is displayed.|
-|2|Scenario A (Invalid Type): Select an invalid file type (e.g., "document.pdf"). Click "Upload".|The system should reject the upload.<br><br>An error message should be displayed (e.g., "Invalid file type. Please upload JPG, PNG, or MP4 files.").<br><br>No file should be uploaded, and no database record created.|
-|3|Scenario B (Oversized File): Select a valid file type that exceeds the size limit (e.g., "large_image.jpg" which is 10MB, limit is 5MB). Click "Upload".|The system should reject the upload.<br><br>An error message should be displayed (e.g., "File size exceeds the maximum limit of 5MB.").<br><br>No file should be uploaded, and no database record created.|
+| ID | Name |
+|----|------|
+| TC_A_008_01 | Verify create and update pricing tier |
+| TC_A_008_02 | Verify validation on invalid tier data |
 
-### 2.8 Test TC_A_008 for Module : <Manage Pricing Panel (UC008)>
-
-This test contains the following test cases:
-
-- **TC_A_008_01:** Verify successful creation of a new pricing tier with valid data.
-
-- **TC_A_008_02:** Verify successful update of an existing pricing tier.
-
-- **TC_A_008_03:** Verify input validation when creating/updating a pricing tier (e.g., empty required field, invalid price format).
-
-#### 2.8.1 TC_A_008_01: Verify successful creation of a new pricing tier with valid data.
+#### TC_A_008_01: Verify create and update pricing tier
 
 **Test Case ID:** TC_A_008_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in | Name: `Gold Package`, Price: `150000`, Description, `isActive=true` |
 
-**Test Case Description:** To ensure the administrator can successfully add a new pricing tier/package with all required details (name, price, description), and it becomes active and visible where appropriate.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Create tier at `/admin/pricing` | Success; tier in admin list |
+| 2 | Open `/#pricing` | Tier visible publicly |
+| 3 | Edit price; set `isActive=false`; save | Tier hidden from public pricing section |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input:<br><br>Tier Name: "Gold Package"<br><br>Base Price: "1500.00"<br><br>Description: "Includes premium catering and decoration"<br><br>IsActive: TRUE|
-|2|Administrator is logged into the admin panel.|2|Database State (Post-Test): A new record in PricingTier table with the input details.|
-
-**Test Conditions:** Use valid data for all fields of the new pricing tier.
-
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Pricing Management" section in the admin panel.|The list of existing pricing tiers (if any) is displayed. An option to "Add New Tier" is visible.|
-|2|Click the "Add New Tier" button/link.|A form for entering new pricing tier details (Tier Name, Base Price, Description, IsActive status) is displayed.|
-|3|Fill in all fields with valid data (e.g., Tier Name: "Gold Package", Base Price: "1500.00", Description: "Includes premium catering", IsActive: TRUE).|Data is entered into the form fields.|
-|4|Click the "Save" or "Create Tier" button.|The system should process the creation.<br><br>A success message (e.g., "Pricing tier created successfully.") should be displayed.<br><br>The new pricing tier should be added to the PricingTier table in the database.<br><br>The new tier should appear in the admin list of pricing tiers.<br><br>If active, it should be visible on the public pricing page.|
-
-#### 2.8.2 TC_A_008_02: Verify successful update of an existing pricing tier.
+#### TC_A_008_02: Verify validation on invalid tier data
 
 **Test Case ID:** TC_A_008_02
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Create tier with empty name | Validation prevents save |
+| 2 | Create tier with non-numeric price | Validation prevents save |
 
-**Test Case Description:** To ensure the administrator can select an existing pricing tier, modify its details (e.g., price, description, active status), and save the changes successfully.
+---
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: For existing "Gold Package" (Price: 1500.00, IsActive: TRUE):<br><br>New Base Price: "1600.00"<br><br>New Description: "Updated premium catering..."<br><br>New IsActive: FALSE|
-|2|Administrator is logged into the admin panel.|2|Database State (Initial): Record for "Gold Package" exists with old details.|
-|3|At least one pricing tier exists in the Pricing Tier table (e.g., created via TC_A_008_01).|3|Database State (Post-Test): Record for "Gold Package" is updated with the new details.|
+### 2.9 Test TC_A_009 for Module: Manage Calendar & Inquiries (UC009)
 
-**Test Conditions:** Test updating multiple fields of an existing tier.
+| ID | Name |
+|----|------|
+| TC_A_009_01 | Verify manual calendar slot status update |
+| TC_A_009_02 | Verify admin inquiry status update |
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Pricing Management" section in the admin panel.|The list of existing pricing tiers is displayed.|
-|2|Select an existing pricing tier (e.g., "Gold Package") and click its "Edit" option.|A form is displayed, pre-filled with the current details of the "Gold Package".|
-|3|Modify one or more fields (e.g., change Base Price to "1600.00", update Description to "Updated premium catering and enhanced decoration", set IsActive to FALSE).|Changes are reflected in the form fields.|
-|4|Click the "Update" or "Save Changes" button.|The system should process the update.<br><br>A success message (e.g., "Pricing tier updated successfully.") should be displayed.<br><br>The PricingTier table in the database should reflect the new price, description, and inactive status for "Gold Package".<br><br>The tier, being inactive, should no longer appear on the public pricing page (or appear differently if inactive items are shown to admin).|
-
-#### 2.8.3 TC_A_008_03: Verify input validation when creating/updating a pricing tier.
-
-**Test Case ID:** TC_A_008_03
-
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
-
-**Test Case Description:** To ensure that the system validates input when an administrator creates or updates a pricing tier, preventing submission if required fields (e.g., Tier Name, Base Price) are empty or if data is in an invalid format (e.g., non-numeric price).
-
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input (Scenario A): Tier Name="", Base Price="1000", Description="Test"|
-|2|Administrator is logged into the admin panel.|2|Input (Scenario B): Tier Name="Test Tier", Base Price="abc", Description="Test"|
-|3|Validation rules are implemented for pricing tier fields (e.g., Tier Name not empty, Base Price is a positive number).|3|Input (Editing): Select existing tier, clear Base Price field.|
-
-**Test Conditions:** Test scenarios: empty Tier Name, empty Base Price, non-numeric Base Price.
-
-|            |                                                                                                                                           |                                                                                                                                                                                                                      |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Step #** | **Step Details**                                                                                                                          | **Expected Result**                                                                                                                                                                                                  |
-| 1          | Navigate to "Pricing Management" and click "Add New Tier".                                                                                | New pricing tier form is displayed.                                                                                                                                                                                  |
-| 2          | Scenario A (Empty Name): Leave "Tier Name" empty, fill other fields validly. Click "Save".                                                | Form should not submit.<br><br>Error message for "Tier Name" (e.g., "Tier Name cannot be empty.").<br><br>No new record in Pricing Tier table.                                                   |
-| 3          | Scenario B (Invalid Price): Enter a valid "Tier Name", but for "Base Price" enter non-numeric text (e.g., "Free" or "abc"). Click "Save". | Form should not submit.<br><br>Error message for "Base Price" (e.g., "Base Price must be a valid number.").<br><br>No new record in Pricing Tier table.                                          |
-| 4          | Select an existing tier for editing. Clear its "Base Price" field. Click "Update".                                                        | Form should not submit.<br><br>Error message for "Base Price" (e.g., "Base Price cannot be empty.").<br><br>The existing record in PricingTier table should not be modified with an empty price. |
-
-### 2.9 Test TC_A_009 for Module : <Manage Calendar & Inquiries (UC009)>
-
-This test contains the following test cases:
-
-- **TC_A_009_01:** Verify successful manual update of a date's status on the availability calendar.
-
-#### 2.9.1 TC_A_009_01: Verify successful manual update of a date's status on the availability calendar.
+#### TC_A_009_01: Verify manual calendar slot status update
 
 **Test Case ID:** TC_A_009_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Date `2026-11-10` currently `AVAILABLE` | Change to `BOOKED` |
 
-**Test Case Description:** To ensure the administrator can select a specific date on the admin calendar, change its status (e.g., from "available" to "booked" or "pending_confirmation"), and the change is saved and reflected on both admin and public calendars.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/calendar` | Admin calendar with current statuses |
+| 2 | Select date; set status to `BOOKED`; save | Success; DB `availability_slots` updated |
+| 3 | Open visitor `/#availability` | Same date shows as `BOOKED` |
+| 4 | Verify grid refresh | Calendar stays on selected month (no full-page jump) |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin selects date "2025-11-10" and changes its status to "booked".|
-|2|Administrator is logged into the admin panel.|2|Database State (Initial): AvailabilitySlot record for "2025-11-10" has status "available".|
-|3|The "Calendar Management" interface is accessible. A specific date (e.g., "2025-11-10") is currently marked as "available" in the AvailabilitySlot table.|3|Database State (Post-Test): AvailabilitySlot record for "2025-11-10" has status "booked".|
+#### TC_A_009_02: Verify admin inquiry status update
 
-**Test Conditions:** Ensure the date selected for update is clearly identifiable.
+**Test Case ID:** TC_A_009_02
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Calendar Management" section in the admin panel.|The interactive admin calendar is displayed, showing current date statuses. The target date (e.g., "2025-11-10") shows as "available".|
-|2|Select the target date (e.g., "2025-11-10") on the calendar.|The date is selected/highlighted.|
-|3|Choose a new status for the selected date, for example, "booked".|The new status ("booked") is selected for the date.|
-|4|Click the "Save Change" or "Update Status" button.|The system should process the update.<br><br>A success message (e.g., "Calendar status updated successfully.") should be displayed.<br><br>The AvailabilitySlot table in the database should now show "2025-11-10" with status "booked".<br><br>The admin calendar view should refresh to show the new status.<br><br>The public-facing availability calendar should also reflect that "2025-11-10" is now "booked".|
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Inquiry in `NEW` status | Change to `CONTACTED` with optional admin note |
 
-### 2.10 Test TC_A_010 for Module : <View Traffic Analytics (UC010)>
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/inquiries`; open inquiry detail | Status dropdown and notes field shown |
+| 2 | Update status; save | DB updated; list reflects new status |
 
-This test contains the following test cases:
+---
 
-#### 2.10.1 TC_A_010_01: Verify viewing traffic analytics data or placeholder.
+### 2.10 Test TC_A_010 for Module: View Traffic Analytics (UC010)
+
+| ID | Name |
+|----|------|
+| TC_A_010_01 | Verify analytics charts display page visit data |
+| TC_A_010_02 | Verify AI Traffic Funnel Advisor loads asynchronously |
+
+#### TC_A_010_01: Verify analytics charts display page visit data
 
 **Test Case ID:** TC_A_010_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in; some `page_visits` records exist | Browse visitor pages before test |
 
-**Test Case Description:** To ensure that the administrator can access the analytics section and view either very basic logged traffic data (e.g., page visit counts) or a placeholder message indicating the current status/scope of the analytics feature.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/analytics` | Bar chart (top pages) and line chart (daily traffic) render without error |
+| 2 | If no visit data yet | Charts show empty/zero state gracefully |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Navigation to the "Analytics" page by the admin.|
-|2|Administrator is logged into the admin panel.|2|System State (Scenario A - Data Exists): Simple log files or database table contains some visit count data.|
-|3|The "Analytics" or "Site Statistics" section is implemented, either with simple logging capability or as a placeholder.|3|System State (Scenario B - No Data/Placeholder): No visit count data logged, or the section is a designed placeholder.|
+#### TC_A_010_02: Verify AI Traffic Funnel Advisor loads asynchronously
 
-**Test Conditions:** Test when some basic data might have been logged (if implemented) and when no data is available.
+**Test Case ID:** TC_A_010_02
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Analytics" or "Site Statistics" section in the admin panel.|The browser navigates to the Analytics page.|
-|2|Observe the content displayed on the Analytics page.|The page should display either:<br><br>a) Basic logged data (e.g., "Homepage Visits: 150", "Gallery Views: 80") if simple logging is active and data exists.<br><br>OR<br><br>b) A message indicating "No traffic data available yet" if logging is active but no data collected.<br><br>OR<br><br>c) A placeholder message like "Basic analytics view. Advanced analytics planned for future development." if the feature is largely conceptual at this stage.<br><br>The page should not show errors.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/analytics` | Page renders immediately; AI panel shows loading spinner |
+| 2 | Wait for `/admin/analytics/ai-insight` response | Bullet-point advice appears OR graceful error if API key unavailable |
+| 3 | Verify page load | Initial render not blocked by AI call |
 
-### 2.11 Test TC_V_011 for Module : <Submit Payment Proof (UC011)>
+---
 
-This test contains the following test cases:
+### 2.11 Test TC_V_011 for Module: Submit Payment Proof (UC011)
 
-- **TC_V_011_01:** Verify successful submission of a valid payment proof file.
+| ID | Name |
+|----|------|
+| TC_V_011_01 | Verify successful payment proof upload via reference code |
+| TC_V_011_02 | Verify rejection of invalid proof file |
 
-#### 2.11.1 TC_V_011_01: Verify successful submission of a valid payment proof file.
+#### TC_V_011_01: Verify successful payment proof upload via reference code
 
 **Test Case ID:** TC_V_011_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Existing inquiry; valid JPG/PNG ≤ 5 MB | Access via `/payment/upload?referenceCode={code}` from confirmation page |
 
-**Test Case Description:** To ensure a visitor can successfully upload an accepted image file (e.g., JPG/PNG, within size limits) as payment proof, associate it with an inquiry (if applicable), and receive confirmation.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open upload page from inquiry confirmation | Form shows visitor name and event date banner |
+| 2 | Select valid receipt image; submit | Success message; `payment_proofs` record with `PENDING_VERIFICATION` |
+| 3 | Check admin `/admin/payments` | New proof listed as pending |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input:<br><br>File: "transfer_receipt.jpg" (valid image, e.g., 1MB, JPG format)<br><br>Inquiry ID (optional): "INQ12345"|
-|2|Visitor has access to the "Submit Payment Proof" page/form.|2|Database State (Post-Test): New record in PaymentProof table linked to "INQ12345" (if provided), with details of "transfer_receipt.jpg".|
-|3|Visitor has a valid payment proof image file (e.g., "transfer_receipt.jpg") meeting system criteria (type, size).|||
-|4|(Optional) An Inquiry ID exists for the visitor to associate the proof with.|||
+#### TC_V_011_02: Verify rejection of invalid proof file
 
-**Test Conditions:** Test with a common valid image format and size.
+**Test Case ID:** TC_V_011_02
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Submit Payment Proof" page.|The payment proof upload form is displayed, including a file chooser and an optional field for Inquiry ID or notes.|
-|2|(If applicable) Enter a valid Inquiry ID.|Inquiry ID is accepted.|
-|3|Click the "Choose File" button and select the valid payment proof image file (e.g., "transfer_receipt.jpg").|The selected file name appears in the form.|
-|4|Click the "Upload Proof" or "Submit" button.|The system should process the file upload.<br><br>A success message (e.g., "Payment proof submitted successfully. We will verify it shortly.") should be displayed.<br><br>The file should be uploaded to server storage.<br><br>A record for the payment proof (linking to Inquiry ID if provided, file path, timestamp) should be created in the PaymentProof table.<br><br>Admin should be notified (if configured).|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Upload PDF or file > 5 MB | Error message; no proof record created |
 
-### 2.12 Test TC_V_012 for Module : <Submit Feedback (UC012)>
+---
 
-This test contains the following test cases:
+### 2.12 Test TC_V_012 for Module: Submit Feedback (UC012)
 
-- **TC_V_012_01:** Verify successful submission of feedback with optional contact details.
+| ID | Name |
+|----|------|
+| TC_V_012_01 | Verify successful feedback with rating and optional contact |
+| TC_V_012_02 | Verify empty message rejected |
 
-#### 2.12.1 TC_V_012_01: Verify successful submission of feedback with optional contact details.
+#### TC_V_012_01: Verify successful feedback with rating and optional contact
 
 **Test Case ID:** TC_V_012_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| — | Rating: 5, Message: `Great venue!`, optional name/WhatsApp |
 
-**Test Case Description:** To ensure a visitor can successfully submit feedback text, optionally including their name and contact details, and receive confirmation.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/feedback` | Form with optional name/WhatsApp, required rating stars, required message |
+| 2 | Submit with rating and message | Thank-you message; record in `feedback` with `isReviewed=false` |
+| 3 | Submit anonymously (blank name/WhatsApp) | Accepted; stored with null contact fields |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input (Scenario A): Name="Feedback User", Contact="user@example.com", Message="Great service!", Rating=5|
-|2|The "Feedback" page/form is accessible to visitors.|2|Input (Scenario B): Name="", Contact="", Message="Portal is easy to use.", Rating-(not selected)|
-|3||3|Database State (Post-Test): Two new records in Feedback table corresponding to the inputs.|
+#### TC_V_012_02: Verify empty message rejected
 
-**Test Conditions:** Test one scenario with contact details provided, and another without (anonymous).
+**Test Case ID:** TC_V_012_02
 
-|            |                                                                                                                                                                           |                                                                                                                                                                                                                                                                 |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Step #** | **Step Details**                                                                                                                                                          | **Expected Result**                                                                                                                                                                                                                                             |
-| 1          | Navigate to the "Feedback" page.                                                                                                                                          | The feedback form is displayed with fields for Name (optional), Contact (optional), Feedback Message (required), and Rating (optional).                                                                                                                         |
-| 2          | Scenario A (With Details): Fill in Name ("Feedback User"), Contact ("user@example.com"), Feedback Message ("Great service!"), and select a Rating (e.g., 5 stars).        | Data is entered.                                                                                                                                                                                                                                                |
-| 3          | Click the "Submit Feedback" button.                                                                                                                                       | System processes the submission.<br><br>A success message (e.g., "Thank you for your feedback!") is displayed.<br><br>Feedback data (including details from Step 2) is saved to the Feedback table.<br><br>Admin may be notified. |
-| 4          | Scenario B (Anonymous): Navigate to the feedback page again. Leave Name and Contact blank. Enter Feedback Message ("Portal is easy to use.") and click "Submit Feedback". | System processes the submission.<br><br>A success message is displayed.<br><br>Feedback data (message only, name/contact blank) is saved.                                                                                                   |
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Leave message blank; submit | Error: message required; no DB record |
 
-### 2.13 Test TC_A_013 for Module : <Manage Payment Status (UC013)>
+---
 
-This test contains the following test cases:
+### 2.13 Test TC_A_013 for Module: Manage Payment Status (UC013)
 
-- **TC_A_013_01:** Verify successful update of a payment proof status to "Verified".
+| ID | Name |
+|----|------|
+| TC_A_013_01 | Verify payment proof verification cascades to confirmed booking |
+| TC_A_013_02 | Verify payment proof rejection |
 
-#### 2.13.1 TC_A_013_01: Verify successful update of a payment proof status to "Verified".
+#### TC_A_013_01: Verify payment proof verification cascades to confirmed booking
 
 **Test Case ID:** TC_A_013_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Pending proof linked to inquiry | Admin note optional |
 
-**Test Case Description:** To ensure the administrator can view a submitted payment proof, verify it (offline), and update its status in the system to "Verified", potentially triggering a client notification.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open proof in `/admin/payments/{id}` | Receipt image visible |
+| 2 | Set status to `VERIFIED`; save | Proof `VERIFIED`; inquiry → `CONFIRMED`; slot → `BOOKED` |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin selects payment proof "PP789" and updates its status to "Verified". Admin Note: "Payment confirmed via local transfer."|
-|2|Administrator is logged into the admin panel.|2|Database State (Initial): PaymentProof record "PP789" has verificationStatus="pending". BookingInquiry "INQ12345" has status="payment_pending".|
-|3|At least one payment proof has been submitted by a visitor and is in "pending" verification status in the PaymentProof table (e.g., proofId="PP789" linked to inquiryId="INQ12345"). The image file for the proof exists.|3|Database State (Post-Test): PaymentProof "PP789" verificationStatus="Verified", adminNotes updated. BookingInquiry "INQ12345" status="Confirmed".|
+#### TC_A_013_02: Verify payment proof rejection
 
-**Test Conditions:** Ensure the payment proof is clearly identifiable for the admin.
+**Test Case ID:** TC_A_013_02
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Payment Proofs" or "Booking Management" section in the admin panel.|A list of submitted payment proofs is displayed, showing "PP789" with status "pending".|
-|2|Select/click on the payment proof "PP789" to view its details.|Details of "PP789" are displayed, including a link/view of the uploaded image.|
-|3|Admin views the image and performs offline verification of the payment. (Assumed successful for this test case).|(Offline action)|
-|4|In the admin panel, change the verification status for "PP789" to "Verified". Optionally add an admin note.|The status selection is made.|
-|5|Click the "Save Status" or "Update" button.|System processes the update.<br><br>A success message (e.g., "Payment status updated successfully.") is displayed.<br><br>The status of "PP789" in the PaymentProof table is updated to "Verified".<br><br>The status of the linked BookingInquiry "INQ12345" may be updated to "Confirmed".<br><br>A notification may be triggered to the visitor about payment verification.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Set proof status to `REJECTED`; save | Proof `REJECTED`; inquiry status unchanged or per business rule; no slot booking |
 
-### 2.14 Test TC_A_014 for Module : <View/Generate Reports (UC014)>
+---
 
-This test contains the following test cases:
+### 2.14 Test TC_A_014 for Module: View/Generate Reports (UC014)
 
-- **TC_A_014_01:** Verify successful generation and display of an "Inquiry Summary" report for a given date range.
+| ID | Name |
+|----|------|
+| TC_A_014_01 | Verify reports dashboard with date filter and charts |
+| TC_A_014_02 | Verify AI Business Report Advisor |
 
-#### 2.14.1 TC_A_014_01: Verify successful generation and display of an "Inquiry Summary" report for a given date range.
+#### TC_A_014_01: Verify reports dashboard with date filter and charts
 
 **Test Case ID:** TC_A_014_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Inquiries/feedback/proofs in DB | `fromDate` and `toDate` spanning known records |
 
-**Test Case Description:** To ensure the administrator can select the "Inquiry Summary" report type, specify a date range, and the system generates and displays a report showing relevant inquiry data.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/reports` | Summary counts and pie/bar charts (inquiry status, payment status, feedback ratings) |
+| 2 | Apply date range filter | Figures and charts reflect filtered period |
+| 3 | Use range with no data | Zero/empty state shown without error |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Report Type="Inquiry Summary", Start Date="2025-05-01", End Date="2025-05-30".|
-|2|Administrator is logged into the admin panel.|2|Database State: Multiple records in BookingInquiry table, with some submissionDate values falling between 2025-05-01 and 2025-05-30, and some outside this range.|
-|3|Several booking inquiries exist in the BookingInquiry table with submission dates spanning across different days/weeks/months.|||
+#### TC_A_014_02: Verify AI Business Report Advisor
 
-**Test Conditions:** Select a date range that is known to contain some inquiry records.
+**Test Case ID:** TC_A_014_02
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Reports" section in the admin panel.|A list of available report types is displayed (e.g., "Inquiry Summary," "Booking Status Report").|
-|2|Select the "Inquiry Summary" report type.|Options for report parameters (e.g., "Start Date," "End Date") are displayed.|
-|3|Enter a valid "Start Date" and "End Date" (e.g., "2025-05-01" to "2025-05-30").|Dates are entered.|
-|4|Click the "Generate Report" button.|The system processes the request.<br><br>A report is displayed (e.g., in a table format on the page) showing a summary of inquiries submitted within the specified date range. The report should include relevant details like Inquiry ID, Visitor Name, Event Date, Status for each inquiry.<br><br>If no inquiries match the criteria, a "No data available" message should be shown.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/reports?fromDate=...&toDate=...` | AI panel shows spinner after page load |
+| 2 | Wait for `/admin/reports/ai-insight` | 3 bullet points referencing report figures, or graceful API error |
 
-### 2.15 Test TC_A_015 for Module : <Manage Feedback (UC015)>
+---
 
-This test contains the following test cases:
+### 2.15 Test TC_A_015 for Module: Manage Feedback (UC015)
 
-- **TC_A_015_01:** Verify successful viewing of submitted feedback and updating its review status.
+| ID | Name |
+|----|------|
+| TC_A_015_01 | Verify mark feedback as reviewed |
+| TC_A_015_02 | Verify AI Feedback Advisor |
 
-#### 2.15.1 TC_A_015_01: Verify successful viewing of submitted feedback and updating its review status.
+#### TC_A_015_01: Verify mark feedback as reviewed
 
 **Test Case ID:** TC_A_015_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Unreviewed feedback exists | Admin note optional |
 
-**Test Case Description:** To ensure the administrator can view the details of submitted feedback, mark it as "Reviewed", and add internal notes if necessary.
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/feedback` | List with snippet and review status |
+| 2 | Open detail; mark reviewed; add note; save | `isReviewed=true`; note saved; list updated |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin selects feedback "FB001", marks isReviewed=TRUE, Admin Note="Issue addressed."|
-|2|Administrator is logged into the admin panel.|2|Database State (Initial): Feedback record "FB001" has isReviewed=FALSE, adminNotes=NULL.|
-|3|At least one feedback entry exists in the Feedback table, with isReviewed status as FALSE (e.g., feedbackId="FB001").|3|Database State (Post-Test): Feedback record "FB001" has isReviewed=TRUE, adminNotes="Issue addressed."|
+#### TC_A_015_02: Verify AI Feedback Advisor
 
-**Test Conditions:** Ensure the feedback entry is clearly identifiable.
+**Test Case ID:** TC_A_015_02
 
-|   |   |   |
-|---|---|---|
-|**Step #**|**Step Details**|**Expected Result**|
-|1|Navigate to the "Feedback Management" section in the admin panel.|A list of submitted feedback entries is displayed, showing "FB001" with review status as "Not Reviewed" (or equivalent).|
-|2|Select/click on the feedback entry "FB001" to view its full details.|The full details of feedback "FB001" are displayed (visitor name/contact if provided, message, rating, submission date). An option to mark as "Reviewed" and add notes is visible.|
-|3|Mark the feedback "FB001" as "Reviewed". Optionally, add an internal admin note (e.g., "Issue addressed by contacting user.").|The "Reviewed" status is selected/checked. Notes are entered.|
-|4|Click the "Save Changes" or "Update Feedback" button.|The system should process the update.<br><br>A success message (e.g., "Feedback status updated successfully.") should be displayed.<br><br>The isReviewed field for "FB001" in the Feedback table should be updated to TRUE.<br><br>Admin notes should be saved if entered.<br><br>The feedback list view should reflect the updated "Reviewed" status.|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/feedback` | AI panel loads async via `/admin/feedback/ai-insight` |
+| 2 | Observe response | Complaints vs highlights with actionable bullets, or graceful error |
 
-### 2.16 Test TC_A_016 for Module : <Configure/Manage Notifications (UC016)>
+---
 
-This test contains the following test cases:
+### 2.16 Test TC_A_016 for Module: Configure/Manage Notifications (UC016)
 
-- **TC_A_016_01:** Verify successful update of a notification setting (e.g., enabling/disabling a specific notification type).
+| ID | Name |
+|----|------|
+| TC_A_016_01 | Verify create and edit WhatsApp notification template |
+| TC_A_016_02 | Verify delete notification template |
 
-#### 2.16.1 TC_A_016_01: Verify successful update of a notification setting.
+#### TC_A_016_01: Verify create and edit WhatsApp notification template
 
 **Test Case ID:** TC_A_016_01
 
-**Created by:** Ahmed Hani Ahmed Ghaleb | **Version:** 1.0
+**Description:** Admin manages reusable WhatsApp message templates with placeholders (not system notification toggles).
 
-**Test Case Description:** To ensure the administrator can change a notification setting (e.g., toggle enabling/disabling notification for "New Inquiry") and the change is saved.
+| Prerequisites | Test Data |
+|---------------|-----------|
+| Admin logged in | Event: `CUSTOM_REMINDER`, Label: `Booking Reminder`, Body with `{visitorName}`, `{eventDate}` placeholders |
 
-|   |   |   |   |
-|---|---|---|---|
-|**No.**|**Prerequisites**|**No.**|**Test Data**|
-|1|The Al-Muneer Online Portal is deployed and accessible.|1|Input: Admin changes "Admin New Inquiry Notification" setting from "Enabled" to "Disabled".|
-|2|Administrator is logged into the admin panel.|2|System Config (Initial): Setting for "Admin New Inquiry Notification" is "Enabled".|
-|3|The "Notification Settings" interface is implemented, allowing toggling of specific notification events (e.g., "Admin New Inquiry Notification" is currently "Enabled").|3|System Config (Post-Test): Setting for "Admin New Inquiry Notification" is "Disabled".|
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Open `/admin/templates` | List of seeded templates (e.g. INQUIRY_RECEIVED, PAYMENT_VERIFIED) |
+| 2 | Create new template; save | Template in list and DB |
+| 3 | On inquiry detail, select template from dropdown | Message preview resolves placeholders; WhatsApp deep link generated client-side |
 
-**Test Conditions:** Test changing a setting from enabled to disabled, or vice-versa.
+#### TC_A_016_02: Verify delete notification template
 
-|            |                                                                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Step #** | **Step Details**                                                                                                                    | **Expected Result**                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| 1          | Navigate to the "Notification Settings" or "System Configuration" section in the admin panel.                                       | The current notification settings are displayed (e.g., "Admin New Inquiry Notification: Enabled").                                                                                                                                                                                                                                                                                                                                       |
-| 2          | Change the setting for "Admin - New Inquiry Notification" from "Enabled" to "Disabled" (e.g., uncheck a checkbox, toggle a switch). | The UI reflects the change to "Disabled".                                                                                                                                                                                                                                                                                                                                                                                                |
-| 3          | Click the "Save Configurations" or "Update Settings" button.                                                                        | The system should process the update.<br><br>A success message (e.g., "Notification settings updated successfully.") should be displayed.<br><br>The corresponding configuration (in database or config file) for "Admin New Inquiry Notification" should be updated to reflect "Disabled".<br><br>Subsequently, when a new inquiry is submitted, the admin should not receive this specific notification. |
+**Test Case ID:** TC_A_016_02
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Delete a custom template; confirm | Removed from list and DB |
+| 2 | Verify seeded templates | Default templates remain unless explicitly deleted |
+
+---
+
+## Appendix: Test Case Traceability Summary
+
+| UC | Test IDs | Primary FR coverage |
+|----|----------|---------------------|
+| Admin Login | TC_A_000_01–02 | Secure admin access |
+| UC001 | TC_V_001_01–02 | Venue info, maps, FAQ |
+| UC002 | TC_V_002_01–02 | Media gallery |
+| UC003 | TC_V_003_01–02 | Availability calendar |
+| UC004 | TC_V_004_01–02 | Pricing display |
+| UC005 | TC_V_005_01–05 | Booking inquiry lifecycle |
+| UC006 | TC_A_006_01–02 | Venue & FAQ management |
+| UC007 | TC_A_007_01–03 | Gallery management |
+| UC008 | TC_A_008_01–02 | Pricing management |
+| UC009 | TC_A_009_01–02 | Calendar & inquiries |
+| UC010 | TC_A_010_01–02 | Analytics & AI funnel |
+| UC011 | TC_V_011_01–02 | Payment proof upload |
+| UC012 | TC_V_012_01–02 | Feedback submission |
+| UC013 | TC_A_013_01–02 | Payment verification |
+| UC014 | TC_A_014_01–02 | Reports & AI advisor |
+| UC015 | TC_A_015_01–02 | Feedback management |
+| UC016 | TC_A_016_01–02 | WhatsApp templates |
+
+**Total test cases:** 38 (across 17 modules including admin login).
