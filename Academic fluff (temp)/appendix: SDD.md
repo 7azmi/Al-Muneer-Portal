@@ -14,7 +14,7 @@
 
 **Al-Muneer Online Portal**
 
-**Version 1.0**
+**Version 1.2**
 
 **Prepared by:** Ahmed Ghaleb
 
@@ -22,7 +22,7 @@
 
 ### a. Overview
 
-This document is Version 1.0 of the Software Design Description (SDD) for the Al-Muneer Online Portal. It details the high-level and detailed design of the system, building upon the requirements defined in the Software Requirements Specification (SRS) Version 1.0. This SDD describes the system architecture, data design, interface design, and component-level design necessary to guide the implementation of the portal. This document is prepared as part of the SECJ 3032: Software Engineering FYP1 course requirements.
+This document is Version 1.2 of the Software Design Description (SDD) for the Al-Muneer Online Portal. It details the high-level and detailed design of the system, building upon the requirements defined in the Software Requirements Specification (SRS) Version 1.2. This SDD describes the system architecture, data design, interface design, component-level design, and AI integration patterns necessary to guide the implementation of the portal. This document is prepared as part of the SECJ 3032: Software Engineering FYP1 course requirements.
 
 ### b. Issuing Organisation / Team
 
@@ -46,7 +46,8 @@ This document is Version 1.0 of the Software Design Description (SDD) for the Al
 |**REVISION NO.**|**ISSUE DATE**|**DETAILS OF REVISION**|
 |00 (Draft)|15/05/2025|Initial internal draft based on SRS.|
 |1.0|30/05/2025|First complete version of SDD for FYP1 Progress 2.|
-|1.1|8/08/2025|Use case diagram updated: Deleted UC006|
+|1.1|8/08/2025|Use case diagram updated: Deleted UC006.|
+|1.2|18/06/2026|Synced with implementation: added Gemini AI advisor subsystem, asynchronous AI panel design, PageVisit tracking, reference-code booking flow, WhatsApp notification templates, and refined data model (GalleryLabel, maps URLs, corrected relationships).|
 
 _(Note: This Software Design Descriptions (SDD) template is adapted from IEEE Recommended Practice based on Software Design Descriptions (SDD) (IEEE Std. 1016-1998), that are simplified and customized to meet the need of SECJ3203 FYP1 SE course at Faculty of Computing, UTM. Examples of models are from Arlow and Neustadt (2002) and other sources stated accordingly.)_
 
@@ -138,7 +139,7 @@ The following sections of the Software Design Description (SDD) should provide t
 
 ### 2.1 Purpose
 
-This Software Design Description (SDD) document delineates the design for the Al-Muneer Online Portal. Its purpose is to translate the functional and non-functional requirements specified in the Software Requirements Specification (SRS) document (Version 1.0) into a detailed blueprint for implementation. This SDD describes the system architecture, data design, component design, interface design, and other design decisions that will guide the development of the portal.
+This Software Design Description (SDD) document delineates the design for the Al-Muneer Online Portal. Its purpose is to translate the functional and non-functional requirements specified in the Software Requirements Specification (SRS) document (Version 1.2) into a detailed blueprint for implementation. This SDD describes the system architecture, data design, component design, interface design, AI integration design, and other design decisions that will guide the development of the portal.
 
 This SDD describes how the Al-Muneer Online Portal will be structured and built. It is intended for use by the project developer (Ahmed Hani Ahmed Ghaleb) as the primary technical guide for system implementation during PSM2, by the project supervisor for reviewing the technical design and ensuring it meets the requirements, and by examiners for assessing the design quality and completeness.
 
@@ -146,27 +147,29 @@ This SDD describes how the Al-Muneer Online Portal will be structured and built.
 
 This SDD document covers the design of the "Al-Muneer Online Portal," a web-based application for Al-Muneer Hall for Weddings and Events. The scope of the design encompasses:
 
-- **System Architecture:** The overall structure of the system, including its layers, components, and their interactions.
+- **System Architecture:** The overall structure of the system, including its layers, components, AI service integration, and their interactions.
 
-- **Database Design:** The logical and physical design of the relational database (MySQL/PostgreSQL) that will store the portal's data, including entity definitions and relationships.
+- **Database Design:** The logical and physical design of the relational database (PostgreSQL) that will store the portal's data, including entity definitions and relationships.
 
-- **Component Design:** The design of major software components within the backend (Spring Boot) and frontend, detailing their responsibilities and interfaces.
+- **Component Design:** The design of major software components within the backend (Spring Boot) and frontend, detailing their responsibilities and interfaces, including the Gemini AI advisor service.
 
 - **Interface Design:**
 
-    - **User Interfaces (UI):** Conceptual design and layout for key user-facing screens for both Visitors and the Administrator.
+    - **User Interfaces (UI):** Conceptual design and layout for key user-facing screens for both Visitors and the Administrator, including asynchronous AI advisor panels in the admin dashboard.
 
-    - **Internal Interfaces:** APIs between the frontend and backend components.
+    - **Internal Interfaces:** APIs between the frontend and backend components, including REST endpoints for AI insights.
 
-- **Security Design Considerations:** How security requirements (authentication, authorisation, data protection) will be incorporated into the design.
+- **Security Design Considerations:** How security requirements (authentication, authorisation, data protection, JWT cookie-based session management) will be incorporated into the design.
+
+- **AI Integration Design:** How optional, non-blocking AI advisors (business, feedback, traffic funnel) are loaded asynchronously and degrade gracefully on API failure.
 
 The software product will, as defined in the SRS:
 
-- Allow visitors to view venue information, media, availability, pricing, submit inquiries, upload payment proofs, and provide feedback.
+- Allow visitors to view venue information, media, availability, pricing, submit booking inquiries with a 9-digit reference code, upload payment proofs, and provide feedback.
 
-- Enable administrators to manage all content, inquiries, payment statuses, feedback, view basic reports, and configure notifications.
+- Enable administrators to manage all content, inquiries, payment statuses, feedback, view traffic analytics and operational reports augmented by AI advisors, and configure WhatsApp notification templates.
 
-The design will adhere to the constraints identified in the SRS, including the use of the specified technology stack (Spring Boot, relational database, HTML/CSS/JS), deployment on a Cloud VPS, and considerations for the solo developer context and project timeline. This SDD aims to provide sufficient detail to implement a functional, reliable, and maintainable system as per the project's objectives.
+The design will adhere to the constraints identified in the SRS, including the use of the specified technology stack (Spring Boot 3.4.4, Java 21, PostgreSQL, HTML/CSS/JS, Thymeleaf, Chart.js, Google GenAI Java SDK), deployment on a Cloud VPS, and considerations for the solo developer context and project timeline. This SDD aims to provide sufficient detail to implement a functional, reliable, and maintainable system as per the project's objectives.
 
 The software product is a custom web application designed specifically for Al-Muneer Hall.
 
@@ -208,9 +211,9 @@ This SDD document provides a comprehensive overview of the design for the Al-Mun
 
     - State Dynamic Viewpoint (5.9): State changes of key entities (State Machine Diagrams, if applicable at a detailed level).
 
-    - Algorithm Viewpoint (5.10): Logic for complex operations or algorithms (Activity Diagrams for processes).
+    - Algorithm Viewpoint (5.10): Logic for complex operations or algorithms, including AI prompt construction, reference-code generation, and status cascade rules.
 
-- **Section 6 (User Interface Design):** Provides conceptual screen layouts and descriptions for key user interfaces.
+- **Section 6 (User Interface Design):** Provides conceptual screen layouts and descriptions for key user interfaces, including asynchronous AI advisor panels.
 
 - **Section 7 (Appendices):** Includes any supporting design information.
 
@@ -220,13 +223,15 @@ This organization aims to present the design in a structured and understandable 
 
 This section provides a complete list of all documents referenced elsewhere in this SDD.
 
-1. Ahmed Hani Ahmed Ghaleb. (2025). Software Requirements Specification (SRS) - Al-Muneer Online Portal, Version 1.0. Universiti Teknologi Malaysia. (Internal Project Document)
+1. Ahmed Hani Ahmed Ghaleb. (2026). Software Requirements Specification (SRS) - Al-Muneer Online Portal, Version 1.2. Universiti Teknologi Malaysia. (Internal Project Document)
 
-2. Ahmed Hani Ahmed Ghaleb. (2025). FYP1 Progress 2 Report - Al-Muneer Online Portal. Universiti Teknologi Malaysia. (Internal Project Document, containing Chapters 3, 4, 5 of the main report)
+2. Ahmed Hani Ahmed Ghaleb. (2026). Al-Muneer Online Portal - Core Specifications & Implementation Changelog (README.md). Universiti Teknologi Malaysia. (Internal Project Document)
 
 3. IEEE. (1998). IEEE Recommended Practice for Software Design Descriptions (IEEE Std 1016-1998). Institute of Electrical and Electronics Engineers.
 
 4. Fowler, M. (2002). Patterns of Enterprise Application Architecture. Addison-Wesley Professional.
+
+5. Google. (2026). Google GenAI Java SDK (google-genai 1.56.0). https://github.com/googleapis/java-genai
 
 Sources for these documents include internal project documentation created as part of the FYP1 process, IEEE standards, established software engineering literature, and official documentation for the chosen technologies.
 
@@ -236,17 +241,27 @@ This section provides the definitions of all key terms, acronyms, and abbreviati
 
 - **Admin:** Administrator of the Al-Muneer Online Portal.
 
+- **AI Advisor:** An optional, asynchronous insight panel powered by the Google GenAI Java SDK (Gemini) that analyses portal data and presents concise, actionable recommendations to the Administrator.
+
 - **API:** Application Programming Interface.
 
 - **Component Diagram:** A diagram that depicts how components are wired together to form larger components or software systems.
 
 - **CRUD:** Create, Read, Update, Delete.
 
+- **Deep Link:** A `wa.me` URL generated client-side from a WhatsApp template and a normalised phone number, allowing the admin to open a pre-filled WhatsApp chat.
+
 - **ERD:** Entity-Relationship Diagram.
 
 - **FAQ:** Frequently Asked Questions.
 
 - **FYP:** Final Year Project. (Also PSM)
+
+- **GenAI / Gemini:** Google's generative artificial intelligence service accessed through the official Google GenAI Java SDK; used by the system for optional business, feedback, and traffic insights.
+
+- **JWT:** JSON Web Token — a compact, URL-safe token used for stateless admin authentication.
+
+- **BCrypt:** A password-hashing function used to store administrator credentials securely.
 
 - **HTML:** Hyper Text Markup Language.
 
@@ -258,9 +273,13 @@ This section provides the definitions of all key terms, acronyms, and abbreviati
 
 - **MVC:** Model-View-Controller architectural pattern.
 
+- **PageVisit:** A daily counter entity that records how many times a public visitor page was accessed.
+
 - **PaaS:** Platform as a Service.
 
 - **PSM:** Projek Sarjana Muda (Bachelor's Degree Project).
+
+- **Reference Code:** A random 9-digit number assigned to each `BookingInquiry` and stored in a 150-day HTTP-only cookie so visitors can retrieve their inquiry.
 
 - **REST:** Representational State Transfer - an architectural style for distributed hypermedia systems.
 
@@ -281,6 +300,8 @@ This section provides the definitions of all key terms, acronyms, and abbreviati
 - **UX:** User Experience.
 
 - **VPS:** Virtual Private Server.
+
+- **WhatsApp Template:** A database-stored message body with placeholders (e.g. `{visitorName}`, `{inquiryId}`) used to generate pre-filled WhatsApp deep links for visitor communication.
 
 ## 5. Design Body
 
@@ -320,7 +341,7 @@ This section specifies the design stakeholders for the Al-Muneer Online Portal a
 
     - **Modularity & Maintainability:** Is the system designed in a way that is easy to code, test, and potentially modify or extend later?
 
-    - **Feasibility:** Can all designed aspects be realistically implemented with the chosen technology stack (Spring Boot, MySQL/PostgreSQL, HTML/CSS/JS) and within the project timeline?
+    - **Feasibility:** Can all designed aspects be realistically implemented with the chosen technology stack (Spring Boot 3.4.4, Java 21, PostgreSQL 16, HTML/CSS/JS, Thymeleaf, Chart.js, Google GenAI Java SDK) and within the project timeline?
 
     - **Performance:** Will the design support the required response times and handle the anticipated load?
 
@@ -380,9 +401,9 @@ The system features, from a context viewpoint, are represented by the services i
 
 The system features include:
 
-- **For Visitors:** Viewing venue details, browsing the media gallery, checking availability via an interactive calendar, viewing pricing information, submitting booking inquiries, optionally submitting proof of payment, and providing feedback.
+- **For Visitors:** Viewing venue details, browsing the media gallery, checking availability via an interactive calendar, viewing pricing information, submitting booking inquiries with a 9-digit reference code, optionally submitting proof of payment, and providing feedback.
 
-- **For the Administrator:** Securely logging in to manage all website content (hall information, media, availability calendar, pricing, FAQs), managing booking inquiries, managing submitted payment proofs and their statuses, reviewing user feedback, viewing basic operational reports, and configuring system notifications.
+- **For the Administrator:** Securely logging in to manage all website content (hall information, media, availability calendar, pricing, FAQs), managing booking inquiries, managing submitted payment proofs and their statuses, reviewing user feedback, viewing traffic analytics and operational reports augmented by AI advisors, and configuring WhatsApp notification templates.
 
 ```plantuml
 @startuml
@@ -394,7 +415,7 @@ rectangle "Al-Muneer Online Portal" {
   usecase "UC001: View Venue Information" as UC1
   usecase "UC002: View Media Gallery" as UC2
   usecase "UC003: Check Availability (Interactive Calendar)" as UC3
-  usecase "UC004: View Pricing Customisation Panel" as UC4
+  usecase "UC004: View Pricing Panel" as UC4
   usecase "UC005: Submit Booking Inquiry" as UC5
   usecase "UC011: Submit Payment Proof" as UC11
   usecase "UC012: Submit Feedback" as UC12
@@ -407,7 +428,7 @@ rectangle "Al-Muneer Online Portal" {
   usecase "UC015: Manage Feedback" as UC15
   usecase "UC010: View Traffic (Analytics)" as UC10
   usecase "UC014: View / Generate Reports" as UC14
-  usecase "UC016: Configure / Manage Notifications" as UC16
+  usecase "UC016: Configure/Manage Notifications" as UC16
 }
 
 Visitor --> UC1
@@ -451,15 +472,19 @@ The purpose of the composition viewpoint is to define the subsystems that compos
 
 The system formed by these modules aims to deliver the functionalities outlined in the SRS. For the Al-Muneer Online Portal, we can identify the following major logical subsystems:
 
-1. **Presentation Subsystem (Frontend):** Responsible for all user interaction, rendering information, and capturing user input. This subsystem itself can be seen as having two main parts: the Public-Facing Interface and the Administrator Panel Interface.
+1. **Presentation Subsystem (Frontend):** Responsible for all user interaction, rendering information, and capturing user input. This subsystem itself can be seen as having two main parts: the Public-Facing Interface and the Administrator Panel Interface. It loads AI advisor panels asynchronously after the initial page render.
 
 2. **Application Logic Subsystem (Backend Core):** Responsible for implementing the core business logic, processing requests from the frontend, interacting with the data layer, and managing application state.
 
 3. **Data Management Subsystem (Backend Persistence):** Responsible for all aspects of data storage and retrieval, ensuring data integrity and consistency.
 
-4. **Notification Subsystem (Backend Service):** Responsible for generating and dispatching notifications to users and administrators.
+4. **Notification Subsystem (Backend Service):** Responsible for managing WhatsApp message templates and generating client-side deep links for visitor communication.
 
-5. **Reporting Subsystem (Backend Service):** Responsible for generating basic operational reports for the administrator.
+5. **Reporting Subsystem (Backend Service):** Responsible for generating operational reports and aggregating data for visual charts and AI advisors.
+
+6. **Analytics Subsystem (Backend Service):** Responsible for tracking public page visits and serving traffic analytics data to the admin dashboard and AI funnel advisor.
+
+7. **AI/GenAI Subsystem (Backend Service):** Responsible for constructing prompts from portal data and calling the Google GenAI Java SDK (Gemini) to generate optional business, feedback, and traffic insights. This subsystem is designed to be non-blocking and to return graceful fallbacks on failure.
 
 #### 5.3.2 Design View
 
@@ -477,14 +502,18 @@ package "Al-Muneer Online Portal System" {
     [Database\n<<Persistence>>] as DB
     [Backend Core\n<<Business Logic>>] as Core
     [Reports\n<<Service>>] as Reports
+    [Analytics\n<<Service>>] as Analytics
     [Notifications\n<<Service>>] as Notif
+    [AI/GenAI\n<<Service>>] as AI
     [File Storage\n<<Utility>>] as File
 
     interface "User Interface" as IF_UI
     interface "API" as IF_API
     interface "DAO" as IF_DAO
     interface "Report IF" as IF_Report
+    interface "Analytics IF" as IF_Analytics
     interface "Notify IF" as IF_Notify
+    interface "AI IF" as IF_AI
     interface "File IF" as IF_File
 
     UI ..> IF_UI : uses
@@ -494,8 +523,12 @@ package "Al-Muneer Online Portal System" {
     DB -up-> IF_DAO
     Core ..> IF_Report : Reports
     Reports -up-> IF_Report
-    Core ..> IF_Notify : Alerts
+    Core ..> IF_Analytics : Traffic
+    Analytics -up-> IF_Analytics
+    Core ..> IF_Notify : Templates
     Notif -up-> IF_Notify
+    Core ..> IF_AI : Insights
+    AI -up-> IF_AI
     Core ..> IF_File : File Ops
     File -up-> IF_File
 }
@@ -527,108 +560,202 @@ This design view includes a class diagram representing key classes within the re
 
 ```plantuml
 @startuml
-package "Controllers (REST API) <<Spring Component>>" {
-    class VenueInfoController {
-        + getVenueInfo()
-        + updateVenueInfo()
+package "Controllers <<Spring @Controller/@RestController>>" {
+    package "Visitor" {
+        class HomeController
+        class GalleryController
+        class CalendarController
+        class PricingController
+        class InquiryController
+        class PaymentProofController
+        class FeedbackController
     }
-    class AvailabilityController {
-        + getAvailability()
-        + updateSlot()
+    package "Admin" {
+        class AdminAuthController
+        class AdminVenueController
+        class AdminGalleryController
+        class AdminCalendarController
+        class AdminPricingController
+        class AdminInquiryController
+        class AdminPaymentController
+        class AdminFeedbackController
+        class AdminTemplateController
+        class AdminAnalyticsController
+        class AdminReportController
     }
-    class InquiryController {
-        + submitInquiry()
-        + getInquiries()
-        + updateInquiryStatus()
+}
+
+package "Services <<Spring @Service>>" {
+    class GeminiService {
+        + generate(prompt: String): String
     }
-    class FeedbackController {
-        + submitFeedback()
-        + getFeedback()
-        + updateFeedbackStatus()
-    }
-    class AdminAuthController {
-        + loginAdmin()
-    }
-    class PaymentProofController {
-        + uploadProof()
-        + getPaymentProofs()
-        + updateProofStatus()
-    }
+    class BookingInquiryService
+    class PaymentProofService
+    class FeedbackService
+    class AvailabilitySlotService
+    class PricingTierService
+    class VenueInfoService
+    class MediaItemService
+    class NotificationTemplateService
+    class AdminDashboardService
 }
 
 package "Domain Entities (JPA)" {
     class VenueInfo <<Entity>> {
-        - infoId
-        - description
-        - services
+        - infoId: Integer
+        - description: String
+        - services: String
+        - capacity: Integer
+        - location: String
+        - contactInfo: String
+        - mapsShareUrl: String
+        - mapsEmbedUrl: String
+        - faqJson: String
+    }
+    class MediaItem <<Entity>> {
+        - mediaId: Long
+        - mediaType: MediaType
+        - fileName: String
+        - filePath: String
+        - youtubeUrl: String
+        - caption: String
+        - category: String
+        - uploadDate: LocalDateTime
+    }
+    class GalleryLabel <<Entity>> {
+        - labelId: Long
+        - name: String
+        - icon: String
+        - sortOrder: Integer
     }
     class AvailabilitySlot <<Entity>> {
-        - slotId
-        - date
-        - status
+        - slotId: Long
+        - slotDate: LocalDate
+        - status: SlotStatus
+        - notes: String
+        - updatedAt: LocalDateTime
+    }
+    class PricingTier <<Entity>> {
+        - pricingId: Long
+        - tierName: String
+        - basePrice: BigDecimal
+        - description: String
+        - isActive: Boolean
     }
     class BookingInquiry <<Entity>> {
-        - inquiryId
-        - visitorName
-        - eventDate
-        - status
-    }
-    class Feedback <<Entity>> {
-        - feedbackId
-        - feedbackText
-        - isReviewed
-    }
-    class AdminUser <<Entity>> {
-        - userId
-        - username
+        - inquiryId: Long
+        - referenceCode: Long
+        - visitorName: String
+        - visitorWhatsApp: String
+        - numGuests: Integer
+        - eventType: String
+        - message: String
+        - submissionDate: LocalDateTime
+        - status: InquiryStatus
+        - adminNotes: String
     }
     class PaymentProof <<Entity>> {
-        - proofId
-        - fileName
-        - verificationStatus
+        - proofId: Long
+        - fileName: String
+        - filePath: String
+        - uploadTimestamp: LocalDateTime
+        - verificationStatus: VerificationStatus
+        - adminNotes: String
     }
-    BookingInquiry "1" -- "0..1" PaymentProof : Has >
+    class Feedback <<Entity>> {
+        - feedbackId: Long
+        - visitorName: String
+        - visitorWhatsApp: String
+        - feedbackText: String
+        - rating: Integer
+        - submissionDate: LocalDateTime
+        - isReviewed: Boolean
+        - adminNotes: String
+    }
+    class AdminUser <<Entity>> {
+        - userId: Long
+        - username: String
+        - passwordHash: String
+        - role: String
+    }
+    class NotificationTemplate <<Entity>> {
+        - templateId: Long
+        - eventName: String
+        - label: String
+        - templateText: String
+        - updatedAt: LocalDateTime
+    }
+    class PageVisit <<Entity>> {
+        - id: Long
+        - visitDate: LocalDate
+        - pagePath: String
+        - hitCount: Long
+    }
+
+    AvailabilitySlot "1" -- "0..*" BookingInquiry : reserves >
+    PricingTier "1" -- "0..*" BookingInquiry : selects >
+    BookingInquiry "1" -- "0..*" PaymentProof : has >
+    GalleryLabel "1" -- "0..*" MediaItem : categorises >
 }
 
-package "DTOs" {
-    class VenueInfoDTO
-    class AvailabilitySlotDTO
-    class InquiryDTO
-    class FeedbackDTO
-    class LoginRequest
-    class PaymentProofDTO
+package "Enums" {
+    enum InquiryStatus { NEW, VIEWED, CONTACTED, PAYMENT_PENDING, CONFIRMED, COMPLETED, CANCELLED_BY_ADMIN, CANCELLED_BY_VISITOR }
+    enum SlotStatus { AVAILABLE, PENDING, BOOKED }
+    enum VerificationStatus { PENDING_VERIFICATION, VERIFIED, REJECTED }
+    enum MediaType { IMAGE, VIDEO }
 }
 
-VenueInfoController ..> VenueInfo
-VenueInfoController ..> VenueInfoDTO
-AvailabilityController ..> AvailabilitySlot
-AvailabilityController ..> AvailabilitySlotDTO
+package "Security <<Spring Security + JWT>>" {
+    class JwtUtil
+    class JwtAuthFilter
+    class AdminUserDetailsService
+}
+
+package "Utilities" {
+    class FileUploadUtil
+    class ReportGeneratorUtil
+    class DeepLinkBuilderUtil
+    class PageVisitInterceptor
+}
+
+AdminAnalyticsController ..> GeminiService
+AdminReportController ..> GeminiService
+AdminFeedbackController ..> GeminiService
+AdminAnalyticsController ..> PageVisit
+AdminReportController ..> ReportGeneratorUtil
+AdminFeedbackController ..> Feedback
 InquiryController ..> BookingInquiry
-InquiryController ..> InquiryDTO
-FeedbackController ..> Feedback
-FeedbackController ..> FeedbackDTO
-AdminAuthController ..> AdminUser
-AdminAuthController ..> LoginRequest
 PaymentProofController ..> PaymentProof
-PaymentProofController ..> PaymentProofDTO
+AdminPaymentController ..> PaymentProof
+AdminPaymentController ..> BookingInquiry
+FeedbackController ..> Feedback
+AdminFeedbackController ..> Feedback
+AvailabilitySlot "*" --> SlotStatus
+BookingInquiry "*" --> InquiryStatus
+PaymentProof "*" --> VerificationStatus
+MediaItem "*" --> MediaType
 @enduml
 ```
 
-_Figure 5.3: Class Diagram for Key Backend Entities and Controllers (Conceptual)_
+_Figure 5.3: Class Diagram for Key Backend Entities, Controllers, and AI Service (Conceptual)_
 
-The backend design primarily follows the Model-View-Controller (MVC) pattern, where Spring Boot facilitates this structure.
+The backend design primarily follows the Model-View-Controller (MVC) layered pattern, where Spring Boot facilitates this structure.
 
-- **Controller Classes (e.g., VenueInfoController, InquiryController):** These classes are stereotyped as Spring `@RestController`s. They handle incoming HTTP requests from the Presentation Subsystem (Frontend), parse request data (often mapped to DTOs), delegate business logic processing to Service classes (not explicitly shown in this simplified diagram but implied), and return HTTP responses (often DTOs converted to JSON). Each controller typically corresponds to a major domain entity or functional area.
+- **Controller Classes:** Stereotyped as Spring `@Controller` or `@RestController`, these handle incoming HTTP requests from the Presentation Subsystem (Frontend), parse request data, delegate business logic processing to Service classes, and return HTTP responses or Thymeleaf view names. Visitor-facing controllers (e.g., `InquiryController`, `FeedbackController`) serve HTML pages, while admin controllers (e.g., `AdminReportController`, `AdminAnalyticsController`) manage the protected admin panel and expose asynchronous AI insight endpoints.
 
-- **Domain Entity Classes (e.g., VenueInfo, BookingInquiry, PaymentProof):** These are Plain Old Java Objects (POJOs) typically annotated as JPA `@Entity`s. They represent the persistent data structures of the application and are mapped to database tables. They contain attributes corresponding to the data fields. Relationships between entities (e.g., a PaymentProof is associated with a BookingInquiry) are defined here.
+- **AI Service (`GeminiService`):** A dedicated Spring `@Service` that wraps the Google GenAI Java SDK. It accepts a plain-text prompt, calls the Gemini model, and returns generated text. The service is designed to be resilient: any SDK or network failure is caught and a human-readable fallback message is returned, ensuring that AI panels never block page rendering.
 
-- **Data Transfer Objects (DTOs) (e.g., InquiryDTO, PaymentProofDTO):** These are simple objects used to transfer data between layers, particularly between the Controller layer and the client (Frontend), and sometimes between the Service and Controller layers. They help decouple the service layer from the presentation layer and can be tailored to specific API needs, preventing exposure of internal entity structures.
+- **Domain Entity Classes (e.g., `VenueInfo`, `BookingInquiry`, `PaymentProof`, `PageVisit`):** These are Plain Old Java Objects (POJOs) annotated as JPA `@Entity`s. They represent the persistent data structures of the application and are mapped to database tables. Relationships between entities (e.g., a `BookingInquiry` references one `AvailabilitySlot` and optionally one `PricingTier`; a `BookingInquiry` may have many `PaymentProof`s) are defined here.
 
-- **Service Classes (Implied, not shown in diagram for brevity):** Stereotyped as Spring `@Service`s, these classes contain the core business logic. Controllers delegate calls to them. For instance, an `InquiryService` would handle the logic for saving a new inquiry, validating its data, and triggering notifications. Services interact with Repository classes.
+- **Data Transfer Objects (DTOs):** Simple objects used to transfer data between layers, particularly between the Controller layer and the client (Frontend), and sometimes between Service and Controller. They help decouple the service layer from the presentation layer.
 
-- **Repository Classes (Implied, not shown in diagram for brevity):** These are interfaces (typically extending Spring Data JPA interfaces like `JpaRepository`) stereotyped as Spring `@Repository`s. They provide an abstraction layer for data access operations (CRUD) on the domain entities, interacting directly with the database.
+- **Service Classes:** Stereotyped as Spring `@Service`s (with interfaces and `impl` implementations), these contain the core business logic. Controllers delegate calls to them. For instance, `BookingInquiryService` handles saving a new inquiry, generating a random `referenceCode`, and freeing a slot on visitor cancellation; `PaymentProofService` handles the status cascade from proof verification to inquiry and slot.
 
-The relationships shown in the diagram are primarily conceptual associations indicating which controllers manage which entities (via the service and repository layers). The relationship between BookingInquiry and PaymentProof (one-to-one or one-to-zero/one) is an example of a domain entity relationship. The ERD in the Information Viewpoint (Section 5.5) will provide a more database-centric view of these entity relationships. This logical view ensures a separation of concerns, promotes loose coupling, and enhances the maintainability of the backend system.
+- **Repository Classes (Implied, not shown in diagram for brevity):** Interfaces extending Spring Data JPA (`JpaRepository`) stereotyped as Spring `@Repository`s. They provide CRUD operations and custom query methods for the domain entities.
+
+- **Security Classes (`JwtUtil`, `JwtAuthFilter`, `AdminUserDetailsService`):** Implement stateless JWT cookie-based authentication for the admin panel, using BCrypt for password hashing.
+
+The relationships shown in the diagram are primarily conceptual associations indicating which controllers manage which entities (via the service and repository layers). The ERD in the Information Viewpoint (Section 5.5) provides a database-centric view of entity relationships. This logical view ensures separation of concerns, loose coupling, and maintainability.
 
 ### 5.5 Information Viewpoint
 
@@ -636,9 +763,9 @@ The Information Viewpoint is applicable as there is substantial persistent data 
 
 #### 5.5.1 Design Concerns
 
-This section explains how the information domain of the Al-Muneer Online Portal is transformed into data structures. It describes how the major data or system entities are stored, processed, and organized. The primary data storage will be a relational database (MySQL/PostgreSQL). This database will consist of several tables, where each table represents an entity and stores its attributes.
+This section explains how the information domain of the Al-Muneer Online Portal is transformed into data structures. It describes how the major data or system entities are stored, processed, and organized. The primary data storage will be a relational database (PostgreSQL). This database will consist of several tables, where each table represents an entity and stores its attributes.
 
-The major data or system entities are stored in a relational database named `almuneer_portal_db` (example name). This database comprises the following key entities, which are detailed further in the Data Dictionary and ERD.
+The major data or system entities are stored in a relational database named `almuneer_portal_db`. This database comprises the following key entities, which are detailed further in the Data Dictionary and ERD.
 
 **Entity Name List (Conceptual):**
 
@@ -648,15 +775,21 @@ The major data or system entities are stored in a relational database named `alm
 
 3. MediaItem
 
-4. AvailabilitySlot
+4. GalleryLabel
 
-5. PricingTier
+5. AvailabilitySlot
 
-6. BookingInquiry
+6. PricingTier
 
-7. PaymentProof
+7. BookingInquiry
 
-8. Feedback
+8. PaymentProof
+
+9. Feedback
+
+10. NotificationTemplate
+
+11. PageVisit
 
 #### 5.5.2 Design View
 
@@ -678,41 +811,65 @@ Manages administrator login credentials and roles.
 
 **Entity: VenueInfo**
 
+Stores the single record of hall description, services, capacity, contact details, Google Maps URLs, and FAQ JSON.
+
 |   |   |   |
 |---|---|---|
 |**Attribute Name**|**Type**|**Description**|
-|infoId|INT|Unique identifier|
+|infoId|INT|Unique identifier (single-row configuration table)|
 |description|TEXT|Detailed description of the hall|
 |services|TEXT|List of services offered|
-|location|VARCHAR(255)|Physical address of the hall|
+|capacity|INT|Maximum guest capacity|
+|location|VARCHAR(255)|Physical address label of the hall|
 |contactInfo|VARCHAR(255)|Contact details|
-|faqJson|JSON or TEXT|FAQs stored|
+|mapsShareUrl|TEXT|Google Maps share/open link|
+|mapsEmbedUrl|TEXT|Google Maps embed iframe URL|
+|faqJson|TEXT|FAQs stored as JSON|
 
 **Entity: MediaItem**
+
+A gallery image or video. Local files are served from `/uploads/gallery/**`; videos may also be embedded from YouTube.
 
 |   |   |   |
 |---|---|---|
 |**Attribute Name**|**Type**|**Description**|
 |mediaId|BIGINT|Unique identifier for the media item|
-|mediaType|VARCHAR(12)|Type of media (e.g., "image", "video")|
+|mediaType|VARCHAR(12)|Type of media (`IMAGE` or `VIDEO`)|
 |fileName|VARCHAR(255)|Original name of the uploaded file|
 |filePath|VARCHAR(255)|Server path where the file is stored|
 |youtubeUrl|VARCHAR(255)|URL for embedded YouTube videos|
 |caption|VARCHAR(255)|Optional caption for the media|
+|category|VARCHAR(30)|Gallery filter label (foreign key concept to GalleryLabel)|
 |uploadDate|TIMESTAMP|Date and time of upload|
 
+**Entity: GalleryLabel**
+
+Visitor-facing category used by the gallery filter bar.
+
+|   |   |   |
+|---|---|---|
+|**Attribute Name**|**Type**|**Description**|
+|labelId|BIGINT|Unique identifier|
+|name|VARCHAR(60)|Display name of the label (unique)|
+|icon|VARCHAR(8)|Optional emoji/icon prefix|
+|sortOrder|INT|Display order in the filter bar|
+
 **Entity: AvailabilitySlot**
+
+Represents a calendar date and its booking status. Future dates default to `AVAILABLE`; past dates are dimmed in the UI.
 
 |   |   |   |
 |---|---|---|
 |**Attribute Name**|**Type**|**Description**|
 |slotId|BIGINT|Unique identifier for the slot|
-|slotDate|DATE|The specific date|
-|status|VARCHAR(20)|Booking status (e.g., "available", "booked", "pending_confirmation")|
+|slotDate|DATE|The specific date (unique)|
+|status|VARCHAR(20)|Booking status (`AVAILABLE`, `PENDING`, `BOOKED`)|
 |notes|TEXT|Internal notes for the admin regarding this slot|
 |updatedAt|TIMESTAMP|Last update timestamp|
 
 **Entity: PricingTier**
+
+A pricing package that visitors can view and pre-select when submitting an inquiry.
 
 |   |   |   |
 |---|---|---|
@@ -725,35 +882,42 @@ Manages administrator login credentials and roles.
 
 **Entity: BookingInquiry**
 
+A visitor's booking request, linked to a calendar slot and optionally a pricing tier. Each inquiry receives a random 9-digit `referenceCode` used for visitor self-service lookup and cancellation.
+
 |   |   |   |
 |---|---|---|
 |**Attribute Name**|**Type**|**Description**|
 |inquiryId|BIGINT|Unique identifier for the inquiry|
+|referenceCode|BIGINT|Random 9-digit visitor-facing reference code (unique)|
 |visitorName|VARCHAR(255)|Name of the person making the inquiry|
-|visitorWhatsApp|VARCHAR(50)|WhatsApp contact number of the visitor|
+|visitorWhatsApp|VARCHAR(50)|Normalised WhatsApp contact number of the visitor|
 |numGuests|INT|Estimated number of guests|
 |eventType|VARCHAR(100)|Type of event (e.g., Wedding, Gathering)|
-|pricingId|BIGINT|Foreign key linking to the selected PricingTier|
-|slotId|BIGINT|Foreign key linking to the desired AvailabilitySlot|
+|pricing_id|BIGINT|Foreign key linking to the selected PricingTier (nullable)|
+|slot_id|BIGINT|Foreign key linking to the desired AvailabilitySlot|
 |message|TEXT|Specific questions or requirements|
 |submissionDate|TIMESTAMP|Date and time inquiry was submitted|
-|status|VARCHAR(50)|Status (e.g., "new", "viewed", "contacted", "payment_pending", "confirmed", "cancelled")|
+|status|VARCHAR(50)|Status (`NEW`, `VIEWED`, `CONTACTED`, `PAYMENT_PENDING`, `CONFIRMED`, `COMPLETED`, `CANCELLED_BY_ADMIN`, `CANCELLED_BY_VISITOR`)|
 |adminNotes|TEXT|Internal notes by admin for this inquiry|
 
 **Entity: PaymentProof**
+
+An uploaded receipt/screenshot attached to a booking inquiry. Verifying a proof cascades status changes to the linked inquiry and slot.
 
 |   |   |   |
 |---|---|---|
 |**Attribute Name**|**Type**|**Description**|
 |proofId|BIGINT|Unique identifier for the proof|
-|inquiryId|BIGINT|Foreign key linking to BookingInquiry|
+|inquiry_id|BIGINT|Foreign key linking to BookingInquiry|
 |fileName|VARCHAR(255)|Original name of the uploaded file|
 |filePath|VARCHAR(255)|Server path where the file is stored|
 |uploadTimestamp|TIMESTAMP|Date and time of upload|
-|verificationStatus|VARCHAR(25)|Status (e.g., "pending", "verified", "rejected")|
+|verificationStatus|VARCHAR(25)|Status (`PENDING_VERIFICATION`, `VERIFIED`, `REJECTED`)|
 |adminNotes|TEXT|Internal notes by admin for this proof|
 
 **Entity: Feedback**
+
+Visitor-submitted review with a mandatory rating and message. Name and WhatsApp are optional.
 
 |   |   |   |
 |---|---|---|
@@ -762,20 +926,35 @@ Manages administrator login credentials and roles.
 |visitorName|VARCHAR(255)|Optional name of the person providing feedback|
 |visitorWhatsApp|VARCHAR(50)|Optional WhatsApp contact details|
 |feedbackText|TEXT|The feedback message itself|
-|rating|INT|Optional rating (e.g., 1-5 stars)|
+|rating|INT|Rating (1-5 stars)|
 |submissionDate|TIMESTAMP|Date and time feedback was submitted|
 |isReviewed|BOOLEAN|Whether admin has reviewed this feedback|
 |adminNotes|TEXT|Internal notes by admin for this feedback|
 
 **Entity: NotificationTemplate**
 
+Database-backed WhatsApp message templates. Placeholders (`{visitorName}`, `{inquiryId}`, `{eventDate}`, `{status}`) are resolved client-side before generating a `wa.me` deep link.
+
 |   |   |   |
 |---|---|---|
 |**Attribute Name**|**Type**|**Description**|
 |templateId|BIGINT|Unique identifier for the template|
-|eventName|VARCHAR(50)|Name/trigger of the event (e.g., "Payment Verified")|
+|eventName|VARCHAR(50)|Machine-readable name/trigger (e.g., `PAYMENT_VERIFIED`)|
+|label|VARCHAR(255)|Human-readable label shown in the admin UI dropdown|
 |templateText|TEXT|The actual message content containing placeholders|
 |updatedAt|TIMESTAMP|Last update timestamp of the template|
+
+**Entity: PageVisit**
+
+Daily hit counter for public visitor pages. Each row records one page on one date.
+
+|   |   |   |
+|---|---|---|
+|**Attribute Name**|**Type**|**Description**|
+|id|BIGINT|Unique identifier|
+|visitDate|DATE|Date of the visit|
+|pagePath|VARCHAR(255)|Visited URL path (e.g., `/`, `/gallery`)|
+|hitCount|BIGINT|Number of hits for that page on that date|
 
 **Entity Relationship Diagram (ERD)**
 
@@ -792,6 +971,8 @@ entity "VenueInfo" as VenueInfo {
   capacity : INT
   location : VARCHAR(255)
   contactInfo : VARCHAR(255)
+  mapsShareUrl : TEXT
+  mapsEmbedUrl : TEXT
   faqJson : TEXT
 }
 
@@ -803,6 +984,14 @@ entity "AdminUser" as AdminUser {
   role : VARCHAR(20)
 }
 
+entity "GalleryLabel" as GalleryLabel {
+  * labelId : BIGINT <<PK>>
+  --
+  name : VARCHAR(60)
+  icon : VARCHAR(8)
+  sortOrder : INT
+}
+
 entity "MediaItem" as MediaItem {
   * mediaId : BIGINT <<PK>>
   --
@@ -811,6 +1000,7 @@ entity "MediaItem" as MediaItem {
   filePath : VARCHAR(255)
   youtubeUrl : VARCHAR(255)
   caption : VARCHAR(255)
+  category : VARCHAR(30)
   uploadDate : TIMESTAMP
 }
 
@@ -833,10 +1023,9 @@ entity "PricingTier" as PricingTier {
 }
 
 entity "BookingInquiry" as BookingInquiry {
-  * pricingId : BIGINT <<PK>>
-  * slotId : BIGINT <<PK>>
   * inquiryId : BIGINT <<PK>>
   --
+  referenceCode : BIGINT <<UQ>>
   visitorName : VARCHAR(255)
   visitorWhatsApp : VARCHAR(50)
   numGuests : INT
@@ -845,10 +1034,11 @@ entity "BookingInquiry" as BookingInquiry {
   submissionDate : TIMESTAMP
   status : VARCHAR(50)
   adminNotes : TEXT
+  * slot_id : BIGINT <<FK>>
+  pricing_id : BIGINT <<FK>>
 }
 
 entity "PaymentProof" as PaymentProof {
-  * inquiryId : BIGINT <<PK>>
   * proofId : BIGINT <<PK>>
   --
   fileName : VARCHAR(255)
@@ -856,12 +1046,14 @@ entity "PaymentProof" as PaymentProof {
   uploadTimestamp : TIMESTAMP
   verificationStatus : VARCHAR(25)
   adminNotes : TEXT
+  * inquiry_id : BIGINT <<FK>>
 }
 
 entity "NotificationTemplate" as NotificationTemplate {
   * templateId : BIGINT <<PK>>
   --
   eventName : VARCHAR(50)
+  label : VARCHAR(255)
   templateText : TEXT
   updatedAt : TIMESTAMP
 }
@@ -878,16 +1070,17 @@ entity "Feedback" as Feedback {
   adminNotes : TEXT
 }
 
-AdminUser ||--o{ VenueInfo : Manages
-AdminUser ||--o{ MediaItem : Manages
-AdminUser ||--o{ AvailabilitySlot : Manages
-AdminUser ||--o{ PricingTier : Manages
-AdminUser ||--o{ BookingInquiry : Manages
-AdminUser ||--o{ NotificationTemplate : Manages
-AdminUser ||--o{ Feedback : Manages
+entity "PageVisit" as PageVisit {
+  * id : BIGINT <<PK>>
+  --
+  visitDate : DATE
+  pagePath : VARCHAR(255)
+  hitCount : BIGINT
+}
 
+GalleryLabel ||--o{ MediaItem : Categorises
 AvailabilitySlot ||--o{ BookingInquiry : Reserves
-PricingTier ||--o{ BookingInquiry : Uses
+PricingTier ||--o{ BookingInquiry : Selects
 BookingInquiry ||--o{ PaymentProof : Has
 @enduml
 ```
@@ -922,11 +1115,11 @@ The Al-Muneer Online Portal will feature a web-based graphical user interface (G
 
 - **Administrator Interface (Admin Panel):**
 
-    - **Screen Layouts:** A secure, dashboard-style interface with sections for managing venue content, availability, pricing, inquiries, payment proofs, feedback, reports, and notification settings. Will heavily utilize forms, tables for data display, and action buttons.
+    - **Screen Layouts:** A secure, dashboard-style interface with sections for managing venue content, availability, pricing, inquiries, payment proofs, feedback, traffic analytics, reports, and WhatsApp notification templates. Will heavily utilize forms, tables for data display, action buttons, and asynchronous AI advisor panels.
 
-    - **Content:** Will display system data in manageable formats, configuration options, and input fields for updates.
+    - **Content:** Will display system data in manageable formats, configuration options, Chart.js visualisations, AI-generated insight cards, and input fields for updates.
 
-    - **Interaction:** Secure login required. Interaction via mouse clicks and keyboard input for data entry and management tasks.
+    - **Interaction:** Secure JWT cookie-based login required. Interaction via mouse clicks and keyboard input for data entry and management tasks. AI panels load asynchronously after the page renders and display a spinner until the insight is returned.
 
 **b) Optimizing the Interface:**
 
@@ -968,15 +1161,27 @@ This specifies the use of other required software products and interfaces with o
 
 3. **Database Management System (DBMS):**
 
-    - MySQL or PostgreSQL.
+    - PostgreSQL 16.
 
-    - **Interface:** The Spring Boot application will interface with the DBMS using JDBC (Java Database Connectivity) and Spring Data JPA for data persistence and retrieval.
+    - **Interface:** The Spring Boot application will interface with the DBMS using JDBC and Spring Data JPA for data persistence and retrieval.
 
 4. **Web Browsers (Client-Side):**
 
     - Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge (latest stable versions).
 
-    - **Interface:** The system will output HTML, CSS, and JavaScript that these browsers render. It will receive user input via HTTP requests.
+    - **Interface:** The system outputs HTML (rendered by Thymeleaf), CSS, and JavaScript. It receives user input via HTTP requests. Admin pages fetch AI insights asynchronously via `fetch()` to `/admin/reports/ai-insight`, `/admin/feedback/ai-insight`, and `/admin/analytics/ai-insight`.
+
+5. **AI/GenAI Service:**
+
+    - Google GenAI Java SDK (`google-genai` 1.56.0) with model `gemini-3.1-flash-lite`.
+
+    - **Interface:** `GeminiService.generate(prompt)` sends a plain-text prompt to the Gemini API and returns generated text. The service is called from admin AI controllers and returns graceful fallback text on any failure.
+
+6. **WhatsApp Deep Links:**
+
+    - Client-side JavaScript resolves `NotificationTemplate` placeholders (e.g., `{visitorName}`, `{inquiryId}`, `{eventDate}`, `{status}`) against the current record and opens a `wa.me` link with the composed message.
+
+    - **Interface:** No server-side WhatsApp API integration; the browser constructs the deep link using the configured `app.country.code` and the normalised visitor phone number.
 
 **Communication Interfaces**
 
@@ -986,9 +1191,21 @@ This specifies the various interfaces to communications such as local network pr
 
 - **TCP/IP:** The underlying network protocol suite for all internet-based communication.
 
-- **JDBC:** Used for communication between the Java application (Spring Boot backend) and the relational database (MySQL/PostgreSQL).
+- **JDBC:** Used for communication between the Java application (Spring Boot backend) and the PostgreSQL database.
 
-No other specialized local network protocols are designed for this system beyond these standard web and database communication protocols.
+- **External HTTPS:** Used by `GeminiService` to call the Google GenAI REST API.
+
+**Key Internal API Patterns**
+
+Representative server-rendered and API routes that realise the design include:
+
+- Visitor routes: `GET /`, `GET /gallery`, `GET /calendar`, `GET /pricing`, `GET /inquiry`, `POST /inquiry/submit`, `GET /inquiry/confirmation/{refCode}`, `POST /inquiry/cancel`, `POST /payment/upload`, `POST /feedback/submit`.
+
+- Admin routes: `GET /admin/login`, `POST /admin/login`, `GET /admin/dashboard`, `GET /admin/inquiries`, `GET /admin/payments`, `POST /admin/payments/{id}/verify`, `GET /admin/calendar`, `GET /admin/reports`, `GET /admin/analytics`, `GET /admin/feedback`, `GET /admin/templates`.
+
+- Asynchronous AI insight endpoints: `GET /admin/reports/ai-insight`, `GET /admin/feedback/ai-insight`, `GET /admin/analytics/ai-insight`.
+
+All admin routes except `/admin/login` require a valid `jwt` HTTP-only cookie.
 
 ### 5.7 Structure Viewpoint
 
@@ -1017,56 +1234,121 @@ This section includes the overall package diagram of the system, primarily focus
 ```plantuml
 @startuml
 package "com.almuneer.portal" {
+    class AlMuneerPortalApplication
+
     package "config" {
         class WebSecurityConfig
-        class MvcConfig
-        class NotificationConfig
+        class WebMvcConfig
+        class DataSeeder
+        class GlobalModelAdvice
+        class PageVisitInterceptor
     }
+
     package "controller" {
+        class HomeController
+        class GalleryController
+        class CalendarController
+        class PricingController
         class InquiryController
-        class AdminAuthController
-        class VenueInfoController
-        class AvailabilityController
-        class FeedbackController
         class PaymentProofController
-        class ReportController
-    }
-    package "service" {
-        package "impl" {
-            class InquiryServiceImpl
-            class PaymentProofServiceImpl
+        class FeedbackController
+        package "admin" {
+            class AdminAuthController
+            class AdminVenueController
+            class AdminGalleryController
+            class AdminGalleryLabelController
+            class AdminCalendarController
+            class AdminPricingController
+            class AdminInquiryController
+            class AdminPaymentController
+            class AdminFeedbackController
+            class AdminTemplateController
+            class AdminAnalyticsController
+            class AdminReportController
         }
-        interface InquiryService
+    }
+
+    package "service" {
+        class GeminiService
+        interface BookingInquiryService
         interface PaymentProofService
+        interface FeedbackService
+        interface AvailabilitySlotService
+        interface PricingTierService
+        interface VenueInfoService
+        interface MediaItemService
+        interface NotificationTemplateService
+        interface AdminDashboardService
+        interface GalleryLabelService
+        package "impl" {
+            class BookingInquiryServiceImpl
+            class PaymentProofServiceImpl
+            class FeedbackServiceImpl
+            class AvailabilitySlotServiceImpl
+            class PricingTierServiceImpl
+            class VenueInfoServiceImpl
+            class MediaItemServiceImpl
+            class NotificationTemplateServiceImpl
+            class AdminDashboardServiceImpl
+            class GalleryLabelServiceImpl
+        }
     }
+
     package "repository" {
-        interface InquiryRepository
         interface AdminUserRepository
+        interface VenueInfoRepository
+        interface MediaItemRepository
+        interface GalleryLabelRepository
+        interface AvailabilitySlotRepository
+        interface PricingTierRepository
+        interface BookingInquiryRepository
+        interface PaymentProofRepository
+        interface FeedbackRepository
+        interface NotificationTemplateRepository
+        interface PageVisitRepository
     }
+
     package "model" {
-        class BookingInquiry
         class AdminUser
+        class VenueInfo
+        class MediaItem
+        class GalleryLabel
+        class AvailabilitySlot
+        class PricingTier
+        class BookingInquiry
+        class PaymentProof
+        class Feedback
+        class NotificationTemplate
+        class PageVisit
+        package "enums" {
+            enum InquiryStatus
+            enum SlotStatus
+            enum VerificationStatus
+            enum MediaType
+        }
     }
-    package "dto" {
-        class InquiryDTO
-        class LoginRequestDTO
-    }
+
     package "util" {
         class FileUploadUtil
-        class DateUtil
         class ReportGeneratorUtil
+        class DeepLinkBuilderUtil
     }
+
     package "security" {
-        class JwtTokenProvider
-        class UserDetailsServiceImpl
+        class JwtUtil
+        class JwtAuthFilter
+        class AdminUserDetailsService
     }
 }
+
 controller ..> service
+controller.admin ..> service
 service ..> repository
-repository ..> model
-controller ..> dto
 service ..> util
+repository ..> model
 config ..> security
+security ..> repository
+security ..> model
 @enduml
 ```
 
@@ -1080,21 +1362,29 @@ The backend of the Al-Muneer Online Portal, built with Spring Boot, is organized
 
 - **`config`:** This package holds configuration classes for the application.
 
-    - `WebSecurityConfig`: Configures Spring Security for authentication, authorization, password hashing, and defining protected routes (e.g., for the admin panel).
+    - `WebSecurityConfig`: Configures Spring Security for JWT cookie authentication, authorization, BCrypt password hashing, and defining protected routes.
 
-    - `MvcConfig`: Contains configurations related to Spring MVC, such as view resolvers (if not using pure REST), static resource handling, or interceptors.
+    - `WebMvcConfig`: Contains Spring MVC configurations, including static resource handlers for `/uploads/**` and registration of the `PageVisitInterceptor`.
 
-    - `NotificationConfig`: May contain beans or configurations related to the notification service.
+    - `GlobalModelAdvice`: Adds global model attributes (e.g., `countryCode`) available to all Thymeleaf templates.
 
-- **`controller` (API Layer):** This package contains REST controller classes that handle incoming HTTP requests from the frontend.
+    - `DataSeeder`: Seeds the default admin user and sample data on first run.
 
-    - Each controller (e.g., `InquiryController`, `AdminAuthController`) is responsible for a specific domain or functional area. They receive requests, validate them (often delegating complex validation), call appropriate methods in the service layer, and formulate HTTP responses, typically using DTOs.
+    - `PageVisitInterceptor`: Intercepts public visitor requests and increments the daily `PageVisit` counter.
 
-- **`service` (Business Logic Layer):** This package contains interfaces defining the business logic contracts and an `impl` sub-package containing their concrete implementations.
+- **`controller` (API Layer):** This package contains Spring `@Controller` classes that handle incoming HTTP requests from the frontend and return Thymeleaf views or JSON responses.
 
-    - Service interfaces (e.g., `InquiryService`, `PaymentProofService`) define the business operations.
+    - Visitor-facing controllers (e.g., `HomeController`, `InquiryController`, `FeedbackController`) serve the public website.
 
-    - Implementation classes (e.g., `InquiryServiceImpl`) contain the core business logic, orchestrating calls to repositories, other services, and utility classes to fulfill the use cases. They handle transactions and business rule enforcement.
+    - `controller.admin` sub-package contains protected admin controllers (e.g., `AdminReportController`, `AdminAnalyticsController`, `AdminFeedbackController`) that manage the admin panel and expose asynchronous AI insight endpoints.
+
+- **`service` (Business Logic Layer):** This package contains interfaces defining business logic contracts and an `impl` sub-package containing their concrete implementations.
+
+    - Service interfaces (e.g., `BookingInquiryService`, `PaymentProofService`) define business operations.
+
+    - `GeminiService` is a dedicated AI service wrapping the Google GenAI Java SDK.
+
+    - Implementation classes (e.g., `BookingInquiryServiceImpl`, `PaymentProofServiceImpl`) contain core business logic, orchestrating calls to repositories, other services, and utility classes. They handle transactions and business rule enforcement, including the payment-proof status cascade and reference-code generation.
 
 - **`repository` (Data Access Layer):** This package contains Spring Data JPA repository interfaces (e.g., `InquiryRepository`, `AdminUserRepository`).
 
@@ -1102,23 +1392,27 @@ The backend of the Al-Muneer Online Portal, built with Spring Boot, is organized
 
 - **`model` (Domain Entities):** This package contains the Plain Old Java Objects (POJOs) that represent the persistent data entities of the application, as defined in the Information Viewpoint (ERD and Data Dictionary).
 
-    - These classes (e.g., `BookingInquiry`, `AdminUser`) are typically annotated with JPA (`@Entity`) to map them to database tables.
+    - These classes (e.g., `BookingInquiry`, `AdminUser`, `PageVisit`) are typically annotated with JPA (`@Entity`) to map them to database tables.
 
-- **`dto` (Data Transfer Objects):** This package contains classes used to transfer data between layers, especially between the controller and the frontend, and sometimes between service and controller.
-
-    - DTOs (e.g., `InquiryDTO`, `LoginRequestDTO`) help decouple the internal domain model from the API structure and can be tailored for specific request/response needs.
+    - The `model.enums` sub-package contains JPA-mapped Java enums such as `InquiryStatus`, `SlotStatus`, `VerificationStatus`, and `MediaType`.
 
 - **`util` (Utility Classes):** This package holds common utility classes that provide helper functions used across different parts of the application.
 
-    - Examples include `FileUploadUtil` for handling file uploads (like payment proofs), `DateUtil` for date/time manipulations, or `ReportGeneratorUtil` for basic report formatting logic.
+    - `FileUploadUtil` handles secure file uploads for gallery images and payment proofs.
 
-- **`security`:** This package contains classes related to application security, primarily for authentication and authorization using Spring Security.
+    - `ReportGeneratorUtil` aggregates inquiry, payment proof, and feedback data into the report model used by the reports page and AI business advisor.
 
-    - `JwtTokenProvider` (if using JWT for session management) would handle token generation and validation.
+    - `DeepLinkBuilderUtil` helps format WhatsApp numbers and message bodies for client-side deep links.
 
-    - `UserDetailsServiceImpl` would implement Spring Security's UserDetailsService to load user-specific data (from `AdminUserRepository`) for authentication.
+- **`security`:** This package contains classes related to application security using Spring Security and JWT.
 
-This package structure promotes a clear separation of concerns, modularity, and adherence to common practices in Spring Boot application development, making the system more organized and maintainable. Dependencies are managed such that controllers depend on services, services depend on repositories, and repositories interact with domain models. DTOs are used for data exchange, and utility/configuration/security packages provide cross-cutting concerns.
+    - `JwtUtil` generates and validates JWT tokens using a configurable secret (`app.jwt.secret`).
+
+    - `JwtAuthFilter` reads the `jwt` HTTP-only cookie, validates the token, and populates the Spring Security context for admin requests.
+
+    - `AdminUserDetailsService` loads user-specific data from `AdminUserRepository` for authentication.
+
+This package structure promotes a clear separation of concerns, modularity, and adherence to common practices in Spring Boot application development, making the system more organized and maintainable. Dependencies are managed such that controllers depend on services, services depend on repositories, and repositories interact with domain models. Form data is bound directly to request parameters or entity builders, and utility/configuration/security packages provide cross-cutting concerns.
 
 ### 5.8 Interaction Viewpoint
 
@@ -1208,6 +1502,45 @@ _Figure 5.7: SD002 - High-Level Sequence: Admin Manages Payment Proof Status_
 
 The Administrator, via the Admin Panel (Presentation Subsystem), initiates an update to a payment proof's status. The request is sent to the Application Logic Subsystem. The AppLogic first retrieves details of the payment proof (and potentially the associated booking inquiry) from the Data Management Subsystem. It then instructs the Data Management Subsystem to update the status of the payment proof and possibly the linked booking inquiry. After successful database updates, the AppLogic triggers the Notification Subsystem to inform the Visitor of their payment status update. A success response is then relayed to the Admin Panel, which updates the Administrator's view. The File Storage Service would have been involved earlier when the admin viewed the actual proof image, orchestrated by the AppLogic.
 
+**c) SD003: High-Level Sequence Diagram for Asynchronous AI Advisor Panel**
+
+```plantuml
+@startuml
+actor Administrator
+participant "Admin Panel (Frontend)" as UI
+participant "Application Logic Subsystem (Backend Core)" as AppLogic
+participant "Data Management Subsystem (Persistence)" as DB
+participant "AI/GenAI Subsystem" as AI
+participant "Google Gemini API" as Gemini
+
+Administrator -> UI: Opens Reports / Feedback / Analytics page
+UI -> AppLogic: GET /admin/<page> (main page render)
+AppLogic -> DB: fetch primary data for the page
+DB --> AppLogic: primary data
+AppLogic --> UI: Rendered HTML page
+UI --> Administrator: Page displayed immediately
+
+note over UI, AI: After DOM load, browser fetches AI insight asynchronously
+
+UI -> AppLogic: GET /admin/<page>/ai-insight (fetch)
+AppLogic -> DB: fetch aggregated data for prompt
+DB --> AppLogic: aggregated data
+AppLogic -> AppLogic: build prompt from data
+AppLogic -> AI: GeminiService.generate(prompt)
+AI -> Gemini: HTTPS generateContent request
+Gemini --> AI: generated text
+AI --> AppLogic: insight text (or fallback message)
+AppLogic --> UI: AIInsightResponse
+UI --> Administrator: Displays AI advisor panel with bullets
+@enduml
+```
+
+_Figure 5.8: SD003 - High-Level Sequence: Asynchronous AI Advisor Panel_
+
+**Description of SD003:**
+
+When the Administrator opens a page that includes an AI advisor (Reports, Feedback, or Analytics), the Backend Core first renders the page using only local data. The AI insight is never fetched during the initial render. After the browser finishes loading the DOM, a separate asynchronous `fetch()` requests the insight endpoint (`/admin/reports/ai-insight`, `/admin/feedback/ai-insight`, or `/admin/analytics/ai-insight`). The corresponding controller aggregates the relevant data, constructs a plain-text prompt, and delegates to `GeminiService`. `GeminiService` calls the Google GenAI Java SDK, which communicates with the Gemini API over HTTPS. If the SDK call succeeds, the generated text is returned to the browser and formatted as styled bullet points. If any failure occurs (network issue, invalid API key, empty response), `GeminiService` catches the exception and returns a human-readable fallback message such as "AI summary unavailable — API call failed." This design guarantees that AI failures never block page rendering or degrade the core user experience.
+
 ### 5.9 State Dynamic Viewpoint
 
 Reactive systems and systems whose internal behavior is of interest use this viewpoint. System dynamics including modes, states, transitions, and reactions to events are described here. This section focuses on the behavior and states of key entities within the Al-Muneer Online Portal, illustrated via state transition diagrams. This informs designers, developers, and testers about the dynamic view of critical parts of the system.
@@ -1239,7 +1572,7 @@ state New {
 New --> Viewed : Admin Opens Inquiry
 Viewed --> Contacted : Admin Contacts Visitor / Updates Status
 Contacted --> Payment_Pending : Admin Requests Payment / Visitor Agrees
-Payment_Pending --> Confirmed : Admin Verifies Payment Proof (UC014)
+Payment_Pending --> Confirmed : Admin Verifies Payment Proof (UC013)
 Confirmed --> Completed : Event Date Passes / Marked by Admin
 
 New --> Cancelled_By_Admin : Admin Rejects/Closes Inquiry
@@ -1260,11 +1593,11 @@ Completed --> [*]
 @enduml
 ```
 
-_Figure 5.8: State Machine Diagram for BookingInquiry Entity_
+_Figure 5.9: State Machine Diagram for BookingInquiry Entity_
 
 **Description of BookingInquiry States:**
 
-The BookingInquiry entity transitions through several states from its creation to its resolution. It begins in a `New` state upon submission. An administrator action moves it to `Viewed` and then potentially `Contacted`. If discussions lead to a tentative agreement, it moves to `Payment_Pending`. Successful verification of payment (from the PaymentProof entity) transitions it to `Confirmed`. The inquiry can be `Cancelled` by either the visitor or admin at various stages. After the event date, a `Confirmed` booking moves to `Completed`.
+The BookingInquiry entity transitions through several states from its creation to its resolution. It begins in a `NEW` state upon submission. An administrator action moves it to `VIEWED` and then potentially `CONTACTED`. If discussions lead to a tentative agreement, it moves to `PAYMENT_PENDING`. Successful verification of a `PaymentProof` (UC013) transitions it to `CONFIRMED` and also marks the linked `AvailabilitySlot` as `BOOKED`. The inquiry can be `CANCELLED_BY_ADMIN` or `CANCELLED_BY_VISITOR` at various stages; visitor self-cancellation is only allowed when no payment proof is attached, and it frees the slot back to `AVAILABLE`. After the event date, an administrator may mark a `CONFIRMED` booking as `COMPLETED`.
 
 ```plantuml
 @startuml
@@ -1280,7 +1613,7 @@ Rejected --> [*] : Processed (Admin may contact visitor)
 @enduml
 ```
 
-_Figure 5.9: State Machine Diagram for PaymentProof Entity_
+_Figure 5.10: State Machine Diagram for PaymentProof Entity_
 
 **Description of PaymentProof States:**
 
@@ -1316,7 +1649,7 @@ For example:
 
 - The algorithm for an **Administrator Managing Payment Status (UC013)** is detailed in its activity diagram in SRS Section 2.3.14. This covers viewing proofs, offline verification, updating status in the system, and notifying the visitor.
 
-Within the backend (Spring Boot application), this logic will primarily be implemented within the Service layer classes (e.g., `InquiryServiceImpl`, `PaymentProofServiceImpl`). These service methods will encapsulate the algorithms depicted in the SRS activity diagrams.
+Within the backend (Spring Boot application), this logic is implemented within the Service layer classes (e.g., `BookingInquiryServiceImpl`, `PaymentProofServiceImpl`). These service methods encapsulate the algorithms depicted in the SRS activity diagrams.
 
 Key algorithmic considerations within these services include:
 
@@ -1330,7 +1663,19 @@ Key algorithmic considerations within these services include:
 
 - **File Handling for Payment Proofs:** The PaymentProofService (utilizing a `FileUploadUtil`) will implement the logic for receiving an uploaded file, validating its type and size, securely storing it in the designated file storage, and associating its path and metadata with the corresponding BookingInquiry.
 
-The detailed design of these specific algorithms, where not fully elaborated by the SRS activity diagrams, will be straightforward implementations of the described business rules within the respective Java service methods, leveraging Spring Boot and JPA functionalities for data access and transaction management. No overly complex or novel algorithms requiring specialized documentation beyond standard procedural logic are anticipated for the core features of this portal.
+Additional algorithmic considerations specific to the implemented system include:
+
+- **Reference Code Generation:** When a `BookingInquiry` is persisted, `@PrePersist` generates a random 9-digit `Long` value in the range `[100_000_000, 999_999_999]` using `ThreadLocalRandom`. This value is stored in a 150-day HTTP-only cookie named `inq_ref` so the visitor can retrieve or cancel their inquiry without authentication.
+
+- **Status Cascade on Payment Proof Verification:** When an administrator marks a `PaymentProof` as `VERIFIED`, the service layer atomically updates the linked `BookingInquiry.status` to `CONFIRMED` and the linked `AvailabilitySlot.status` to `BOOKED`. Rejection leaves the inquiry in its current state for manual follow-up.
+
+- **Visitor Self-Cancellation:** The cancellation service first checks whether the inquiry has any attached payment proofs. If proofs exist, cancellation is rejected with an `IllegalStateException`. Otherwise, the inquiry status becomes `CANCELLED_BY_VISITOR` and the reserved slot returns to `AVAILABLE`.
+
+- **AI Prompt Construction and Graceful Fallback:** Each AI controller builds a plain-text prompt that includes aggregated figures (e.g., conversion rate, cancellation rate, funnel counts, low/high rating samples). The prompt explicitly requests a fixed number of bullet points tied to real numbers. `GeminiService.generate()` wraps the SDK call in a try/catch block; if the response is empty, malformed, or the call throws, a fallback string such as "AI summary unavailable — API call failed." is returned. This guarantees that AI failures are non-blocking.
+
+- **WhatsApp Deep Link Generation:** Client-side JavaScript reads the selected `NotificationTemplate.templateText`, replaces placeholders with values from the current inquiry/payment record, normalises the visitor phone number with the configured country code, URL-encodes the message, and opens `https://wa.me/<number>?text=<message>` in a new tab. No server-side WhatsApp API is used.
+
+The detailed design of these specific algorithms is implemented within the respective Java service methods, leveraging Spring Boot and JPA functionalities for data access and transaction management.
 
 ## 6. User Interface Design
 
@@ -1346,7 +1691,19 @@ Navigation will be managed through a clear, persistent main navigation menu, lik
 
 **6.1.2 Administrator Interface (Admin Panel):**
 
-Access to the admin panel will be secured via a login page. Navigation within the admin panel will be provided by a sidebar or top navigation menu, granting access to various management modules: Dashboard (for an overview), Content Management (covering Venue Info and FAQs), Media Gallery, Availability Calendar, Pricing, Inquiries, Payment Proofs, Feedback, Reports, and Notification Settings. The layout will typically feature a dashboard presenting summary information, followed by dedicated pages for managing specific data types, often employing tables for listing records and forms for editing or adding new ones. The primary language of the administrator interface will be Arabic to ensure ease of use for Mr. Almunajid. Interactivity in the admin panel will include data entry forms, tables with basic sorting and filtering capabilities, and action buttons such as Save, Update, Delete, View, Approve, and Reject. File upload widgets will also be present.
+Access to the admin panel will be secured via a login page. Navigation within the admin panel will be provided by a sidebar granting access to management modules: Dashboard (overview), Venue Info, Media Gallery, Gallery Labels, Availability Calendar, Pricing, Booking Inquiries, Payment Proofs, Customer Feedback, Reports, Analytics, and Notification Templates. The layout will typically feature a dashboard presenting summary cards (new inquiries, pending proofs, unreviewed feedback, visits today/last 7 days, average rating), followed by dedicated pages for managing specific data types, often employing tables, filter bars, and forms. The Reports and Analytics pages include Chart.js visualisations and an asynchronous AI advisor card that loads after the page renders. The primary language of the administrator interface will be Arabic to ensure ease of use for Mr. Almunajid. Interactivity in the admin panel will include data entry forms, tables with client-side search and status filters, action buttons (Save, Update, Delete, View, Verify, Reject, Mark Reviewed), file upload widgets, and a WhatsApp template selector that generates a `wa.me` deep link on inquiry/payment detail pages.
+
+**AI Advisor Panels:**
+
+Three admin pages include optional AI advisor cards:
+
+- **Reports Page:** Displays an "AI Business Report Advisor" card showing 3 bullet points derived from the current period's inquiry, payment, and feedback figures.
+
+- **Feedback Page:** Displays an "AI Feedback Advisor" card highlighting what guests love, the most urgent complaint, and one concrete action.
+
+- **Analytics Page:** Displays an "AI Traffic Funnel Advisor" card analysing Home → Gallery → Pricing → Inquiry visit counts and suggesting one conversion improvement.
+
+Each card initially shows a spinner and loads its content asynchronously via `fetch()`. If the Gemini API is unavailable or unconfigured, the card displays a graceful fallback message instead of crashing the page.
 
 ### 6.2 Screen Images (English Version)
 
