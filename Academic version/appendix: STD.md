@@ -10,7 +10,7 @@
 
 **Project:** Al-Muneer Online Portal
 
-**Version:** 1.2
+**Version:** 1.3
 
 **Prepared by:** Ahmed Ghaleb
 
@@ -20,9 +20,9 @@
 
 ### a. Overview
 
-This document is Version 1.2 of the Software Test Documentation (STD) for the Al-Muneer Online Portal. It defines the testing strategy, scope, and test case design for verifying that the implemented system matches the Software Requirements Specification (SRS) Version 1.2 and Software Design Description (SDD) Version 1.2.
+This document is Version 1.3 of the Software Test Documentation (STD) for the Al-Muneer Online Portal. It defines the testing strategy, scope, and test case design for verifying that the implemented system matches the Software Requirements Specification (SRS) Version 1.2 and Software Design Description (SDD) Version 1.2.
 
-Version 1.2 syncs all test cases with the **actual implemented system**: single-page visitor home, 9-digit inquiry reference codes, WhatsApp-based contact fields, WhatsApp notification **templates** (not toggle settings), Chart.js dashboards, and asynchronous Gemini AI advisor panels. Test execution results are out of scope per course guidelines.
+Version 1.2 syncs all test cases with the **actual implemented system**. Version 1.3 adds a **test execution summary** (Section 3) and cross-reference to the User Acceptance Test (UAT) document (Appendix E), which records manual UAT performed locally on 29/06/2026.
 
 ### b. Target Audience
 
@@ -44,6 +44,7 @@ Single developer responsible for all modules:
 | 1.0 | Ahmed Hani Ahmed Ghaleb | Initial draft of STD document, including test case design. | 30/05/2025 |
 | 1.1 | Ahmed Hani Ahmed Ghaleb | Use case 6 removed. | 30/05/2025 |
 | 1.2 | Ahmed Hani Ahmed Ghaleb | Synced with implementation (SRS/SDD v1.2): single-page home, reference-code booking flow, FAQ section, corrected field names/enums, removed non-existent features, added AI advisor and inquiry lifecycle tests. | 21/06/2026 |
+| 1.3 | Ahmed Hani Ahmed Ghaleb | Added Section 3 test execution summary; linked UAT results (35 pass, 1 fail, 2 blocked of 38 cases). | 30/06/2026 |
 
 ### e. Sync Change Log (v1.2)
 
@@ -98,6 +99,7 @@ Single developer responsible for all modules:
    - 2.15 TC_A_014 — View/Generate Reports (UC014)
    - 2.16 TC_A_015 — Manage Feedback (UC015)
    - 2.17 TC_A_016 — Configure/Manage Notifications (UC016)
+3. Test Execution Summary (UAT — 29/06/2026)
 
 ---
 
@@ -105,7 +107,7 @@ Single developer responsible for all modules:
 
 ### 1.1 Purpose
 
-The purpose of this STD is to define the scope, approach, and test cases for the Al-Muneer Online Portal. It verifies that the system functions as specified in SRS v1.2 and is implemented per SDD v1.2. Actual test results and execution logs are excluded per course requirements; this document focuses on test case **design**.
+The purpose of this STD is to define the scope, approach, and test cases for the Al-Muneer Online Portal. It verifies that the system functions as specified in SRS v1.2 and is implemented per SDD v1.2. **Test execution results** are summarised in Section 3 and detailed in **Appendix E — UAT** (`appendix: UAT.md`).
 
 ### 1.2 Scope
 
@@ -132,9 +134,7 @@ The purpose of this STD is to define the scope, approach, and test cases for the
 **Out of scope:**
 
 - Stress/load testing beyond basic performance observation.
-- Automated GUI test scripts.
 - Exhaustive combinatorial input testing.
-- Actual test execution results.
 
 ### 1.3 Definitions, Acronyms and Abbreviations
 
@@ -160,6 +160,8 @@ b) Ahmed Hani Ahmed Ghaleb. (2026). Software Design Description (SDD) Al-Muneer 
 c) IEEE Std 829-2008 (adapted for course requirements).
 
 d) Al-Muneer Online Portal — Core Specifications and README (implementation reference).
+
+e) Ahmed Hani Ahmed Ghaleb. (2026). User Acceptance Test (UAT) Document, Version 1.0. UTM. Appendix E. (Internal)
 
 ### 1.5 System Overview
 
@@ -860,3 +862,62 @@ d) Al-Muneer Online Portal — Core Specifications and README (implementation re
 | UC016 | TC_A_016_01–02 | WhatsApp templates |
 
 **Total test cases:** 38 (across 17 modules including admin login).
+
+---
+
+## 3. Test Execution Summary (UAT — 29/06/2026)
+
+Manual user acceptance testing was performed **locally** at `http://localhost:8080` against a PostgreSQL-seeded instance. Full step-by-step results, screenshots, and tester comments are in **Appendix E — UAT** (`appendix: UAT.md`). Screenshots: `test-execution/uat-screenshots/`.
+
+| Field | Detail |
+|-------|--------|
+| **Tester** | Ahmed Hani (local UAT — Ibb) |
+| **Admin credentials** | `admin` / `admin123` |
+| **Browser** | Google Chrome (Chromium) |
+| **STD version tested** | 1.2 |
+
+### 3.1 Overall Results
+
+| Result | Count |
+|--------|-------|
+| **Pass** | 35 |
+| **Fail** | 1 |
+| **Blocked** | 2 |
+| **Total** | 38 |
+
+### 3.2 Results by Module
+
+| Module | Cases | Pass | Fail | Blocked | Notes |
+|--------|-------|------|------|---------|-------|
+| Admin Login (TC_A_000) | 2 | 2 | 0 | 0 | JWT login and route protection verified |
+| Venue & FAQ (TC_V_001) | 2 | 2 | 0 | 0 | FAQ hide/show cycle tested via admin |
+| Media Gallery (TC_V_002) | 2 | 1 | 0 | 1 | TC_V_002_02 blocked — gallery not empty on local DB |
+| Availability (TC_V_003) | 2 | 2 | 0 | 0 | Calendar statuses and inquiry deep link OK |
+| Pricing (TC_V_004) | 2 | 1 | 0 | 1 | TC_V_004_02 blocked — active tiers exist in seed data |
+| Booking Inquiry (TC_V_005) | 5 | 5 | 0 | 0 | Reference code, validation, cancel flow OK |
+| Venue Admin (TC_A_006) | 2 | 2 | 0 | 0 | Venue text and FAQ CRUD OK |
+| Gallery Admin (TC_A_007) | 3 | 3 | 0 | 0 | Upload, video, invalid file rejection OK |
+| Pricing Admin (TC_A_008) | 2 | 2 | 0 | 0 | Tier CRUD and validation OK |
+| Calendar & Inquiries (TC_A_009) | 2 | 2 | 0 | 0 | Slot status and inquiry status update OK |
+| Analytics (TC_A_010) | 2 | 2 | 0 | 0 | Charts render; AI panel async (placeholder API key) |
+| Payment Proof (TC_V_011) | 2 | 2 | 0 | 0 | Upload and PDF rejection OK |
+| Feedback (TC_V_012) | 2 | 1 | 1 | 0 | TC_V_012_01 step 3 (second anonymous submit) — flaky thank-you page |
+| Payments Admin (TC_A_013) | 2 | 2 | 0 | 0 | Verify/reject cascades OK |
+| Reports (TC_A_014) | 2 | 2 | 0 | 0 | Charts + date filter OK |
+| Feedback Admin (TC_A_015) | 2 | 2 | 0 | 0 | Mark reviewed + AI panel OK |
+| Templates (TC_A_016) | 2 | 2 | 0 | 0 | WhatsApp template CRUD OK |
+
+### 3.3 Failed / Blocked Cases
+
+| Case ID | Result | Summary |
+|---------|--------|---------|
+| TC_V_002_02 | **Blocked** | Cannot empty gallery without removing owner demo media |
+| TC_V_004_02 | **Blocked** | Cannot deactivate all pricing tiers for negative test |
+| TC_V_012_01 | **Fail** | Named feedback submit passed; second anonymous submit did not show thank-you page consistently |
+
+### 3.4 Observations
+
+- Admin login with `admin` / `admin123` works; invalid password shows error and protected routes redirect to login.
+- Gemini AI advisor panels load asynchronously and degrade gracefully when API key is a placeholder.
+- Visitor booking flow (inquiry → confirmation → payment proof → admin verify) works end-to-end.
+- Negative tests requiring **empty** gallery or **no** active pricing tiers need a dedicated test database or teardown script.

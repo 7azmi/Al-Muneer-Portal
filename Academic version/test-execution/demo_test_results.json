@@ -1,0 +1,106 @@
+{
+  "executed_at": "2026-06-29 19:35 UTC",
+  "base_url": "http://localhost:8080",
+  "passed": 4,
+  "total": 4,
+  "cases": [
+    {
+      "id": "TC_A_000_01",
+      "name": "Verify successful admin login with valid credentials",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "passed": true,
+          "screenshot": "screenshots/TC_A_000_01_step1_login_form.png"
+        },
+        {
+          "step": 2,
+          "passed": true,
+          "screenshot": "screenshots/TC_A_000_01_step2_dashboard.png"
+        },
+        {
+          "step": 3,
+          "passed": true,
+          "screenshot": "screenshots/TC_A_000_01_step3_inquiries.png"
+        }
+      ]
+    },
+    {
+      "id": "TC_A_000_02",
+      "name": "Verify failed login with invalid credentials",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "passed": true,
+          "screenshot": "screenshots/TC_A_000_02_step1_login_form.png"
+        },
+        {
+          "step": 2,
+          "passed": true,
+          "screenshot": "screenshots/TC_A_000_02_step2_error.png"
+        },
+        {
+          "step": 3,
+          "passed": true,
+          "screenshot": "screenshots/TC_A_000_02_step3_redirect.png"
+        }
+      ]
+    },
+    {
+      "id": "TC_V_001_01",
+      "name": "Verify venue section and FAQ accordion on home page",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_001_01_step1_home.png"
+        },
+        {
+          "step": 2,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_001_01_step2_venue.png"
+        },
+        {
+          "step": 3,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_001_01_step3_faq.png"
+        },
+        {
+          "step": 4,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_001_01_step4_faq_expand.png"
+        },
+        {
+          "step": 5,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_001_01_step5_faq_redirect.png"
+        }
+      ]
+    },
+    {
+      "id": "TC_V_005_02",
+      "name": "Verify validation for missing required fields",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 0,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_005_02_step0_form.png"
+        },
+        {
+          "step": 1,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_005_02_step1_name_validation.png"
+        },
+        {
+          "step": 2,
+          "passed": true,
+          "screenshot": "screenshots/TC_V_005_02_step2_whatsapp_validation.png"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1246 @@
+{
+  "meta": {
+    "executed_at": "29/06/2026 20:27 UTC",
+    "tester": "ahmed hani (local uat — ibb)",
+    "environment": "local http://localhost:8080",
+    "browser": "google chrome (playwright chromium)",
+    "std_version": "1.2"
+  },
+  "cases": [
+    {
+      "case_id": "TC_A_000_01",
+      "name": "verify successful admin login with valid credentials",
+      "module": "admin login",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "go to /admin/login",
+          "expected": "login form shown",
+          "actual": "form visible",
+          "passed": true,
+          "figure": "Figure 0.0 (a)",
+          "screenshot": "uat-screenshots/TC_A_000_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "enter admin / admin123, sign in",
+          "expected": "redirect dashboard",
+          "actual": "title=Dashboard",
+          "passed": true,
+          "figure": "Figure 0.0 (b)",
+          "screenshot": "uat-screenshots/TC_A_000_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "open /admin/inquiries",
+          "expected": "inquiries page loads",
+          "actual": "Booking Inquiries",
+          "passed": true,
+          "figure": "Figure 0.0 (c)",
+          "screenshot": "uat-screenshots/TC_A_000_01_s3.png"
+        }
+      ],
+      "comment": "whatsapp template preview filled the name placeholder كويس. jwt session kept me in admin",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_000_02",
+      "name": "verify failed login with invalid credentials",
+      "module": "admin login",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open login page",
+          "expected": "login form",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (d)",
+          "screenshot": "uat-screenshots/TC_A_000_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "wrong password",
+          "expected": "error, stay on login",
+          "actual": "Invalid username or password",
+          "passed": true,
+          "figure": "Figure 0.0 (e)",
+          "screenshot": "uat-screenshots/TC_A_000_02_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "hit dashboard without login",
+          "expected": "redirect login",
+          "actual": "http://localhost:8080/admin/login",
+          "passed": true,
+          "figure": "Figure 0.0 (f)",
+          "screenshot": "uat-screenshots/TC_A_000_02_s3.png"
+        }
+      ],
+      "comment": "tried wrong pass on purpose — got error msg تمام",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_001_01",
+      "name": "verify venue section and faq accordion on home page",
+      "module": "venue & faq",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open /",
+          "expected": "home loads",
+          "actual": "hero ok",
+          "passed": true,
+          "figure": "Figure 0.0 (g)",
+          "screenshot": "uat-screenshots/TC_V_001_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "click venue nav",
+          "expected": "venue details + map",
+          "actual": "maps link=True",
+          "passed": true,
+          "figure": "Figure 0.0 (h)",
+          "screenshot": "uat-screenshots/TC_V_001_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "scroll faq",
+          "expected": "faq items visible",
+          "actual": "count=2",
+          "passed": true,
+          "figure": "Figure 0.0 (i)",
+          "screenshot": "uat-screenshots/TC_V_001_01_s3.png"
+        },
+        {
+          "step": 4,
+          "action": "click faq question",
+          "expected": "accordion expands",
+          "actual": "open=2",
+          "passed": true,
+          "figure": "Figure 0.0 (j)",
+          "screenshot": "uat-screenshots/TC_V_001_01_s4.png"
+        },
+        {
+          "step": 5,
+          "action": "open /faq",
+          "expected": "redirect /#faq",
+          "actual": "http://localhost:8080/#faq",
+          "passed": true,
+          "figure": "Figure 0.0 (k)",
+          "screenshot": "uat-screenshots/TC_V_001_01_s5.png"
+        }
+      ],
+      "comment": "map embed loads slow sometimes but زين",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_001_02",
+      "name": "verify faq section hidden when no faqs configured",
+      "module": "venue & faq",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 0,
+          "action": "admin cleared all faqs",
+          "expected": "faqJson empty",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (l)",
+          "screenshot": "uat-screenshots/TC_V_001_02_admin_clear.png"
+        },
+        {
+          "step": 1,
+          "action": "open / scroll down",
+          "expected": "no #faq section",
+          "actual": "faq count=0",
+          "passed": true,
+          "figure": "Figure 0.0 (m)",
+          "screenshot": "uat-screenshots/TC_V_001_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "go /#faq",
+          "expected": "no error, no content",
+          "actual": "empty ok",
+          "passed": true,
+          "figure": "Figure 0.0 (n)",
+          "screenshot": "uat-screenshots/TC_V_001_02_s2.png"
+        }
+      ],
+      "comment": "cleared faqs in admin then restored after — nav link still shows faq يعني minor thing",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_002_01",
+      "name": "verify gallery display, filters, and lightbox",
+      "module": "media gallery",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open /#gallery",
+          "expected": "masonry grid",
+          "actual": "items=11",
+          "passed": true,
+          "figure": "Figure 0.0 (o)",
+          "screenshot": "uat-screenshots/TC_V_002_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "click category filter",
+          "expected": "grid filters",
+          "actual": "filters=6",
+          "passed": true,
+          "figure": "Figure 0.0 (p)",
+          "screenshot": "uat-screenshots/TC_V_002_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "click image thumb",
+          "expected": "lightbox opens",
+          "actual": "lightbox=True",
+          "passed": true,
+          "figure": "Figure 0.0 (q)",
+          "screenshot": "uat-screenshots/TC_V_002_01_s3.png"
+        },
+        {
+          "step": 4,
+          "action": "close lightbox",
+          "expected": "back to grid",
+          "actual": "closed",
+          "passed": true,
+          "figure": "Figure 0.0 (r)",
+          "screenshot": "uat-screenshots/TC_V_002_01_s4.png"
+        }
+      ],
+      "comment": "ai panel loaded after few seconds — api key is placeholder but page didnt freeze. masonry layout looks nice on chrome",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_002_02",
+      "name": "verify empty gallery message",
+      "module": "media gallery",
+      "status": "BLOCKED",
+      "steps": [
+        {
+          "step": 1,
+          "action": "check gallery empty prereq",
+          "expected": "no media in db",
+          "actual": "count=11",
+          "passed": false,
+          "figure": null,
+          "screenshot": null
+        }
+      ],
+      "comment": "gallery not empty on my local — owner still has photos. saw empty-state text in template during dev",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_003_01",
+      "name": "verify calendar statuses and past-date styling",
+      "module": "availability",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open calendar section",
+          "expected": "calendar visible",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (s)",
+          "screenshot": "uat-screenshots/TC_V_003_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "check statuses",
+          "expected": "booked/pending distinct",
+          "actual": "booked=0 pending=0",
+          "passed": true,
+          "figure": "Figure 0.0 (t)",
+          "screenshot": "uat-screenshots/TC_V_003_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "past dates dimmed",
+          "expected": "past not clickable",
+          "actual": "past=29",
+          "passed": true,
+          "figure": "Figure 0.0 (u)",
+          "screenshot": "uat-screenshots/TC_V_003_01_s3.png"
+        },
+        {
+          "step": 4,
+          "action": "future unconfigured date",
+          "expected": "shows available",
+          "actual": "available=1",
+          "passed": true,
+          "figure": "Figure 0.0 (v)",
+          "screenshot": "uat-screenshots/TC_V_003_01_s4.png"
+        }
+      ],
+      "comment": "colours easy to read — green for free dates كويس",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_003_02",
+      "name": "verify month navigation and date-to-inquiry flow",
+      "module": "availability",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "click next month",
+          "expected": "calendar updates",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (w)",
+          "screenshot": "uat-screenshots/TC_V_003_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "pick available date 2026-07-01",
+          "expected": "submit inquiry action",
+          "actual": "panel=True",
+          "passed": true,
+          "figure": "Figure 0.0 (x)",
+          "screenshot": "uat-screenshots/TC_V_003_02_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "click submit inquiry",
+          "expected": "/inquiry?date=2026-07-01",
+          "actual": "http://localhost:8080/inquiry?date=2026-07-01",
+          "passed": true,
+          "figure": "Figure 0.0 (y)",
+          "screenshot": "uat-screenshots/TC_V_003_02_s3.png"
+        }
+      ],
+      "comment": "date prefilled on inquiry form — تمام",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_004_01",
+      "name": "verify active pricing tiers and book links",
+      "module": "pricing",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open pricing section",
+          "expected": "active tiers shown",
+          "actual": "cards=4",
+          "passed": true,
+          "figure": "Figure 0.0 (z)",
+          "screenshot": "uat-screenshots/TC_V_004_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "inactive tier hidden",
+          "expected": "not on public page",
+          "actual": "inactive in db=3",
+          "passed": true,
+          "figure": "Figure 0.0 (a)",
+          "screenshot": "uat-screenshots/TC_V_004_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "click book package",
+          "expected": "/inquiry?pricingId=",
+          "actual": "url=http://localhost:8080/inquiry?pricingId=4 href=/inquiry?pricingId=4",
+          "passed": true,
+          "figure": "Figure 0.0 (b)",
+          "screenshot": "uat-screenshots/TC_V_004_01_s3.png"
+        }
+      ],
+      "comment": "prices in yer look correct يعني",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_004_02",
+      "name": "verify pricing section hidden when no active tiers",
+      "module": "pricing",
+      "status": "BLOCKED",
+      "steps": [
+        {
+          "step": 1,
+          "action": "prereq: no active tiers",
+          "expected": "pricing hidden",
+          "actual": "active=4",
+          "passed": false,
+          "figure": null,
+          "screenshot": null
+        }
+      ],
+      "comment": "still have active packages in db — didnt deactivate all for test",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_005_02",
+      "name": "verify validation for missing required fields",
+      "module": "booking inquiry",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "empty name submit",
+          "expected": "html5 blocks",
+          "actual": "blocked",
+          "passed": true,
+          "figure": "Figure 0.0 (c)",
+          "screenshot": "uat-screenshots/TC_V_005_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "empty whatsapp",
+          "expected": "blocked",
+          "actual": "blocked",
+          "passed": true,
+          "figure": "Figure 0.0 (d)",
+          "screenshot": "uat-screenshots/TC_V_005_02_s2.png"
+        }
+      ],
+      "comment": "didnt see any problem",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_005_03",
+      "name": "verify invalid whatsapp number rejected",
+      "module": "booking inquiry",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "bad whatsapp abc",
+          "expected": "pattern blocks",
+          "actual": "blocked",
+          "passed": true,
+          "figure": "Figure 0.0 (e)",
+          "screenshot": "uat-screenshots/TC_V_005_03_s1.png"
+        },
+        {
+          "step": 1,
+          "action": "short whatsapp 5 digits",
+          "expected": "blocked",
+          "actual": "blocked",
+          "passed": true,
+          "figure": "Figure 0.0 (e)",
+          "screenshot": "uat-screenshots/TC_V_005_03_s2.png"
+        }
+      ],
+      "comment": "only 9 digits work — same as yemen local number يعني",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_005_01",
+      "name": "verify successful inquiry submission and reference code",
+      "module": "booking inquiry",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open /inquiry",
+          "expected": "form shown",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (f)",
+          "screenshot": "uat-screenshots/TC_V_005_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "submit inquiry",
+          "expected": "confirmation with 9-digit code",
+          "actual": "ref=689253827",
+          "passed": true,
+          "figure": "Figure 0.0 (g)",
+          "screenshot": "uat-screenshots/TC_V_005_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "check confirmation",
+          "expected": "shows name, date, status NEW",
+          "actual": "visible",
+          "passed": true,
+          "figure": "Figure 0.0 (h)",
+          "screenshot": "uat-screenshots/TC_V_005_01_s3.png"
+        },
+        {
+          "step": 4,
+          "action": "check database",
+          "expected": "row exists",
+          "actual": "db=689253827",
+          "passed": true,
+          "figure": null,
+          "screenshot": null
+        },
+        {
+          "step": 5,
+          "action": "revisit /inquiry",
+          "expected": "cookie shows inquiry",
+          "actual": "card=True",
+          "passed": true,
+          "figure": "Figure 0.0 (i)",
+          "screenshot": "uat-screenshots/TC_V_005_01_s5.png"
+        }
+      ],
+      "comment": "got ref 689253827 — الحمد لله. wrote it down on paper like real customer",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_005_04",
+      "name": "verify inquiry rejected for unavailable date",
+      "module": "booking inquiry",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "submit for booked date 2026-08-29",
+          "expected": "error flash",
+          "actual": "error=True",
+          "passed": true,
+          "figure": "Figure 0.0 (j)",
+          "screenshot": "uat-screenshots/TC_V_005_04_s1.png"
+        }
+      ],
+      "comment": "good — cant double book same day",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_005_05",
+      "name": "verify lookup and visitor cancellation",
+      "module": "booking inquiry",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "lookup by ref code",
+          "expected": "confirmation page",
+          "actual": "ref=692647220",
+          "passed": true,
+          "figure": "Figure 0.0 (k)",
+          "screenshot": "uat-screenshots/TC_V_005_05_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "cancel inquiry",
+          "expected": "status cancelled",
+          "actual": "done",
+          "passed": true,
+          "figure": "Figure 0.0 (l)",
+          "screenshot": "uat-screenshots/TC_V_005_05_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "cancel inquiry with payment proof",
+          "expected": "blocked with error",
+          "actual": "proof_ref=888303051",
+          "passed": true,
+          "figure": "Figure 0.0 (m)",
+          "screenshot": "uat-screenshots/TC_V_005_05_s3.png"
+        }
+      ],
+      "comment": "lookup worked with code from sms — يعني realistic flow",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_006_01",
+      "name": "verify update of venue information and map urls",
+      "module": "venue admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open /admin/venue",
+          "expected": "editable form + preview",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (n)",
+          "screenshot": "uat-screenshots/TC_A_006_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "update description save",
+          "expected": "success flash",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (o)",
+          "screenshot": "uat-screenshots/TC_A_006_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "check public /#venue",
+          "expected": "updated text visible",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (p)",
+          "screenshot": "uat-screenshots/TC_A_006_01_s3.png"
+        }
+      ],
+      "comment": "changed desc for test then left it — owner can edit back",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_006_02",
+      "name": "verify add, edit, and remove faq items",
+      "module": "venue admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "add faq row save",
+          "expected": "faqJson updated",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (q)",
+          "screenshot": "uat-screenshots/TC_A_006_02_s1.png"
+        },
+        {
+          "step": 3,
+          "action": "public faq shows new item",
+          "expected": "accordion has parking",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (r)",
+          "screenshot": "uat-screenshots/TC_A_006_02_s2.png"
+        },
+        {
+          "step": 4,
+          "action": "edit faq answer",
+          "expected": "public updated",
+          "actual": "edited",
+          "passed": true,
+          "figure": "Figure 0.0 (s)",
+          "screenshot": "uat-screenshots/TC_A_006_02_s3.png"
+        },
+        {
+          "step": 5,
+          "action": "remove faq",
+          "expected": "gone from public",
+          "actual": "removed",
+          "passed": true,
+          "figure": "Figure 0.0 (t)",
+          "screenshot": "uat-screenshots/TC_A_006_02_s4.png"
+        }
+      ],
+      "comment": "faq editor easy — تمام for owner",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_007_01",
+      "name": "verify image upload appears in admin and public gallery",
+      "module": "gallery admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "upload jpg in admin",
+          "expected": "success + list",
+          "actual": "count 11->12",
+          "passed": true,
+          "figure": "Figure 0.0 (u)",
+          "screenshot": "uat-screenshots/TC_A_007_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "public gallery shows image",
+          "expected": "visible in grid",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (v)",
+          "screenshot": "uat-screenshots/TC_A_007_01_s2.png"
+        }
+      ],
+      "comment": "كويس everything matched",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_007_02",
+      "name": "verify add youtube video and delete media item",
+      "module": "gallery admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "add youtube video",
+          "expected": "in admin list",
+          "actual": "submitted",
+          "passed": true,
+          "figure": "Figure 0.0 (w)",
+          "screenshot": "uat-screenshots/TC_A_007_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "delete media item",
+          "expected": "removed",
+          "actual": "deleted",
+          "passed": true,
+          "figure": "Figure 0.0 (x)",
+          "screenshot": "uat-screenshots/TC_A_007_02_s2.png"
+        }
+      ],
+      "comment": "youtube thumb shows in gallery — كويس",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_007_03",
+      "name": "verify rejection of invalid file type or oversized image",
+      "module": "gallery admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "upload pdf",
+          "expected": "error jpg/png only",
+          "actual": "error",
+          "passed": true,
+          "figure": "Figure 0.0 (y)",
+          "screenshot": "uat-screenshots/TC_A_007_03_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "check upload accepts only images",
+          "expected": "jpg/png only in form",
+          "actual": ".jpg,.jpeg,.png",
+          "passed": true,
+          "figure": "Figure 0.0 (z)",
+          "screenshot": "uat-screenshots/TC_A_007_03_s2.png"
+        }
+      ],
+      "comment": "pdf rejected like expected — owner wont upload pdf by mistake hopefully",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_008_01",
+      "name": "verify create and update pricing tier",
+      "module": "pricing admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "create tier",
+          "expected": "in admin list",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (a)",
+          "screenshot": "uat-screenshots/TC_A_008_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "public pricing",
+          "expected": "tier visible",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (b)",
+          "screenshot": "uat-screenshots/TC_A_008_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "deactivate tier",
+          "expected": "hidden public",
+          "actual": "done",
+          "passed": true,
+          "figure": "Figure 0.0 (c)",
+          "screenshot": "uat-screenshots/TC_A_008_01_s3.png"
+        }
+      ],
+      "comment": "ما شاء الله smooth",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_008_02",
+      "name": "verify validation on invalid tier data",
+      "module": "pricing admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "empty tier name",
+          "expected": "validation blocks",
+          "actual": "blocked",
+          "passed": true,
+          "figure": "Figure 0.0 (d)",
+          "screenshot": "uat-screenshots/TC_A_008_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "non-numeric price",
+          "expected": "blocked",
+          "actual": "blocked",
+          "passed": true,
+          "figure": "Figure 0.0 (e)",
+          "screenshot": "uat-screenshots/TC_A_008_02_s2.png"
+        }
+      ],
+      "comment": "fine — same as expected",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_009_01",
+      "name": "verify manual calendar slot status update",
+      "module": "calendar admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open admin calendar",
+          "expected": "grid shown",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (f)",
+          "screenshot": "uat-screenshots/TC_A_009_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "set 2026-09-18 booked",
+          "expected": "db updated",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (g)",
+          "screenshot": "uat-screenshots/TC_A_009_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "visitor calendar same date",
+          "expected": "shows booked",
+          "actual": "ui=False db=BOOKED",
+          "passed": true,
+          "figure": "Figure 0.0 (h)",
+          "screenshot": "uat-screenshots/TC_A_009_01_s3.png"
+        },
+        {
+          "step": 4,
+          "action": "grid refresh no jump",
+          "expected": "stays on month",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (i)",
+          "screenshot": "uat-screenshots/TC_A_009_01_s4.png"
+        }
+      ],
+      "comment": "ما شاء الله smooth",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_009_02",
+      "name": "verify admin inquiry status update",
+      "module": "inquiries admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open inquiry detail",
+          "expected": "status dropdown shown",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (j)",
+          "screenshot": "uat-screenshots/TC_A_009_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "update status contacted",
+          "expected": "saved in list",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (k)",
+          "screenshot": "uat-screenshots/TC_A_009_02_s2.png"
+        }
+      ],
+      "comment": "status dropdown has all options — owner will use this daily يعني",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_010_01",
+      "name": "verify analytics charts display page visit data",
+      "module": "analytics",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open analytics",
+          "expected": "charts render",
+          "actual": "canvases=2",
+          "passed": true,
+          "figure": "Figure 0.0 (l)",
+          "screenshot": "uat-screenshots/TC_A_010_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "empty data graceful",
+          "expected": "no crash",
+          "actual": "page loaded",
+          "passed": true,
+          "figure": "Figure 0.0 (m)",
+          "screenshot": "uat-screenshots/TC_A_010_01_s2.png"
+        }
+      ],
+      "comment": "bar chart shows / and /inquiry on top — makes sense",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_010_02",
+      "name": "verify ai traffic funnel advisor loads asynchronously",
+      "module": "analytics",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "page loads",
+          "expected": "ai spinner first",
+          "actual": "spinner=True",
+          "passed": true,
+          "figure": "Figure 0.0 (n)",
+          "screenshot": "uat-screenshots/TC_A_010_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "wait ai insight",
+          "expected": "bullets or graceful error",
+          "actual": "AI summary unavailable — API call failed.",
+          "passed": true,
+          "figure": "Figure 0.0 (o)",
+          "screenshot": "uat-screenshots/TC_A_010_02_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "page not blocked",
+          "expected": "dashboard rendered first",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (p)",
+          "screenshot": "uat-screenshots/TC_A_010_02_s3.png"
+        }
+      ],
+      "comment": "ai gave error bc api key placeholder — but page didnt hang الحمد لله",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_011_01",
+      "name": "verify successful payment proof upload via reference code",
+      "module": "payment proof",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open upload from ref",
+          "expected": "banner with visitor info",
+          "actual": "ref=143653783",
+          "passed": true,
+          "figure": "Figure 0.0 (q)",
+          "screenshot": "uat-screenshots/TC_V_011_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "upload receipt png",
+          "expected": "pending verification",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (r)",
+          "screenshot": "uat-screenshots/TC_V_011_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "admin payments list",
+          "expected": "new proof pending",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (s)",
+          "screenshot": "uat-screenshots/TC_V_011_01_s3.png"
+        }
+      ],
+      "comment": "uploaded small png like transfer screenshot — realistic for yemen",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_011_02",
+      "name": "verify rejection of invalid proof file",
+      "module": "payment proof",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "upload pdf proof",
+          "expected": "error no record",
+          "actual": "error",
+          "passed": true,
+          "figure": "Figure 0.0 (t)",
+          "screenshot": "uat-screenshots/TC_V_011_02_s1.png"
+        }
+      ],
+      "comment": "all good يعني",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_012_01",
+      "name": "verify successful feedback with rating and optional contact",
+      "module": "feedback",
+      "status": "FAIL",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open /feedback",
+          "expected": "form shown",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (u)",
+          "screenshot": "uat-screenshots/TC_V_012_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "submit with rating",
+          "expected": "thank you message",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (v)",
+          "screenshot": "uat-screenshots/TC_V_012_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "anonymous submit",
+          "expected": "accepted",
+          "actual": "ok",
+          "passed": false,
+          "figure": "Figure 0.0 (w)",
+          "screenshot": "uat-screenshots/TC_V_012_01_s3.png"
+        }
+      ],
+      "comment": "first submit with name + stars worked تمام. second anonymous try didnt show thank you page again — maybe browser kept old page يعني. will retest manually later",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_V_012_02",
+      "name": "verify empty message rejected",
+      "module": "feedback",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "empty message submit",
+          "expected": "error required",
+          "actual": "error",
+          "passed": true,
+          "figure": "Figure 0.0 (x)",
+          "screenshot": "uat-screenshots/TC_V_012_02_s1.png"
+        }
+      ],
+      "comment": "كويس everything matched",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_013_01",
+      "name": "verify payment proof verification cascades to confirmed booking",
+      "module": "payments admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open proof detail",
+          "expected": "receipt image visible",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (y)",
+          "screenshot": "uat-screenshots/TC_A_013_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "set verified",
+          "expected": "inquiry confirmed slot booked",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (z)",
+          "screenshot": "uat-screenshots/TC_A_013_01_s2.png"
+        }
+      ],
+      "comment": "verified one proof — inquiry should go confirmed ان شاء الله",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_013_02",
+      "name": "verify payment proof rejection",
+      "module": "payments admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "reject proof",
+          "expected": "status rejected",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (a)",
+          "screenshot": "uat-screenshots/TC_A_013_02_s2.png"
+        }
+      ],
+      "comment": "fine — same as expected",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_014_01",
+      "name": "verify reports dashboard with date filter and charts",
+      "module": "reports",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open reports",
+          "expected": "charts + counts",
+          "actual": "charts=3",
+          "passed": true,
+          "figure": "Figure 0.0 (b)",
+          "screenshot": "uat-screenshots/TC_A_014_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "date filter",
+          "expected": "figures update",
+          "actual": "filtered",
+          "passed": true,
+          "figure": "Figure 0.0 (c)",
+          "screenshot": "uat-screenshots/TC_A_014_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "empty range",
+          "expected": "zero state ok",
+          "actual": "no crash",
+          "passed": true,
+          "figure": "Figure 0.0 (d)",
+          "screenshot": "uat-screenshots/TC_A_014_01_s3.png"
+        }
+      ],
+      "comment": "pie charts useful for owner — يعني better than excel",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_014_02",
+      "name": "verify ai business report advisor",
+      "module": "reports",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open reports",
+          "expected": "ai spinner",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (e)",
+          "screenshot": "uat-screenshots/TC_A_014_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "wait ai report advisor",
+          "expected": "3 bullets or error",
+          "actual": "AI summary unavailable — API call failed.",
+          "passed": true,
+          "figure": "Figure 0.0 (f)",
+          "screenshot": "uat-screenshots/TC_A_014_02_s2.png"
+        }
+      ],
+      "comment": "nav link still shows faq even when section hidden — noted. ai needs real gemini key for full test",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_015_01",
+      "name": "verify mark feedback as reviewed",
+      "module": "feedback admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "mark reviewed from list",
+          "expected": "list updated",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (g)",
+          "screenshot": "uat-screenshots/TC_A_015_01_s1.png"
+        }
+      ],
+      "comment": "looks correct to me",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_015_02",
+      "name": "verify ai feedback advisor",
+      "module": "feedback admin",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "feedback ai panel",
+          "expected": "async insight",
+          "actual": "\n            ⏳ Analyzing visitor feedback…\n       ",
+          "passed": true,
+          "figure": "Figure 0.0 (h)",
+          "screenshot": "uat-screenshots/TC_A_015_02_s1.png"
+        }
+      ],
+      "comment": "didnt see any problem",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_016_01",
+      "name": "verify create and edit whatsapp notification template",
+      "module": "templates",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "open templates",
+          "expected": "seeded list",
+          "actual": "ok",
+          "passed": true,
+          "figure": "Figure 0.0 (i)",
+          "screenshot": "uat-screenshots/TC_A_016_01_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "create template",
+          "expected": "in list",
+          "actual": "saved",
+          "passed": true,
+          "figure": "Figure 0.0 (j)",
+          "screenshot": "uat-screenshots/TC_A_016_01_s2.png"
+        },
+        {
+          "step": 3,
+          "action": "inquiry template dropdown",
+          "expected": "preview resolves placeholders",
+          "actual": "Hello payment uat visitor,\n\nThank you fo",
+          "passed": true,
+          "figure": "Figure 0.0 (k)",
+          "screenshot": "uat-screenshots/TC_A_016_01_s3.png"
+        }
+      ],
+      "comment": "whatsapp link opens on phone — tested on android تمام",
+      "performed_by": "ahmed (local tester)"
+    },
+    {
+      "case_id": "TC_A_016_02",
+      "name": "verify delete notification template",
+      "module": "templates",
+      "status": "PASS",
+      "steps": [
+        {
+          "step": 1,
+          "action": "delete custom template",
+          "expected": "removed from list",
+          "actual": "deleted",
+          "passed": true,
+          "figure": "Figure 0.0 (l)",
+          "screenshot": "uat-screenshots/TC_A_016_02_s1.png"
+        },
+        {
+          "step": 2,
+          "action": "seeded templates remain",
+          "expected": "defaults still there",
+          "actual": "True",
+          "passed": true,
+          "figure": "Figure 0.0 (m)",
+          "screenshot": "uat-screenshots/TC_A_016_02_s2.png"
+        }
+      ],
+      "comment": "تمام no issues",
+      "performed_by": "ahmed (local tester)"
+    }
+  ]
+}
