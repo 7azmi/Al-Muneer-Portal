@@ -1053,14 +1053,18 @@ The prompts below are taken as-is from the project's actual Claude Code CLI sess
    "fix the lazy intentional way of english writing. Keep it all neat and academic. 2. Figure labels should be below screenshots and should be like eg: 'Figure 2.2 (b)' where 2.2 is the test case number and (b) is the second screenshot of 2.2... put the screenshots after or next to the expected results, and finally introduce an empty column 'Comment' for each test case table."
    → Shaped the STD/UAT table and figure-labelling format used in Appendix D and Section 5.4.
 
-4. **2026-07-01 — curating UAT screenshots**
+4. **2026-06-30 — checking a rendering bug in the test evidence doc**
+   "nice, I see you made changes that I haven't looked into yet because the images don't render in the md preview. would you please investigate and fix that?"
+   → Caught and fixed a broken image-path issue in the UAT evidence document.
+
+5. **2026-07-01 — curating Automated Testing screenshots**
    "there are too many screenshots. Some screenshots are inaccurate, I will manually replace them but for now I tell you move or remove this figure to this place and you do accordingly... remove means deleting the extra screenshots from the project too"
    → Guided the screenshot cleanup pass referenced in Section 5.4.3.
 
-5. **2026-07-01 — generating the short paper**
-   "create a short paper just like this pdf file... given the main_report.md, srs, and sdd in `Academic version` directory... just generate it in markdown format and I'll do the copy pasting..."
+6. **2026-07-01 — generating the short paper**
+   "create a short paper just like this pdf file... given the main_report.md, srs, and sdd in `Academic version` directory... but before that I want to know what you need before we start, some screenshots and png diagrams are in the report in google docs, I'll add them manually (just create text placeholders in md if you can't find them here). What else do you need?"
    → Produced the short paper draft from the existing report, SRS, and SDD.
 
-6. **2026-07-02 — sourcing screenshots for Section 5.2**
+7. **2026-07-02 — sourcing screenshots for Section 5.2**
    "i've been tasked to include screenshots in 5.2.1-5.2.4 in the main report... where do i get these screenshots?"
    → Led to the code-snippet figures added to Section 5.2.1-5.2.4.
