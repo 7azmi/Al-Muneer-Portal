@@ -1036,3 +1036,31 @@ These improvements would build upon the solid foundation established by the Al-M
 13. W3C. (2018). Web Content Accessibility Guidelines (WCAG) 2.1. Retrieved from https://www.w3.org/TR/WCAG21/
 
 14. Walls, C. (2016). Spring Boot in Action. Shelter Island, NY: Manning Publications.
+
+# APPENDIX A - LIST OF PROMPTS USED
+
+The prompts below are taken as-is from the project's actual Claude Code CLI sessions (this tool has no public share-link feature, so each entry is dated instead of linked).
+
+1. **2026-06-04 — turning supervisor feedback into requirements**
+   "This project is complete, however the superviser thinks the project is too simple... Here are the notes he gave me: - Feedback to be shown to those who completed their enquiry experience only, not for everyone - add graphs to analytics. Illustrate the numbers. Same thing with reports - fix `/inquiry` page to be responsive to mobiles - add date filtering to reporting - you can use ai on reports and feedback summurizition to ensure that this project is complex enough // use gemini llm key and a simple prompt to ach[ieve it]"
+   → Turned into the feedback-visibility rule, analytics/report charts, mobile-responsive inquiry page, date filters, and the Gemini AI advisors (Sections 4.2, 5.2.4, 5.2.5).
+
+2. **2026-06-04 — clarifying the feedback-access rule**
+   "no no, the visitor submits a feedback and that's it. It's not visible to anyone. I meant that submiting a feedback is accessable to anyone via link but only shown and suggested to visitors with queries to prevent spamming."
+   → Fixed the exact feedback visibility/suggestion logic in Section 5.2.
+
+3. **2026-06-30 — fixing UAT documentation quality and format**
+   "fix the lazy intentional way of english writing. Keep it all neat and academic. 2. Figure labels should be below screenshots and should be like eg: 'Figure 2.2 (b)' where 2.2 is the test case number and (b) is the second screenshot of 2.2... put the screenshots after or next to the expected results, and finally introduce an empty column 'Comment' for each test case table."
+   → Shaped the STD/UAT table and figure-labelling format used in Appendix D and Section 5.4.
+
+4. **2026-07-01 — curating UAT screenshots**
+   "there are too many screenshots. Some screenshots are inaccurate, I will manually replace them but for now I tell you move or remove this figure to this place and you do accordingly... remove means deleting the extra screenshots from the project too"
+   → Guided the screenshot cleanup pass referenced in Section 5.4.3.
+
+5. **2026-07-01 — generating the short paper**
+   "create a short paper just like this pdf file... given the main_report.md, srs, and sdd in `Academic version` directory... just generate it in markdown format and I'll do the copy pasting..."
+   → Produced the short paper draft from the existing report, SRS, and SDD.
+
+6. **2026-07-02 — sourcing screenshots for Section 5.2**
+   "i've been tasked to include screenshots in 5.2.1-5.2.4 in the main report... where do i get these screenshots?"
+   → Led to the code-snippet figures added to Section 5.2.1-5.2.4.
