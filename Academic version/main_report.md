@@ -107,14 +107,17 @@ Dewan Al-Muneer untuk Perkahwinan dan Acara, yang terletak di Ibb, Yaman, pada m
 |Figure 4.8|Low-Fidelity Wireframe: Availability Calendar Page|41|
 |Figure 4.9|Low-Fidelity Wireframe: Pricing Page|42|
 |Figure 4.10|Low-Fidelity Wireframe: Inquiry Form Page|43|
-|Figure 5.1|Code Snippet: Booking Inquiry Submission Flow|43|
-|Figure 5.2|Visitor Home Page with Single-Page Scroll Layout|45|
-|Figure 5.3|Visitor Availability Calendar and Inquiry CTA|46|
-|Figure 5.4|Inquiry Form with Pre-filled Date and Package|47|
-|Figure 5.5|Administrator Dashboard Overview|48|
-|Figure 5.6|Administrator Inquiry Management Panel|49|
-|Figure 5.7|Reports Page with Visual Charts|50|
-|Figure 5.8|Analytics Dashboard with Chart.js Visualizations|51|
+|Figure 5.1|Code Snippet: Admin Login and JWT Cookie Issuance|43|
+|Figure 5.2|Code Snippet: Booking Inquiry Submission Flow|44|
+|Figure 5.3|Code Snippet: Payment Verification Status Cascade|45|
+|Figure 5.4|Code Snippet: Admin Dashboard Statistics Aggregation|46|
+|Figure 5.5|Visitor Home Page with Single-Page Scroll Layout|48|
+|Figure 5.6|Visitor Availability Calendar and Inquiry CTA|49|
+|Figure 5.7|Inquiry Form with Pre-filled Date and Package|50|
+|Figure 5.8|Administrator Dashboard Overview|51|
+|Figure 5.9|Administrator Inquiry Management Panel|52|
+|Figure 5.10|Reports Page with Visual Charts|53|
+|Figure 5.11|Analytics Dashboard with Chart.js Visualizations|54|
 
 ## LIST OF TABLES
 
@@ -860,11 +863,19 @@ The backend of the Al-Muneer Online Portal was developed in Java 21 using Spring
 
 The backend follows a layered architecture comprising controllers, services, repositories, and JPA entities. The `AdminAuthController` handles login using Spring Security, while JWT tokens stored in HTTP-only cookies maintain authenticated sessions. Passwords are hashed with BCrypt, and a `DataSeeder` creates a default administrator account on the first run. Domain entities include `BookingInquiry`, `PaymentProof`, `AvailabilitySlot`, `PricingTier`, `MediaItem`, `Feedback`, `PageVisit`, and `NotificationTemplate`, all mapped to PostgreSQL tables through Spring Data JPA.
 
+![Figure 5.1: Code Snippet: Admin Login and JWT Cookie Issuance](report-figures/fig-5.2.1-security.png)
+
+_Figure 5.1: Code Snippet: Admin Login and JWT Cookie Issuance_
+
 ### 5.2.2 Visitor Booking Flow and Reference Code System
 
 A central achievement of the implementation is the unified visitor booking flow. The home page was converted into a single-page scrollable landing page with anchor navigation, consolidating the hero section, venue information, media gallery, availability calendar, and pricing packages. Visitors interact with an interactive calendar where future dates default to Available and past dates are dimmed. Tapping an available date reveals a single "Submit inquiry" call-to-action that passes the selected date to `/inquiry?date=YYYY-MM-DD`. Similarly, pricing package cards include "Book [package]" buttons that pre-select the tier via `/inquiry?pricingId=...`; if a date was already chosen, both parameters are combined.
 
 The inquiry landing page unifies two capabilities: submitting a new inquiry and looking up an existing inquiry by a visitor-facing reference code. Each inquiry is assigned a random 9-digit `referenceCode` stored in a 150-day HTTP-only cookie named `inq_ref`. Visitors can also cancel their own inquiry directly from the confirmation page, provided no payment proof has been attached, which frees the associated availability slot.
+
+![Figure 5.2: Code Snippet: Booking Inquiry Submission Flow](report-figures/fig-5.2.2-reference-code.png)
+
+_Figure 5.2: Code Snippet: Booking Inquiry Submission Flow_
 
 ### 5.2.3 Payment Proof, Status Cascade, and Notifications
 
@@ -872,9 +883,17 @@ The payment proof module allows visitors to upload offline payment receipts as i
 
 Dynamic WhatsApp notifications are implemented through database-backed templates. Administrators can create, edit, and delete notification templates from the admin panel. On the inquiry or payment detail page, a dropdown lets the admin choose a template, preview the message with placeholders resolved, and generate a `wa.me` deep-link client-side. The configured country code (`app.country.code=+967`) is prepended to normalised WhatsApp numbers.
 
+![Figure 5.3: Code Snippet: Payment Verification Status Cascade](report-figures/fig-5.2.3-cascade.png)
+
+_Figure 5.3: Code Snippet: Payment Verification Status Cascade_
+
 ### 5.2.4 Administrator Modules and Analytics
 
 The admin dashboard provides a daily workload overview, including counts of new and active inquiries, pending payment proofs, unreviewed feedback, visits today and over the last seven days, average feedback rating, recent inquiries, and top pages. The analytics page visualises traffic data with Chart.js, offering a bar chart of top pages and a line chart of daily trends over the last 30 days. The reports page presents inquiry status, payment status, and feedback rating distributions using pie and bar charts, with optional date range filtering via `?fromDate=` and `?toDate=` query parameters.
+
+![Figure 5.4: Code Snippet: Admin Dashboard Statistics Aggregation](report-figures/fig-5.2.4-dashboard.png)
+
+_Figure 5.4: Code Snippet: Admin Dashboard Statistics Aggregation_
 
 ### 5.2.5 AI Integration with Gemini
 
@@ -886,8 +905,6 @@ Version v0.7 introduced three non-blocking AI advisors powered by the Google Gen
 
 All AI panels load asynchronously through dedicated `GET /ai-insight` endpoints after the page renders, ensuring that the main interface remains fast and degrades gracefully if the API is unavailable.
 
-_[Image: Code snippet showing the inquiry submission endpoint and reference-code generation logic]_ _Figure 5.1: Code Snippet: Booking Inquiry Submission Flow_
-
 ## 5.3 Essential Interfaces Showing System's Results and Achievements
 
 This section describes the key interfaces that demonstrate the functional results of the implementation. Screenshots of the actual system are included as placeholders for the final report.
@@ -896,35 +913,35 @@ This section describes the key interfaces that demonstrate the functional result
 
 The visitor home page presents a single-page scroll experience. The hero section is followed by venue information with an embedded Google Maps iframe, a masonry media gallery with label-based filters, an interactive availability calendar, and pricing packages. Anchor navigation and scroll-spy highlight the active section. The calendar supports month navigation, visually distinguishes available and booked dates, and reveals a contextual "Submit inquiry" action when a visitor selects an available day.
 
-_[Image: Screenshot of the visitor home page showing the single-page scroll layout]_ _Figure 5.2: Visitor Home Page with Single-Page Scroll Layout_
+_[Image: Screenshot of the visitor home page showing the single-page scroll layout]_ _Figure 5.5: Visitor Home Page with Single-Page Scroll Layout_
 
-_[Image: Screenshot of the visitor availability calendar with an available date selected]_ _Figure 5.3: Visitor Availability Calendar and Inquiry CTA_
+_[Image: Screenshot of the visitor availability calendar with an available date selected]_ _Figure 5.6: Visitor Availability Calendar and Inquiry CTA_
 
 ### 5.3.2 Inquiry Form and Reference Code Lookup
 
 The `/inquiry` page serves both new submissions and existing-lookup use cases. When arriving from the home page, the date and/or pricing package are pre-filled in the form. After submission, the visitor sees a confirmation page with the 9-digit reference code and a self-cancellation option. The same page contains a lookup field where returning visitors can enter their reference code to retrieve inquiry status.
 
-_[Image: Screenshot of the inquiry form with pre-filled date and package]_ _Figure 5.4: Inquiry Form with Pre-filled Date and Package_
+_[Image: Screenshot of the inquiry form with pre-filled date and package]_ _Figure 5.7: Inquiry Form with Pre-filled Date and Package_
 
 ### 5.3.3 Admin Dashboard and Analytics
 
 The administrator dashboard gives the owner an at-a-glance view of daily operations. Cards display new and active inquiries, pending proofs, unreviewed feedback, and recent traffic. The analytics page extends this with interactive Chart.js visualisations and the asynchronous AI Traffic Funnel Advisor panel.
 
-_[Image: Screenshot of the administrator dashboard overview]_ _Figure 5.5: Administrator Dashboard Overview_
+_[Image: Screenshot of the administrator dashboard overview]_ _Figure 5.8: Administrator Dashboard Overview_
 
 ### 5.3.4 Admin Inquiry and Payment Management
 
 The inquiry management panel includes status filter chips with per-status counts, client-side search, and an "active only" default view. Each row shows the visitor reference code, contact details, event date, and current status. From the detail view, the administrator can update status, view linked payment proofs filtered by inquiry, and send a dynamic WhatsApp message using a template selector. The payment verification screen displays the uploaded receipt image and supports the verification cascade described in Section 5.2.3.
 
-_[Image: Screenshot of the administrator inquiry management list with filters]_ _Figure 5.6: Administrator Inquiry Management Panel_
+_[Image: Screenshot of the administrator inquiry management list with filters]_ _Figure 5.9: Administrator Inquiry Management Panel_
 
 ### 5.3.5 Reports with Visualisations
 
 The reports page summarises operational data through visual charts. Pie charts show inquiry status and payment status breakdowns, while a bar chart displays feedback rating distribution. Date range filters allow the owner to analyse trends over specific periods. The AI Business Report Advisor panel loads asynchronously to provide actionable insights based on the current report data.
 
-_[Image: Screenshot of the reports page showing charts and AI advisor panel]_ _Figure 5.7: Reports Page with Visual Charts_
+_[Image: Screenshot of the reports page showing charts and AI advisor panel]_ _Figure 5.10: Reports Page with Visual Charts_
 
-_[Image: Screenshot of the analytics dashboard with Chart.js visualisations]_ _Figure 5.8: Analytics Dashboard with Chart.js Visualizations_
+_[Image: Screenshot of the analytics dashboard with Chart.js visualisations]_ _Figure 5.11: Analytics Dashboard with Chart.js Visualizations_
 
 ## 5.4 Testing
 
