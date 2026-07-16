@@ -38,10 +38,10 @@
 
                     <!-- Fallback: manual entry if not pre-filled -->
                     <div class="form-group" th:if="${inquiryId == null}">
-                        <label class="form-label" for="manual-inquiry-id">Inquiry ID *</label>
+                        <label class="form-label" for="manual-inquiry-id">Booking ID *</label>
                         <input type="number" id="manual-inquiry-id" name="inquiryId" class="form-input"
-                               placeholder="Internal inquiry ID" required min="1">
-                        <small class="text-muted">Or go back to <a href="/inquiry">Find My Inquiry</a> to look up by reference code.</small>
+                               placeholder="Internal booking ID" required min="1">
+                        <small class="text-muted">Or go back to <a href="/inquiry">Find My Booking</a> to look it up with your WhatsApp number.</small>
                     </div>
 
                     <div class="form-group">

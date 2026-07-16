@@ -10,6 +10,8 @@ public interface BookingInquiryService {
     BookingInquiry submitInquiry(BookingInquiry inquiry);
     BookingInquiry getById(Long id);
     Optional<BookingInquiry> findByReferenceCode(Long referenceCode);
+    /** Visitor lookup — all bookings submitted with the given (normalised) WhatsApp number */
+    List<BookingInquiry> findByVisitorWhatsApp(String whatsApp);
     List<BookingInquiry> getAll();
     List<BookingInquiry> getFiltered(List<InquiryStatus> excludeStatuses);
     List<BookingInquiry> getByStatus(InquiryStatus status);

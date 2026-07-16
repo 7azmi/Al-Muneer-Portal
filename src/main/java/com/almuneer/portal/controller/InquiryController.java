@@ -78,15 +78,9 @@ public class InquiryController {
         response.addCookie(cookie);
     }
 
-    // ─── UC005: Landing page — new inquiry OR look up existing ─────────────────
+    // ─── UC005: Landing page — new booking OR look up existing ─────────────────
 
-    @GetMapping
-    public String landing(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) Long pricingId,
-            HttpServletRequest request,
-            Model model) {
-
+    private void populateLanding(LocalDate date, Long pricingId, HttpServletRequest request, Model model) {
         Long savedRef = readRefCookie(request);
         BookingInquiry existing = null;
         if (savedRef != null) {
@@ -107,6 +101,15 @@ public class InquiryController {
         model.addAttribute("selectedDate", date);
         model.addAttribute("selectedPricingId", pricingId);
         model.addAttribute("selectedTier", selectedTier);
+    }
+
+    @GetMapping
+    public String landing(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Long pricingId,
+            HttpServletRequest request,
+            Model model) {
+        populateLanding(date, pricingId, request, model);
         return "visitor/inquiry-landing";
     }
 
@@ -161,6 +164,22 @@ public class InquiryController {
         return "visitor/inquiry-confirmation";
     }
 
+    // ─── Visitor lookup by WhatsApp number ──────────────────────────────────────
+
+    @PostMapping("/lookup-whatsapp")
+    public String lookupByWhatsApp(
+            @RequestParam String whatsAppNumber,
+            HttpServletRequest request,
+            Model model) {
+        String normalised = normaliseWhatsApp(whatsAppNumber.trim());
+        List<BookingInquiry> results = inquiryService.findByVisitorWhatsApp(normalised);
+        populateLanding(null, null, request, model);
+        model.addAttribute("waSearched", true);
+        model.addAttribute("waResults", results);
+        model.addAttribute("searchedNumber", normalised);
+        return "visitor/inquiry-landing";
+    }
+
     // ─── Visitor lookup by reference code ──────────────────────────────────────
 
     @PostMapping("/lookup")
@@ -171,7 +190,7 @@ public class InquiryController {
         Optional<BookingInquiry> found = inquiryService.findByReferenceCode(referenceCode);
         if (found.isEmpty()) {
             redirectAttributes.addFlashAttribute("error",
-                    "No inquiry found with reference code " + referenceCode + ". Please check the number.");
+                    "No booking found with reference code " + referenceCode + ". Please check the number.");
             return "redirect:/inquiry";
         }
         // Refresh cookie with the looked-up code
@@ -190,7 +209,7 @@ public class InquiryController {
             inquiryService.cancelByVisitor(referenceCode);
             clearRefCookie(response);
             redirectAttributes.addFlashAttribute("success",
-                    "Your inquiry has been cancelled. The date is now available again.");
+                    "Your booking has been cancelled. The date is now available again.");
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/inquiry/confirmation/" + referenceCode;

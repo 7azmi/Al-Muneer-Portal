@@ -45,7 +45,7 @@ _(Note: This Software Requirements Specification (SRS) template is adapted from 
 
 1. **Introduction** (2) 1.1 Purpose (2) 1.2 Scope (2) 1.3 Definitions, Acronyms and Abbreviation (3) 1.4 References (4) 1.5 Overview (5)
 
-2. **Specific Requirements** (5) 2.1 User characteristics (6) 2.2 System Features (8) 2.3 Use Case Details (11) 2.3.1 UC001: Use Case View Venue Information (11) 2.3.2 UC002: Use Case View Media Gallery (12) 2.3.3 UC003: Use Case Check Availability (14) 2.3.4 UC004: Use Case View Pricing Panel (17) 2.3.5 UC005: Use Case Submit Booking Inquiry (19) 2.3.6 UC006: Use Case Manage Hall Information (21) 2.3.7 UC007: Use Case Manage Media Gallery (24) 2.3.8 UC008: Use Case Manage Pricing Panel (27) 2.3.9 UC009: Use Case Manage Calendar & Inquiries (29) 2.3.10 UC010: Use Case View Traffic Analytics (31) 2.3.11 UC011: Use Case Submit Payment Proof (32) 2.3.12 UC012: Use Case Submit Feedback (34) 2.3.13 UC013: Use Case Manage Payment Status (36) 2.3.14 UC014: Use Case View/Generate Reports (39) 2.3.15 UC015: Use Case Manage Feedback (40) 2.3.16 UC016: Use Case Configure/Manage Notifications (43) 2.4 Performance and Other Requirements (44) 2.5 Design Constraints (48) **Appendix A:** Evidence of Requirements Elicitation Artefacts (1)
+2. **Specific Requirements** (5) 2.1 User characteristics (6) 2.2 System Features (8) 2.3 Use Case Details (11) 2.3.1 UC001: Use Case View Venue Information (11) 2.3.2 UC002: Use Case View Media Gallery (12) 2.3.3 UC003: Use Case Check Availability (14) 2.3.4 UC004: Use Case View Pricing Panel (17) 2.3.5 UC005: Use Case Submit Booking Inquiry (19) 2.3.6 UC006: Use Case Manage Hall Information (21) 2.3.7 UC007: Use Case Manage Media Gallery (24) 2.3.8 UC008: Use Case Manage Pricing Panel (27) 2.3.9 UC009: Use Case Manage Calendar & Inquiries (29) 2.3.10 UC010: Use Case View Traffic Analytics (31) 2.3.11 UC011: Use Case Submit Payment Proof (32) 2.3.12 UC012: Use Case Submit Feedback (34) 2.3.13 UC013: Use Case Manage Payment Status (36) 2.3.14 UC014: Use Case View/Generate Reports (39) 2.3.15 UC015: Use Case Manage Feedback (40) 2.3.16 UC016: Use Case Configure/Manage Notifications (43) 2.3.17 UC017: Use Case Generate AI Insights (44) 2.4 Performance and Other Requirements (44) 2.5 Design Constraints (48) **Appendix A:** Evidence of Requirements Elicitation Artefacts (1)
 
 ## 1. Introduction
 
@@ -234,6 +234,7 @@ The system features are illustrated in the Use Case Diagram (Figure 2.1) below. 
 left to right direction
 actor Visitor
 actor Admin
+actor "Gemini AI\n(External AI Service)" as Gemini
 
 rectangle "Al-Muneer Online Portal" {
   usecase "UC001: View Venue Information" as UC1
@@ -253,6 +254,7 @@ rectangle "Al-Muneer Online Portal" {
   usecase "UC010: View Traffic (Analytics)" as UC10
   usecase "UC014: View / Generate Reports" as UC14
   usecase "UC016: Configure / Manage Notifications" as UC16
+  usecase "UC017: Generate AI Insights" as UC17
 }
 
 Visitor --> UC1
@@ -272,8 +274,11 @@ Admin --> UC15
 Admin --> UC10
 Admin --> UC16
 Admin --> UC14
+Admin --> UC17
 
 UC14 ..> UC10 : <<includes>>
+UC17 ..> UC14 : <<extends>>
+UC17 --> Gemini
 
 @enduml
 ```
@@ -303,6 +308,7 @@ _Figure 2.1: Use Case Diagram for Al-Muneer Online Portal_
 ||UC014: View/Generate Reports|Allows the admin to access visual reports on inquiries, bookings, and feedback, augmented by an AI-generated business advisor.|
 ||UC015: Manage Feedback|Enables the admin to view and manage user-submitted feedback, supported by an AI feedback advisor that highlights complaints and positives.|
 ||UC016: Configure/Manage Notifications|Allows the admin to set up or manage templates/triggers for system notifications.|
+||UC017: Generate AI Insights|Produces AI-generated advisory insights on the Reports, Analytics, and Feedback pages by submitting aggregated operational metrics to the external Gemini AI service.|
 
 The domain model illustrating the key entities and their attributes within the Al-Muneer Online Portal is shown in Figure 2.2. This model focuses on the data aspects of the system from a requirements perspective.
 
@@ -407,23 +413,22 @@ This section provides detailed descriptions for each use case identified for the
 |**Description**|This use case allows a Visitor to view comprehensive descriptive information about Al-Muneer Hall.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has access to a web browser and an internet connection, and has navigated to the portal's URL.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to the "Venue Information" or "About Us" section of the portal (e.g., via a menu link or homepage section).<br><br>2. System retrieves the latest venue details (description, services offered, capacity, location, contact information) from the database.<br><br>3. System renders and displays the formatted venue information page to the Visitor.|
-|**Alternative Flow(s) - AF**|AF1: Information Temporarily Unavailable:<br><br>1. If the venue information content cannot be retrieved from the database due to a temporary issue (e.g., brief database connection problem), the system displays a user-friendly message indicating that the information is currently unavailable and suggests trying again shortly.|
-|**Exception Flow(s) - EF**|EF1: Content Not Found:<br><br>1. If the specific venue information content is missing or not configured in the database (e.g., after a faulty admin update), the system displays a "Content not available" message or redirects to a relevant section of the homepage.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the "Venue Information" or "About Us" section of the portal (e.g., via a menu link or homepage section).<br><br>2. System retrieves the latest venue details (description, services offered, capacity, location, contact information) from the database. **[If retrieval fails due to a temporary issue → AF1; if the content is missing/not configured → EF1]**<br><br>3. System renders and displays the formatted venue information page to the Visitor.|
+|**Alternative Flow(s) - AF**|**AF1: Information Temporarily Unavailable (triggered at NF step 2):**<br><br>AF1.1. The venue information cannot be retrieved from the database due to a temporary issue (e.g., brief database connection problem); the system displays a user-friendly message indicating that the information is currently unavailable and suggests trying again shortly.<br><br>AF1.2. Use case ends.|
+|**Exception Flow(s) - EF**|**EF1: Content Not Found (triggered at NF step 2):**<br><br>EF1.1. The venue information content is missing or not configured in the database (e.g., after a faulty admin update); the system displays a "Content not available" message or redirects to a relevant section of the homepage.<br><br>EF1.2. Use case ends.|
 |**Post-condition(s)**|Visitor has viewed the venue information.<br><br>The system state remains unchanged for other users.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Venue Info Section;
-if (Retrieve Venue Details from DB?) then (Success)
-  :System Renders Venue Information Page;
-  :Display Venue Information to Visitor;
+:1. Visitor Navigates to Venue Info Section;
+if (2. Retrieve Venue Details from DB?) then (Success)
+  :3. System Renders and Displays\nVenue Information Page;
 else (Failure)
-  if (Content Missing?) then (Yes)
-    :Display "Content Not Available" Message;
-  else (No, e.g. Temp DB Issue)
-    :Display "Information Temporarily Unavailable" Message;
+  if (Content Missing? -> EF1) then (Yes)
+    :EF1. Display "Content Not Available" Message;
+  else (No, Temp DB Issue -> AF1)
+    :AF1. Display "Information Temporarily\nUnavailable" Message;
   endif
 endif
 stop
@@ -439,12 +444,22 @@ participant "Frontend (WebUI)" as UI
 participant "Backend (AppServer)" as App
 database "Database (DB)" as DB
 
-Visitor -> UI : Clicks 'Venue Info' Link
+Visitor -> UI : 1. Clicks 'Venue Info' Link
 UI -> App : GET /api/venue-info
-App -> DB : RetrieveVenueDetails()
-DB --> App : VenueDetailsData
-App --> UI : VenueInfoResponse (VenueDetailsData)
-UI --> Visitor : Displays Venue Information Page
+App -> DB : 2. RetrieveVenueDetails()
+alt Step 2: Retrieval Successful
+    DB --> App : VenueDetailsData
+    App --> UI : VenueInfoResponse (VenueDetailsData)
+    UI --> Visitor : 3. Displays Venue Information Page
+else Step 2: Temporary DB Issue -> AF1
+    DB --> App : RetrievalError
+    App --> UI : AF1. TemporarilyUnavailableResponse
+    UI --> Visitor : Displays "Currently Unavailable" Message
+else Step 2: Content Missing -> EF1
+    DB --> App : NoContentFound
+    App --> UI : EF1. ContentNotFoundResponse
+    UI --> Visitor : Displays "Content Not Available" Message
+end
 @enduml
 ```
 
@@ -462,32 +477,31 @@ _Figure 2.4: Sequence Diagram for View Venue Information_
 |**Description**|This use case allows a Visitor to browse a collection of images and potentially videos of Al-Muneer Hall.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has access to a web browser and an internet connection, and has navigated to the portal's URL.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to the "Media Gallery" section of the portal.<br><br>2. System retrieves a list of media items (image thumbnails, video placeholders) from the database.<br><br>3. System displays the gallery layout with the retrieved media items.<br><br>4. Visitor clicks on a specific media item (e.g., an image thumbnail).<br><br>5. System displays the full-size image or plays the video in a lightbox or dedicated view.|
-|**Alternative Flow(s) - AF**|AF1: Empty Gallery:<br><br>1. If no media items are currently configured in the gallery, the system displays a message like "Our gallery is currently being updated. Please check back soon!"<br><br>AF2: Media Item Not Found/Corrupted:<br><br>1. If a specific media file linked in the gallery cannot be loaded (e.g., file deleted, path incorrect), the system displays a placeholder or an error icon for that specific item, while other items remain accessible.|
-|**Exception Flow(s) - EF**|EF1: Error Loading Gallery Data:<br><br>1. If the system encounters an error while trying to retrieve the list of media items (e.g., database error), it displays a general error message to the Visitor.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the "Media Gallery" section of the portal.<br><br>2. System retrieves a list of media items (image thumbnails, video placeholders) from the database. **[If no media items are configured → AF1; if retrieval fails → EF1]**<br><br>3. System displays the gallery layout with the retrieved media items.<br><br>4. Visitor clicks on a specific media item (e.g., an image thumbnail).<br><br>5. System displays the full-size image or plays the video in a lightbox or dedicated view. **[If the media file cannot be loaded → AF2]**|
+|**Alternative Flow(s) - AF**|**AF1: Empty Gallery (triggered at NF step 2):**<br><br>AF1.1. No media items are currently configured; the system displays a message such as "Our gallery is currently being updated. Please check back soon!"<br><br>AF1.2. Use case ends.<br><br>**AF2: Media Item Not Found/Corrupted (triggered at NF step 5):**<br><br>AF2.1. A specific media file cannot be loaded (e.g., file deleted, path incorrect); the system displays a placeholder or an error icon for that item, while other items remain accessible.<br><br>AF2.2. Flow resumes at NF step 4 (Visitor may select another item).|
+|**Exception Flow(s) - EF**|**EF1: Error Loading Gallery Data (triggered at NF step 2):**<br><br>EF1.1. The system encounters an error while retrieving the list of media items (e.g., database error) and displays a general error message to the Visitor.<br><br>EF1.2. Use case ends.|
 |**Post-condition(s)**|Visitor has viewed the media gallery and potentially individual media items.<br><br>The system state remains unchanged for other users.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Media Gallery Section;
-if (Retrieve Media List from DB?) then (Success)
-  if (Gallery Empty?) then (Yes)
-    :Display "Gallery Empty" Message;
+:1. Visitor Navigates to Media Gallery Section;
+if (2. Retrieve Media List from DB?) then (Success)
+  if (Gallery Empty? -> AF1) then (Yes)
+    :AF1. Display "Gallery Being Updated" Message;
   else (No)
-    :System Renders Gallery Layout with Media Items;
-    :Display Gallery to Visitor;
-    if (Visitor Clicks on Media Item?) then (Yes)
-      if (Load Specific Media Item?) then (Success)
-        :Display Full-Size Image / Play Video;
-      else (Failure - e.g. Corrupted)
-        :Display Placeholder/Error for Item;
+    :3. System Displays Gallery Layout\nwith Media Items;
+    if (4. Visitor Clicks on Media Item?) then (Yes)
+      if (5. Load Specific Media Item?) then (Success)
+        :5. Display Full-Size Image / Play Video;
+      else (Failure -> AF2)
+        :AF2. Display Placeholder/Error for Item\n(Visitor may select another item, step 4);
       endif
     else (No)
     endif
   endif
-else (Failure - DB Error)
-  :Display General Error Message;
+else (Failure - DB Error -> EF1)
+  :EF1. Display General Error Message;
 endif
 stop
 @enduml
@@ -502,14 +516,28 @@ participant "Frontend (WebUI)" as UI
 participant "Backend (AppServer)" as App
 database "Database (DB)" as DB
 
-Visitor -> UI : Clicks 'Media Gallery' Link
+Visitor -> UI : 1. Clicks 'Media Gallery' Link
 UI -> App : GET /api/gallery/media-items
-App -> DB : RetrieveMediaItemList()
-DB --> App : MediaItemListData
-App --> UI : GalleryResponse (MediaItemListData)
-UI --> Visitor : Displays Gallery with Thumbnails
-Visitor -> UI : Clicks on a Thumbnail (MediaItemID)
-UI --> Visitor : Displays Full-Size Image / Video Player
+App -> DB : 2. RetrieveMediaItemList()
+alt Step 2: Retrieval Successful (items exist)
+    DB --> App : MediaItemListData
+    App --> UI : GalleryResponse (MediaItemListData)
+    UI --> Visitor : 3. Displays Gallery with Thumbnails
+    Visitor -> UI : 4. Clicks on a Thumbnail (MediaItemID)
+    alt Step 5: Media File Loads
+        UI --> Visitor : 5. Displays Full-Size Image / Video Player
+    else Step 5 fails -> AF2: File Missing/Corrupted
+        UI --> Visitor : AF2. Displays Placeholder/Error Icon for Item
+    end
+else Step 2: Gallery Empty -> AF1
+    DB --> App : EmptyList
+    App --> UI : AF1. EmptyGalleryResponse
+    UI --> Visitor : Displays "Gallery Being Updated" Message
+else Step 2: DB Error -> EF1
+    DB --> App : RetrievalError
+    App --> UI : EF1. ErrorResponse
+    UI --> Visitor : Displays General Error Message
+end
 @enduml
 ```
 
@@ -527,32 +555,30 @@ _Figure 2.6: Sequence Diagram for View Media Gallery_
 |**Description**|This use case allows a Visitor to view an interactive calendar displaying booked and available dates for Al-Muneer Hall.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has access to a web browser and an internet connection, and has navigated to the portal's URL.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to the "Availability" or "Calendar" section of the portal.<br><br>2. System retrieves current booking status data (booked dates, pending dates if applicable) from the database for a default period (e.g., current month and next few months).<br><br>3. System renders and displays an interactive calendar, visually differentiating between available, booked, and potentially pending dates.<br><br>4. Visitor may interact with the calendar (e.g., navigate to different months/years).<br><br>5. For each navigation, System retrieves and updates the calendar display with the relevant booking status data for the selected period.|
-|**Alternative Flow(s) - AF**|AF1: No Booking Data Available:<br><br>1. If there's an issue retrieving booking data, or if all dates are currently marked as available (unlikely for an active hall but possible for a new setup), the calendar displays all dates in the default view as available, or a message indicates no specific bookings are marked for the current view.|
-|**Exception Flow(s) - EF**|EF1: Error Loading Calendar Data:<br><br>1. If the system encounters a persistent error while trying to retrieve booking status data (e.g., database connection error), it displays a general error message to the Visitor, suggesting they try again later or contact the hall directly.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the "Availability" or "Calendar" section of the portal.<br><br>2. System retrieves current booking status data (booked dates, pending dates if applicable) from the database for a default period (e.g., current month and next few months). **[If no booking data exists for the period → AF1; if retrieval fails persistently → EF1]**<br><br>3. System renders and displays an interactive calendar, visually differentiating between available, booked, and potentially pending dates.<br><br>4. Visitor may interact with the calendar (e.g., navigate to different months/years).<br><br>5. For each navigation, System retrieves and updates the calendar display with the relevant booking status data for the selected period. **[If no booking data exists for the new period → AF1; if retrieval fails persistently → EF1]**|
+|**Alternative Flow(s) - AF**|**AF1: No Booking Data Available (triggered at NF step 2 or step 5):**<br><br>AF1.1. No bookings are marked for the requested period (possible for a new setup); the calendar displays all dates in the view as available, or a message indicates no specific bookings are marked for the current view.<br><br>AF1.2. Flow resumes at NF step 4.|
+|**Exception Flow(s) - EF**|**EF1: Error Loading Calendar Data (triggered at NF step 2 or step 5):**<br><br>EF1.1. The system encounters a persistent error while retrieving booking status data (e.g., database connection error) and displays a general error message to the Visitor, suggesting they try again later or contact the hall directly.<br><br>EF1.2. Use case ends.|
 |**Post-condition(s)**|Visitor has viewed the availability status of the hall for the selected period(s).<br><br>The system state remains unchanged for other users.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Availability Section;
-:System Retrieves Booking Status Data (Default Period);
-if (Data Retrieval Successful?) then (Yes)
-  :System Renders Interactive Calendar;
-  :Display Calendar to Visitor;
+:1. Visitor Navigates to Availability Section;
+:2. System Retrieves Booking Status Data (Default Period);
+if (2. Data Retrieval Successful?) then (Yes)
+  :3. System Renders Interactive Calendar
+  (all-available view if no data, AF1);
   repeat
-    :Visitor Interacts with Calendar (e.g., Change Month);
-    if (Navigation Action?) then (Yes)
-      :System Retrieves Booking Status Data (Selected Period);
-      if (Data Retrieval Successful?) then (Yes)
-        :Update Calendar Display;
-      else (No)
-        :Display Error for Period Update;
-      endif
+    :4. Visitor Interacts with Calendar (e.g., Change Month);
+    :5. System Retrieves Booking Status Data (Selected Period);
+    if (5. Data Retrieval Successful?) then (Yes)
+      :5. Update Calendar Display;
+    else (No -> EF1)
+      :EF1. Display Error for Period Update;
     endif
   repeat while (Visitor continues interaction?) is (Yes)
-else (No - Initial Load Error)
-  :Display General Error Message;
+else (No - Initial Load Error -> EF1)
+  :EF1. Display General Error Message;
 endif
 stop
 @enduml
@@ -567,19 +593,31 @@ participant "Frontend (WebUI)" as UI
 participant "Backend (AppServer)" as App
 database "Database (DB)" as DB
 
-Visitor -> UI : Clicks 'Availability' Link
+Visitor -> UI : 1. Clicks 'Availability' Link
 UI -> App : GET /api/availability?month=YYYY-MM (Default Period)
-App -> DB : GetAvailabilitySlots(Period)
-DB --> App : AvailabilityData
-App --> UI : AvailabilityResponse (AvailabilityData)
-UI --> Visitor : Displays Interactive Calendar
+App -> DB : 2. GetAvailabilitySlots(Period)
+alt Step 2: Retrieval Successful
+    DB --> App : AvailabilityData (all-available view if empty, AF1)
+    App --> UI : AvailabilityResponse (AvailabilityData)
+    UI --> Visitor : 3. Displays Interactive Calendar
+else Step 2 fails -> EF1: Persistent DB Error
+    DB --> App : RetrievalError
+    App --> UI : EF1. ErrorResponse
+    UI --> Visitor : Displays General Error Message
+end
 
-Visitor -> UI : Selects Next Month on Calendar
+Visitor -> UI : 4. Selects Next Month on Calendar
 UI -> App : GET /api/availability?month=YYYY-MM (New Period)
-App -> DB : GetAvailabilitySlots(NewPeriod)
-DB --> App : AvailabilityDataForNewPeriod
-App --> UI : AvailabilityResponse (AvailabilityDataForNewPeriod)
-UI --> Visitor : Updates Calendar Display
+App -> DB : 5. GetAvailabilitySlots(NewPeriod)
+alt Step 5: Retrieval Successful
+    DB --> App : AvailabilityDataForNewPeriod
+    App --> UI : AvailabilityResponse (AvailabilityDataForNewPeriod)
+    UI --> Visitor : 5. Updates Calendar Display
+else Step 5 fails -> EF1: Persistent DB Error
+    DB --> App : RetrievalError
+    App --> UI : EF1. ErrorResponse
+    UI --> Visitor : Displays Error for Period Update
+end
 @enduml
 ```
 
@@ -597,30 +635,28 @@ _Figure 2.8: Sequence Diagram for Check Availability (Initial Load & Month Navig
 |**Description**|This use case allows a Visitor to view detailed pricing information, packages, and potentially customizable options for Al-Muneer Hall services.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has access to a web browser and an internet connection, and has navigated to the portal's URL.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to the "Pricing" or "Packages" section of the portal.<br><br>2. System retrieves current pricing tiers, package details, and any configurable options from the database.<br><br>3. System renders and displays the formatted pricing information to the Visitor.<br><br>4. (Optional) If interactive elements for customizing a package are present (e.g., selecting add-on services), Visitor interacts with these elements.<br><br>5. (Optional) System dynamically updates the displayed estimated price based on Visitor's selections.|
-|**Alternative Flow(s) - AF**|AF1: No Specific Pricing Configured:<br><br>1. If detailed pricing tiers are not yet configured by the admin, the system may display a general statement about pricing or a prompt to contact the hall for a custom quote.|
-|**Exception Flow(s) - EF**|EF1: Error Loading Pricing Data:<br><br>1. If the system encounters an error while trying to retrieve pricing information (e.g., database error), it displays a general error message to the Visitor.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the "Pricing" or "Packages" section of the portal.<br><br>2. System retrieves current pricing tiers, package details, and any configurable options from the database. **[If no pricing tiers are configured → AF1; if retrieval fails → EF1]**<br><br>3. System renders and displays the formatted pricing information to the Visitor.<br><br>4. (Optional) If interactive elements for customizing a package are present (e.g., selecting add-on services), Visitor interacts with these elements.<br><br>5. (Optional) System dynamically updates the displayed estimated price based on Visitor's selections.|
+|**Alternative Flow(s) - AF**|**AF1: No Specific Pricing Configured (triggered at NF step 2):**<br><br>AF1.1. Detailed pricing tiers are not yet configured by the admin; the system displays a general statement about pricing or a prompt to contact the hall for a custom quote.<br><br>AF1.2. Use case ends.|
+|**Exception Flow(s) - EF**|**EF1: Error Loading Pricing Data (triggered at NF step 2):**<br><br>EF1.1. The system encounters an error while retrieving pricing information (e.g., database error) and displays a general error message to the Visitor.<br><br>EF1.2. Use case ends.|
 |**Post-condition(s)**|Visitor has viewed the pricing information for Al-Muneer Hall.<br><br>The system state remains unchanged for other users.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Pricing Section;
-:System Retrieves Pricing Information from DB;
-if (Data Retrieval Successful?) then (Yes)
+:1. Visitor Navigates to Pricing Section;
+:2. System Retrieves Pricing Information from DB;
+if (2. Data Retrieval Successful?) then (Yes)
   if (Pricing Data Configured?) then (Yes)
-    :System Renders Pricing Information Page;
-    :Display Pricing Details to Visitor;
-    if (Interactive Customization Elements Present?) then (Yes)
-      :Visitor Interacts with Customization Options;
-      :System Updates Estimated Price Dynamically;
-      :Display Updated Price;
+    :3. System Renders and Displays\nPricing Information Page;
+    if (4. Interactive Customization Elements Present?) then (Yes)
+      :4. Visitor Interacts with Customization Options;
+      :5. System Updates Estimated Price Dynamically;
     endif
-  else (No)
-    :Display "Contact for Quote" or General Pricing Info;
+  else (No -> AF1)
+    :AF1. Display "Contact for Quote" or General Pricing Info;
   endif
-else (No - Data Load Error)
-  :Display General Error Message;
+else (No - Data Load Error -> EF1)
+  :EF1. Display General Error Message;
 endif
 stop
 @enduml
@@ -635,12 +671,22 @@ participant "Frontend (WebUI)" as UI
 participant "Backend (AppServer)" as App
 database "Database (DB)" as DB
 
-Visitor -> UI : Clicks 'Pricing' Link
+Visitor -> UI : 1. Clicks 'Pricing' Link
 UI -> App : GET /api/pricing-info
-App -> DB : RetrievePricingTiers()
-DB --> App : PricingData
-App --> UI : PricingResponse (PricingData)
-UI --> Visitor : Displays Pricing Information Page
+App -> DB : 2. RetrievePricingTiers()
+alt Step 2: Retrieval Successful (tiers configured)
+    DB --> App : PricingData
+    App --> UI : PricingResponse (PricingData)
+    UI --> Visitor : 3. Displays Pricing Information Page
+else Step 2: No Tiers Configured -> AF1
+    DB --> App : EmptyResult
+    App --> UI : AF1. GeneralPricingResponse
+    UI --> Visitor : Displays "Contact for Quote" Message
+else Step 2: DB Error -> EF1
+    DB --> App : RetrievalError
+    App --> UI : EF1. ErrorResponse
+    UI --> Visitor : Displays General Error Message
+end
 @enduml
 ```
 
@@ -658,31 +704,32 @@ _Figure 2.10: Sequence Diagram for View Pricing Panel_
 |**Description**|This use case allows a Visitor to submit a formal inquiry or booking request for Al-Muneer Hall.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has browsed venue information and is interested in making a booking or asking specific questions not covered in the FAQ/general info. Visitor is on the inquiry page/form.|
-|**Normal Flow(s)- NF**|1. Visitor accesses the booking inquiry form on the portal.<br><br>2. Visitor fills in required fields such as name, contact number (phone/WhatsApp), email (optional), preferred event date(s), estimated number of guests, type of event, and any specific questions or requirements in a message field.<br><br>3. Visitor clicks the "Submit Inquiry" button.<br><br>4. System validates the submitted data (e.g., checks for mandatory fields, valid contact format).<br><br>5. System saves the inquiry details (including timestamp) into the database.<br><br>6. System displays a confirmation message to the Visitor (e.g., "Your inquiry has been successfully submitted. We will contact you shortly.").|
-|**Alternative Flow(s) - AF**|AF1: Invalid Input Data:<br><br>1. If data validation fails (Step 4), the system highlights the fields with errors and displays appropriate error messages (e.g., "Please enter a valid phone number," "Required field missing.").<br><br>2. Visitor remains on the form page to correct the input and can re-submit (returns to Step 3).<br><br>  <br><br>AF2: Duplicate Inquiry Detection (Optional - Advanced):<br><br>1. System might check for very similar recent inquiries from the same contact to prevent accidental duplicates. If a potential duplicate is found, it might ask the visitor to confirm if they want to proceed.|
-|**Exception Flow(s) - EF**|EF1: Database Save Error:<br><br>1. If the database fails to save the data, the system will display an error submitting the inquiry message.|
+|**Normal Flow(s)- NF**|1. Visitor accesses the booking form on the portal.<br><br>2. Visitor fills in required fields such as name, contact number (phone/WhatsApp), email (optional), preferred event date(s), estimated number of guests, type of event, and any specific questions or requirements in a message field.<br><br>3. Visitor clicks the "Submit Booking" button.<br><br>4. System validates the submitted data (e.g., checks for mandatory fields, valid contact format). **[If validation fails → AF1]**<br><br>5. System saves the booking details (including timestamp) into the database. **[If the save operation fails → EF1]**<br><br>6. System displays a confirmation message with the booking reference code to the Visitor (e.g., "Your booking has been successfully submitted. We will contact you shortly.").|
+|**Alternative Flow(s) - AF**|**AF1: Invalid Input Data (triggered at NF step 4):**<br><br>AF1.1. Data validation fails; the system highlights the fields with errors and displays appropriate error messages (e.g., "Please enter a valid phone number," "Required field missing.").<br><br>AF1.2. Visitor remains on the form page and corrects the input.<br><br>AF1.3. Flow resumes at NF step 3.|
+|**Exception Flow(s) - EF**|**EF1: Database Save Error (triggered at NF step 5):**<br><br>EF1.1. The database fails to save the data; the system displays an error message stating that the booking could not be submitted.<br><br>EF1.2. Visitor may retry (flow resumes at NF step 3) or abandon the use case. Use case ends.|
 |**Post-condition(s)**|The booking inquiry is successfully recorded in the system's database.<br><br>The Administrator is (ideally) notified of the new inquiry.<br><br>The Visitor receives an on-screen confirmation of submission.|
 
 ```plantuml
 @startuml
 start
-:Visitor Accesses Inquiry Form;
+:1. Visitor Accesses Booking Form;
 repeat
-  :Visitor Fills Inquiry Form Fields;
-  :Visitor Clicks "Submit Inquiry";
-  if (Validate Input Data?) then (Valid)
-    :System Saves Inquiry to Database;
-    if (Save Successful?) then (Yes)
-      :System Triggers Notification to Admin;
-      :Display "Inquiry Submitted Successfully" Message to Visitor;
+  :2. Visitor Fills Booking Form Fields;
+  :3. Visitor Clicks "Submit Booking";
+  if (4. Validate Input Data?) then (Valid)
+    :5. System Saves Booking to Database;
+    if (5. Save Successful?) then (Yes)
+      :6. Display "Booking Submitted Successfully"
+      Message with Reference Code;
       stop
-    else (No - DB Save Error)
-      :Display "Error Submitting Inquiry" Message to Visitor;
+    else (No - DB Save Error -> EF1)
+      :EF1. Display "Error Submitting Booking" Message;
     endif
-  else (Invalid)
-    :Display Validation Error Messages to Visitor;
+  else (Invalid -> AF1)
+    :AF1. Display Validation Error Messages;
   endif
-repeat while
+repeat while (Visitor retries? (resume at step 3)) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -696,17 +743,22 @@ participant "Backend (AppServer)" as App
 database "Database (DB)" as DB
 participant "NotificationService" as NS
 
-Visitor -> UI : Fills Inquiry Form & Clicks Submit
-UI -> App : POST /api/inquiries (InquiryData)
-App -> App : Validate(InquiryData)
-alt Input Valid
-  App -> DB : SaveInquiry(InquiryData)
-  DB --> App : InquirySaved (Generated InquiryID)
-  App -> NS : SendNewInquiryNotification(Admin, InquiryID)
-  NS --> App : NotificationSentStatus
-  App --> UI : InquirySubmissionSuccessResponse
-else Input Invalid
-  App --> UI : InquiryValidationErrorResponse
+Visitor -> UI : 1-3. Fills Booking Form & Clicks "Submit Booking"
+UI -> App : POST /inquiry/submit (BookingData)
+App -> App : 4. Validate(BookingData)
+alt Step 4: Input Valid
+  App -> DB : 5. SaveBooking(BookingData)
+  alt Step 5: Save Successful
+    DB --> App : BookingSaved (Generated ReferenceCode)
+    App -> NS : SendNewBookingNotification(Admin, ReferenceCode)
+    NS --> App : NotificationSentStatus
+    App --> UI : 6. BookingSubmissionSuccessResponse (ReferenceCode)
+  else Step 5 fails -> EF1: DB Save Error
+    DB --> App : SaveError
+    App --> UI : EF1. BookingSubmissionErrorResponse
+  end
+else Step 4 fails -> AF1: Input Invalid
+  App --> UI : AF1. ValidationErrorResponse (resume at step 3)
 end
 UI --> Visitor : Displays Success or Error Message
 @enduml
@@ -726,33 +778,35 @@ _Figure 2.12: Sequence Diagram for Submit Booking Inquiry_
 |**Description**|This use case allows the Administrator to create, read, update, and delete (CRUD) general descriptive information about Al-Muneer Hall, such as venue description, services offered, capacity, location, contact details, and FAQs.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|NF1: View Hall Information:<br><br>1. Administrator navigates to the "Venue Information" or "Content Management" section in the admin panel.<br><br>2. System retrieves the current hall information from the database.<br><br>3. System displays the information in editable fields/text areas.<br><br>  <br><br>NF2: Update Hall Information:<br><br>1. Administrator modifies the content in the displayed fields (e.g., changes description, updates contact number, adds a new FAQ).<br><br>2. Administrator clicks a "Save" or "Update" button.<br><br>3. System validates the input (e.g., checks for required fields if any, character limits).<br><br>4. System saves the updated information to the database.<br><br>5. System displays a success message (e.g., "Information updated successfully.").|
-|**Alternative Flow(s) - AF**|AF1: Input Validation Error (Update):<br><br>1. If system validation fails (Step NF2.3), the system displays an error message next to the problematic fields.<br><br>2. Administrator corrects the input and re-submits.<br><br>  <br><br>AF2: Create New FAQ Item (if FAQs are managed as separate items):<br><br>1. Admin clicks "Add New FAQ".<br><br>2. System displays fields for Question and Answer.<br><br>3. Admin fills fields and saves.<br><br>4. System validates and saves.|
-|**Exception Flow(s) - EF**|EF1: Error Saving Data:<br><br>1. If the system encounters an error while trying to save the updated information to the database (e.g., database connection error), it displays a general error message (e.g., "Failed to update information. Please try again.").|
+|**Normal Flow(s)- NF**|NF1: View Hall Information:<br><br>1. Administrator navigates to the "Venue Information" or "Content Management" section in the admin panel.<br><br>2. System retrieves the current hall information from the database.<br><br>3. System displays the information in editable fields/text areas. **[If the Administrator chooses to add a new FAQ item instead of editing existing content → AF2]**<br><br>  <br><br>NF2: Update Hall Information:<br><br>1. Administrator modifies the content in the displayed fields (e.g., changes description, updates contact number, adds a new FAQ).<br><br>2. Administrator clicks a "Save" or "Update" button.<br><br>3. System validates the input (e.g., checks for required fields if any, character limits). **[If validation fails → AF1]**<br><br>4. System saves the updated information to the database. **[If the save operation fails → EF1]**<br><br>5. System displays a success message (e.g., "Information updated successfully.").|
+|**Alternative Flow(s) - AF**|**AF1: Input Validation Error (triggered at NF2 step 3):**<br><br>AF1.1. Validation fails; the system displays an error message next to the problematic fields.<br><br>AF1.2. Administrator corrects the input.<br><br>AF1.3. Flow resumes at NF2 step 2.<br><br>  <br><br>**AF2: Create New FAQ Item (triggered at NF1 step 3):**<br><br>AF2.1. Administrator clicks "Add New FAQ".<br><br>AF2.2. System displays fields for Question and Answer.<br><br>AF2.3. Administrator fills the fields and saves.<br><br>AF2.4. Flow resumes at NF2 step 3 (validation and save proceed as in the update flow).|
+|**Exception Flow(s) - EF**|**EF1: Error Saving Data (triggered at NF2 step 4):**<br><br>EF1.1. The system encounters an error while saving to the database (e.g., database connection error) and displays a general error message (e.g., "Failed to update information. Please try again.").<br><br>EF1.2. Administrator may retry (flow resumes at NF2 step 2) or abandon the use case. Use case ends.|
 |**Post-condition(s)**|Hall information displayed on the public portal is updated (after successful update).<br><br>Database reflects the changes.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Content Management Section;
-:System Retrieves Current Hall Information;
-:Display Information in Editable Form;
+:NF1.1. Admin Navigates to Content Management Section;
+:NF1.2. System Retrieves Current Hall Information;
+:NF1.3. Display Information in Editable Form
+(or "Add New FAQ" fields, AF2);
 repeat
-  :Admin Modifies Information;
-  :Admin Clicks "Save/Update";
-  if (Validate Input?) then (Valid)
-    :System Saves Updated Information to DB;
-    if (Save Successful?) then (Yes)
-      :Display "Update Successful" Message;
+  :NF2.1. Admin Modifies Information;
+  :NF2.2. Admin Clicks "Save/Update";
+  if (NF2.3. Validate Input?) then (Valid)
+    :NF2.4. System Saves Updated Information to DB;
+    if (NF2.4. Save Successful?) then (Yes)
+      :NF2.5. Display "Update Successful" Message;
       stop
-    else (No - DB Error)
-      :Display "Error Saving Data" Message;
+    else (No - DB Error -> EF1)
+      :EF1. Display "Error Saving Data" Message;
     endif
-  else (Invalid)
-    :Display Validation Error Messages;
-    :Admin Corrects Input;
+  else (Invalid -> AF1)
+    :AF1. Display Validation Error Messages;
+    :AF1. Admin Corrects Input;
   endif
-repeat while
+repeat while (Admin retries? (resume at NF2 step 2)) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -765,22 +819,27 @@ participant "Frontend (WebUI AdminPanel)" as UI
 participant "Backend (AppServer ContentController)" as App
 database "Database (DB VenueInfo)" as DB
 
-Admin -> UI : Navigates to Edit Venue Info
+Admin -> UI : NF1.1. Navigates to Edit Venue Info
 UI -> App : GET /api/admin/venue-info
-App -> DB : GetVenueInfo()
+App -> DB : NF1.2. GetVenueInfo()
 DB --> App : CurrentVenueInfoData
 App --> UI : VenueInfoResponse (CurrentVenueInfoData)
-UI --> Admin : Displays Current Info in Editable Form
+UI --> Admin : NF1.3. Displays Current Info in Editable Form
 
-Admin -> UI : Modifies Info & Clicks Save
+Admin -> UI : NF2.1-2. Modifies Info & Clicks Save
 UI -> App : PUT /api/admin/venue-info (UpdatedData)
-App -> App : Validate(UpdatedData)
-alt Input Valid
-  App -> DB : UpdateVenueInfo(UpdatedData)
-  DB --> App : UpdateSuccess
-  App --> UI : SuccessResponse ("Info Updated")
-else Input Invalid
-  App --> UI : ValidationErrorResponse
+App -> App : NF2.3. Validate(UpdatedData)
+alt NF2 Step 3: Input Valid
+  App -> DB : NF2.4. UpdateVenueInfo(UpdatedData)
+  alt NF2 Step 4: Save Successful
+    DB --> App : UpdateSuccess
+    App --> UI : NF2.5. SuccessResponse ("Info Updated")
+  else NF2 Step 4 fails -> EF1: DB Error
+    DB --> App : SaveError
+    App --> UI : EF1. ErrorResponse ("Failed to Update")
+  end
+else NF2 Step 3 fails -> AF1: Input Invalid
+  App --> UI : AF1. ValidationErrorResponse (resume at NF2 step 2)
 end
 UI --> Admin : Displays Success/Error Message
 @enduml
@@ -800,38 +859,40 @@ _Figure 2.14: Sequence Diagram for Manage Hall Information (Update Flow)_
 |**Description**|This use case allows the Administrator to upload new media items (images, videos) to the gallery, view existing items, and delete items from the gallery.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|NF1: View Gallery Items:<br><br>1. Administrator navigates to the "Media Gallery Management" section.<br><br>2. System retrieves and displays a list or grid of existing media items (thumbnails, names).<br><br>  <br><br>NF2: Upload New Media Item:<br><br>1. Administrator clicks "Upload New Media".<br><br>2. System presents a file selection dialog and fields for optional caption/details.<br><br>3. Administrator selects a media file (image/video) and enters details.<br><br>4. Administrator clicks "Upload".<br><br>5. System validates the file (type, size).<br><br>6. System uploads the file to the server/file storage.<br><br>7. System saves metadata (filename, path, caption) to the database.<br><br>8. System displays a success message and refreshes the gallery list.<br><br>  <br><br>NF3: Delete Media Item:<br><br>1. Administrator selects a media item to delete (e.g., clicks a delete icon next to an item).<br><br>2. System prompts for confirmation.<br><br>3. Administrator confirms deletion.<br><br>4. System deletes the media file from storage.<br><br>5. System deletes the metadata from the database.<br><br>6. System displays a success message and refreshes the gallery list.|
-|**Alternative Flow(s) - AF**|AF1: File Validation Error (Upload):<br><br>1. If file validation fails (NF2.5), system displays an error (e.g., "Invalid file type" or "File too large"). Admin can re-select.<br><br>  <br><br>AF2: Deletion Cancelled:<br><br>1. Administrator cancels the deletion at the confirmation prompt (NF3.3). System takes no action.|
-|**Exception Flow(s) - EF**|EF1: Upload Failure:<br><br>1. If file upload fails due to server error (NF2.6), system displays an error message.<br><br>  <br><br>EF2: Database Save/Delete Failure:<br><br>1. If saving/deleting metadata fails (NF2.7 or NF3.5), system displays an error. May require manual cleanup if file operation succeeded but DB failed.|
+|**Normal Flow(s)- NF**|NF1: View Gallery Items:<br><br>1. Administrator navigates to the "Media Gallery Management" section.<br><br>2. System retrieves and displays a list or grid of existing media items (thumbnails, names).<br><br>  <br><br>NF2: Upload New Media Item:<br><br>1. Administrator clicks "Upload New Media".<br><br>2. System presents a file selection dialog and fields for optional caption/details.<br><br>3. Administrator selects a media file (image/video) and enters details.<br><br>4. Administrator clicks "Upload".<br><br>5. System validates the file (type, size). **[If validation fails → AF1]**<br><br>6. System uploads the file to the server/file storage. **[If the upload fails → EF1]**<br><br>7. System saves metadata (filename, path, caption) to the database. **[If the save fails → EF2]**<br><br>8. System displays a success message and refreshes the gallery list.<br><br>  <br><br>NF3: Delete Media Item:<br><br>1. Administrator selects a media item to delete (e.g., clicks a delete icon next to an item).<br><br>2. System prompts for confirmation.<br><br>3. Administrator confirms deletion. **[If the Administrator cancels → AF2]**<br><br>4. System deletes the media file from storage.<br><br>5. System deletes the metadata from the database. **[If the delete fails → EF2]**<br><br>6. System displays a success message and refreshes the gallery list.|
+|**Alternative Flow(s) - AF**|**AF1: File Validation Error (triggered at NF2 step 5):**<br><br>AF1.1. File validation fails; the system displays an error (e.g., "Invalid file type" or "File too large").<br><br>AF1.2. Flow resumes at NF2 step 3 (Administrator re-selects a file).<br><br>  <br><br>**AF2: Deletion Cancelled (triggered at NF3 step 3):**<br><br>AF2.1. Administrator cancels the deletion at the confirmation prompt; the system takes no action.<br><br>AF2.2. Flow resumes at NF1 step 2. Use case may end.|
+|**Exception Flow(s) - EF**|**EF1: Upload Failure (triggered at NF2 step 6):**<br><br>EF1.1. The file upload fails due to a server error; the system displays an error message.<br><br>EF1.2. Administrator may retry (flow resumes at NF2 step 4) or abandon. Use case ends.<br><br>  <br><br>**EF2: Database Save/Delete Failure (triggered at NF2 step 7 or NF3 step 5):**<br><br>EF2.1. Saving/deleting metadata fails; the system displays an error message. Manual cleanup may be required if the file operation succeeded but the database operation failed.<br><br>EF2.2. Use case ends.|
 |**Post-condition(s)**|Media gallery content is updated (new item added or existing item removed).<br><br>Public gallery reflects changes.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Gallery Management;
-:Admin Clicks "Upload New Media";
+:NF1.1. Admin Navigates to Gallery Management;
+:NF2.1. Admin Clicks "Upload New Media";
 repeat
-  :Display File Upload Form;
-  :Admin Selects File & Enters Details;
-  :Admin Clicks "Upload";
-  if (Validate File (Type, Size)) then (Valid)
-    :System Uploads File to Storage;
-    if (File Upload Successful?) then (Yes)
-      :System Saves Media Metadata to DB;
-      if (DB Save Successful?) then (Yes)
-        :Display "Upload Successful" Message;
-        :Refresh Gallery List;
+  :NF2.2. Display File Upload Form;
+  :NF2.3. Admin Selects File & Enters Details;
+  :NF2.4. Admin Clicks "Upload";
+  if (NF2.5. Validate File (Type, Size)?) then (Valid)
+    :NF2.6. System Uploads File to Storage;
+    if (NF2.6. File Upload Successful?) then (Yes)
+      :NF2.7. System Saves Media Metadata to DB;
+      if (NF2.7. DB Save Successful?) then (Yes)
+        :NF2.8. Display "Upload Successful" Message
+        and Refresh Gallery List;
         stop
-      else (No - DB Error)
-        :Display "Error Saving Metadata" Message;
+      else (No - DB Error -> EF2)
+        :EF2. Display "Error Saving Metadata" Message;
       endif
-    else (No - Storage Error)
-      :Display "File Upload Failed" Message;
+    else (No - Storage Error -> EF1)
+      :EF1. Display "File Upload Failed" Message;
     endif
-  else (Invalid File)
-    :Display File Validation Error Message;
+  else (Invalid File -> AF1)
+    :AF1. Display File Validation Error Message
+    (resume at NF2 step 3);
   endif
-repeat while
+repeat while (Admin retries?) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -845,17 +906,27 @@ participant "Backend (AppServer - MediaController)" as App
 participant "FileStorageService" as Storage
 database "Database (DB - MediaItem)" as DB
 
-Admin -> UI : Selects File & Clicks Upload
+Admin -> UI : NF2.3-4. Selects File & Clicks Upload
 UI -> App : POST /api/admin/gallery/upload (File, Caption)
-App -> App : ValidateFile(File)
-alt File Valid
-  App -> Storage : StoreFile(File)
-  Storage --> App : FilePath
-  App -> DB : SaveMediaMetadata(FilePath, Caption)
-  DB --> App : SaveSuccess
-  App --> UI : UploadSuccessResponse
-else File Invalid
-  App --> UI : FileValidationErrorResponse
+App -> App : NF2.5. ValidateFile(File)
+alt NF2 Step 5: File Valid
+  App -> Storage : NF2.6. StoreFile(File)
+  alt NF2 Step 6: Upload Successful
+    Storage --> App : FilePath
+    App -> DB : NF2.7. SaveMediaMetadata(FilePath, Caption)
+    alt NF2 Step 7: Save Successful
+      DB --> App : SaveSuccess
+      App --> UI : NF2.8. UploadSuccessResponse
+    else NF2 Step 7 fails -> EF2: DB Error
+      DB --> App : SaveError
+      App --> UI : EF2. MetadataSaveErrorResponse
+    end
+  else NF2 Step 6 fails -> EF1: Storage Error
+    Storage --> App : StorageError
+    App --> UI : EF1. UploadFailedResponse
+  end
+else NF2 Step 5 fails -> AF1: File Invalid
+  App --> UI : AF1. FileValidationErrorResponse (resume at NF2 step 3)
 end
 UI --> Admin : Displays Success/Error Message & Refreshes Gallery
 @enduml
@@ -875,33 +946,34 @@ _Figure 2.16: Sequence Diagram for Manage Media Gallery (Upload Flow)_
 |**Description**|This use case allows the Administrator to define, view, update, and delete pricing tiers, packages, and any configurable pricing options for Al-Muneer Hall services.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|NF1: View Pricing Tiers:<br><br>1. Administrator navigates to the "Pricing Management" section.<br><br>2. System retrieves and displays existing pricing tiers/packages.<br><br>  <br><br>NF2: Add New Pricing Tier:<br><br>1. Administrator clicks "Add New Tier".<br><br>2. System displays a form for tier name, base price, description, included services.<br><br>3. Administrator fills in the details and clicks "Save".<br><br>4. System validates input.<br><br>5. System saves the new pricing tier to the database.<br><br>6. System displays a success message and refreshes the list.<br><br>  <br><br>NF3: Update Existing Pricing Tier:<br><br>1. Administrator selects an existing tier to edit.<br><br>2. System populates a form with the tier's current details.<br><br>3. Administrator modifies details and clicks "Update".<br><br>4. System validates input.<br><br>5. System saves changes to the database.<br><br>6. System displays success message.<br><br>  <br><br>NF4: Delete Pricing Tier:<br><br>1. Administrator selects a tier to delete.<br><br>2. System prompts for confirmation.<br><br>3. Administrator confirms.<br><br>4. System deletes the tier from the database (may require checks if linked to active bookings out of simple scope).<br><br>5. System displays success message.|
-|**Alternative Flow(s) - AF**|AF1: Input Validation Error (Add/Update):<br><br>1. If validation fails, display error messages. Admin corrects and resubmits.|
-|**Exception Flow(s) - EF**|EF1: Database Error (Save/Update/Delete):<br><br>1. If a database operation fails, display a general error message.|
+|**Normal Flow(s)- NF**|NF1: View Pricing Tiers:<br><br>1. Administrator navigates to the "Pricing Management" section.<br><br>2. System retrieves and displays existing pricing tiers/packages.<br><br>  <br><br>NF2: Add New Pricing Tier:<br><br>1. Administrator clicks "Add New Tier".<br><br>2. System displays a form for tier name, base price, description, included services.<br><br>3. Administrator fills in the details and clicks "Save".<br><br>4. System validates input. **[If validation fails → AF1]**<br><br>5. System saves the new pricing tier to the database. **[If the save fails → EF1]**<br><br>6. System displays a success message and refreshes the list.<br><br>  <br><br>NF3: Update Existing Pricing Tier:<br><br>1. Administrator selects an existing tier to edit.<br><br>2. System populates a form with the tier's current details.<br><br>3. Administrator modifies details and clicks "Update".<br><br>4. System validates input. **[If validation fails → AF1]**<br><br>5. System saves changes to the database. **[If the save fails → EF1]**<br><br>6. System displays success message.<br><br>  <br><br>NF4: Delete Pricing Tier:<br><br>1. Administrator selects a tier to delete.<br><br>2. System prompts for confirmation.<br><br>3. Administrator confirms.<br><br>4. System deletes the tier from the database (may require checks if linked to active bookings out of simple scope). **[If the delete fails → EF1]**<br><br>5. System displays success message.|
+|**Alternative Flow(s) - AF**|**AF1: Input Validation Error (triggered at NF2 step 4 or NF3 step 4):**<br><br>AF1.1. Validation fails; the system displays error messages next to the problematic fields.<br><br>AF1.2. Administrator corrects the input.<br><br>AF1.3. Flow resumes at NF2 step 3 (or NF3 step 3 respectively).|
+|**Exception Flow(s) - EF**|**EF1: Database Error (triggered at NF2 step 5, NF3 step 5, or NF4 step 4):**<br><br>EF1.1. The database operation fails; the system displays a general error message.<br><br>EF1.2. Administrator may retry the failed action or abandon it. Use case ends.|
 |**Post-condition(s)**|Pricing information is updated in the database.<br><br>Public pricing page reflects changes.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Pricing Management;
-:Admin Clicks "Add New Tier";
+:NF1.1. Admin Navigates to Pricing Management;
+:NF2.1. Admin Clicks "Add New Tier";
 repeat
-  :Display New Pricing Tier Form;
-  :Admin Fills Tier Details;
-  :Admin Clicks "Save";
-  if (Validate Input?) then (Valid)
-    :System Saves New Tier to DB;
-    if (Save Successful?) then (Yes)
-      :Display "Tier Added Successfully" Message;
-      :Refresh Pricing Tier List;
+  :NF2.2. Display New Pricing Tier Form;
+  :NF2.3. Admin Fills Tier Details & Clicks "Save";
+  if (NF2.4. Validate Input?) then (Valid)
+    :NF2.5. System Saves New Tier to DB;
+    if (NF2.5. Save Successful?) then (Yes)
+      :NF2.6. Display "Tier Added Successfully" Message
+      and Refresh Pricing Tier List;
       stop
-    else (No - DB Error)
-      :Display "Error Saving Tier" Message;
+    else (No - DB Error -> EF1)
+      :EF1. Display "Error Saving Tier" Message;
     endif
-  else (Invalid)
-    :Display Validation Error Messages;
+  else (Invalid -> AF1)
+    :AF1. Display Validation Error Messages
+    (resume at NF2 step 3);
   endif
-repeat while
+repeat while (Admin retries?) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -914,15 +986,20 @@ participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - PricingController)" as App
 database "Database (DB - PricingTier)" as DB
 
-Admin -> UI : Clicks "Add New Tier", Fills Form & Saves
+Admin -> UI : NF2.1-3. Clicks "Add New Tier", Fills Form & Saves
 UI -> App : POST /api/admin/pricing-tiers (NewTierData)
-App -> App : Validate(NewTierData)
-alt Input Valid
-  App -> DB : SavePricingTier(NewTierData)
-  DB --> App : SaveSuccess
-  App --> UI : SuccessResponse ("Tier Added")
-else Input Invalid
-  App --> UI : ValidationErrorResponse
+App -> App : NF2.4. Validate(NewTierData)
+alt NF2 Step 4: Input Valid
+  App -> DB : NF2.5. SavePricingTier(NewTierData)
+  alt NF2 Step 5: Save Successful
+    DB --> App : SaveSuccess
+    App --> UI : NF2.6. SuccessResponse ("Tier Added")
+  else NF2 Step 5 fails -> EF1: DB Error
+    DB --> App : SaveError
+    App --> UI : EF1. ErrorResponse ("Error Saving Tier")
+  end
+else NF2 Step 4 fails -> AF1: Input Invalid
+  App --> UI : AF1. ValidationErrorResponse (resume at NF2 step 3)
 end
 UI --> Admin : Displays Success/Error Message & Refreshes List
 @enduml
@@ -942,25 +1019,26 @@ _Figure 2.18: Sequence Diagram for Manage Pricing Panel (Add New Tier Flow)_
 |**Description**|This use case allows the Administrator to manually update the availability calendar (mark dates as booked/available/pending) and to view details of submitted booking inquiries.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|NF1: View Inquiries:<br><br>1. Administrator navigates to the "Booking Inquiries" section.<br><br>2. System retrieves and displays a list of submitted inquiries (e.g., visitor name, contact, event date, status).<br><br>3. Administrator can click on an inquiry to view its full details.<br><br>  <br><br>NF2: Update Calendar Manually:<br><br>1. Administrator navigates to the "Calendar Management" section.<br><br>2. System displays an interactive calendar showing current statuses.<br><br>3. Administrator selects a date or date range.<br><br>4. Administrator chooses a new status (e.g., Booked, Available, Pending).<br><br>5. Administrator saves the change.<br><br>6. System updates the availability slot(s) in the database.<br><br>7. System displays a success message and refreshes the calendar view.<br><br>  <br><br>NF3: Update Inquiry Status (Simple):<br><br>1. When viewing an inquiry (NF1.3), Administrator can update its status (e.g., "Viewed", "Contacted", "Tentatively Booked" - prior to payment proof).<br><br>2. Administrator saves the status change.<br><br>3. System updates the inquiry status in the database.|
-|**Alternative Flow(s) - AF**|AF1: No Inquiries:<br><br>1. If no inquiries exist when viewing (NF1.2), system displays "No new inquiries."|
-|**Exception Flow(s) - EF**|EF1: Database Error (Saving Calendar/Inquiry Status):<br><br>1. If a database operation fails, display a general error message.|
+|**Normal Flow(s)- NF**|NF1: View Inquiries:<br><br>1. Administrator navigates to the "Booking Inquiries" section.<br><br>2. System retrieves and displays a list of submitted inquiries (e.g., visitor name, contact, event date, status). **[If no inquiries exist → AF1]**<br><br>3. Administrator can click on an inquiry to view its full details.<br><br>  <br><br>NF2: Update Calendar Manually:<br><br>1. Administrator navigates to the "Calendar Management" section.<br><br>2. System displays an interactive calendar showing current statuses.<br><br>3. Administrator selects a date or date range.<br><br>4. Administrator chooses a new status (e.g., Booked, Available, Pending).<br><br>5. Administrator saves the change.<br><br>6. System updates the availability slot(s) in the database. **[If the update fails → EF1]**<br><br>7. System displays a success message and refreshes the calendar view.<br><br>  <br><br>NF3: Update Inquiry Status (Simple):<br><br>1. When viewing an inquiry (NF1 step 3), Administrator can update its status (e.g., "Viewed", "Contacted", "Tentatively Booked" - prior to payment proof).<br><br>2. Administrator saves the status change.<br><br>3. System updates the inquiry status in the database. **[If the update fails → EF1]**|
+|**Alternative Flow(s) - AF**|**AF1: No Inquiries (triggered at NF1 step 2):**<br><br>AF1.1. No inquiries exist; the system displays "No new inquiries."<br><br>AF1.2. Use case ends (or Administrator proceeds to NF2).|
+|**Exception Flow(s) - EF**|**EF1: Database Error (triggered at NF2 step 6 or NF3 step 3):**<br><br>EF1.1. The database operation fails; the system displays a general error message.<br><br>EF1.2. Administrator may retry the failed action (flow resumes at NF2 step 5 or NF3 step 2 respectively) or abandon it. Use case ends.|
 |**Post-condition(s)**|Availability calendar is updated.<br><br>Status of inquiries may be updated.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Calendar Management;
-:System Displays Interactive Calendar;
-:Admin Selects Date(s);
-:Admin Chooses New Status (Booked/Available/Pending);
-:Admin Clicks "Save Change";
-:System Updates Availability Slot(s) in DB;
-if (Save Successful?) then (Yes)
-  :Display "Calendar Updated" Message;
-  :Refresh Calendar View;
-else (No - DB Error)
-  :Display "Error Updating Calendar" Message;
+:NF2.1. Admin Navigates to Calendar Management;
+:NF2.2. System Displays Interactive Calendar;
+:NF2.3. Admin Selects Date(s);
+:NF2.4. Admin Chooses New Status (Booked/Available/Pending);
+:NF2.5. Admin Clicks "Save Change";
+:NF2.6. System Updates Availability Slot(s) in DB;
+if (NF2.6. Save Successful?) then (Yes)
+  :NF2.7. Display "Calendar Updated" Message
+  and Refresh Calendar View;
+else (No - DB Error -> EF1)
+  :EF1. Display "Error Updating Calendar" Message
+  (Admin may retry at NF2 step 5);
 endif
 stop
 @enduml
@@ -975,12 +1053,18 @@ participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - CalendarController)" as App
 database "Database (DB - AvailabilitySlot)" as DB
 
-Admin -> UI : Selects Date & New Status, Clicks Save
+Admin -> UI : NF2.3-5. Selects Date & New Status, Clicks Save
 UI -> App : POST /api/admin/calendar/update-slot (Date, NewStatus)
-App -> DB : UpdateAvailabilitySlot(Date, NewStatus)
-DB --> App : UpdateSuccess
-App --> UI : SuccessResponse ("Calendar Updated")
-UI --> Admin : Displays Success Message & Refreshes Calendar
+App -> DB : NF2.6. UpdateAvailabilitySlot(Date, NewStatus)
+alt NF2 Step 6: Update Successful
+  DB --> App : UpdateSuccess
+  App --> UI : NF2.7. SuccessResponse ("Calendar Updated")
+  UI --> Admin : Displays Success Message & Refreshes Calendar
+else NF2 Step 6 fails -> EF1: DB Error
+  DB --> App : UpdateError
+  App --> UI : EF1. ErrorResponse ("Error Updating Calendar")
+  UI --> Admin : Displays Error Message (may retry at NF2 step 5)
+end
 @enduml
 ```
 
@@ -998,30 +1082,30 @@ _Figure 2.20: Sequence Diagram for Manage Calendar (Update Manually)_
 |**Description**|This use case allows the Administrator to view website traffic analytics through interactive Chart.js visualisations and to receive an AI-generated traffic funnel advisor that analyses Home → Gallery → Pricing → Inquiry visit counts and suggests concrete conversion improvements.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>Page visit data has been logged by the system.|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Analytics" section in the admin panel.<br><br>2. System retrieves logged page-visit data for the last 30 days.<br><br>3. System displays a bar chart of top pages and a line chart of daily traffic trends.<br><br>4. System asynchronously requests an AI funnel insight based on the retrieved traffic data.<br><br>5. System displays the AI-generated funnel insight when it becomes available.|
-|**Alternative Flow(s) - AF**|AF1: No Data Logged Yet:<br><br>1. If no traffic data has been logged, the system displays "No traffic data available yet."<br><br>AF2: AI Service Unavailable:<br><br>1. If the AI advisor request fails or returns no insight, the system displays a graceful fallback message (e.g., "AI insight temporarily unavailable; charts are still up to date.") without delaying the rest of the page.|
-|**Exception Flow(s) - EF**|EF1: Error Retrieving Log Data:<br><br>1. If the system encounters an error while retrieving analytics data, it displays a general error message.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Analytics" section in the admin panel.<br><br>2. System retrieves logged page-visit data for the last 30 days. **[If no traffic data has been logged → AF1; if retrieval fails → EF1]**<br><br>3. System displays a bar chart of top pages and a line chart of daily traffic trends.<br><br>4. System asynchronously requests an AI funnel insight based on the retrieved traffic data. **[If the AI service is unavailable → AF2]**<br><br>5. System displays the AI-generated funnel insight when it becomes available.|
+|**Alternative Flow(s) - AF**|**AF1: No Data Logged Yet (triggered at NF step 2):**<br><br>AF1.1. No traffic data has been logged; the system displays "No traffic data available yet."<br><br>AF1.2. Use case ends.<br><br>**AF2: AI Service Unavailable (triggered at NF step 4):**<br><br>AF2.1. The AI advisor request fails or returns no insight; the system displays a graceful fallback message (e.g., "AI insight temporarily unavailable; charts are still up to date.") without delaying the rest of the page.<br><br>AF2.2. Use case ends (charts from NF step 3 remain displayed).|
+|**Exception Flow(s) - EF**|**EF1: Error Retrieving Log Data (triggered at NF step 2):**<br><br>EF1.1. The system encounters an error while retrieving analytics data and displays a general error message.<br><br>EF1.2. Use case ends.|
 |**Post-condition(s)**|Administrator has viewed the available traffic analytics and any AI-generated insight.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Analytics Section;
-:System Retrieves Page-Visit Data (last 30 days);
-if (Data Retrieval Successful?) then (Yes)
+:1. Admin Navigates to Analytics Section;
+:2. System Retrieves Page-Visit Data (last 30 days);
+if (2. Data Retrieval Successful?) then (Yes)
   if (Data Available?) then (Yes)
-    :Display Traffic Charts (Top Pages + Daily Trends);
-    :Asynchronously Request AI Funnel Insight;
-    if (AI Insight Available?) then (Yes)
-      :Display AI Funnel Recommendation;
-    else (No / Error)
-      :Display Graceful Fallback Message;
+    :3. Display Traffic Charts (Top Pages + Daily Trends);
+    :4. Asynchronously Request AI Funnel Insight;
+    if (4. AI Insight Available?) then (Yes)
+      :5. Display AI Funnel Recommendation;
+    else (No / Error -> AF2)
+      :AF2. Display Graceful Fallback Message;
     endif
-  else (No Data Yet)
-    :Display "No Traffic Data Available Yet";
+  else (No Data Yet -> AF1)
+    :AF1. Display "No Traffic Data Available Yet";
   endif
-else (No - Retrieval Error)
-  :Display Error Message;
+else (No - Retrieval Error -> EF1)
+  :EF1. Display Error Message;
 endif
 stop
 @enduml
@@ -1037,18 +1121,24 @@ participant "Backend (AppServer - AnalyticsController)" as App
 database "Database (DB - PageVisit)" as DB
 participant "GeminiService" as AI
 
-Admin -> UI : Navigates to Analytics Section
+Admin -> UI : 1. Navigates to Analytics Section
 UI -> App : GET /api/admin/analytics
-App -> DB : GetTrafficData(last 30 days)
+App -> DB : 2. GetTrafficData(last 30 days)
 DB --> App : TrafficData
 App --> UI : AnalyticsResponse (Charts Data)
-UI --> Admin : Displays Traffic Charts
+UI --> Admin : 3. Displays Traffic Charts
 
-UI -> App : GET /api/admin/analytics/ai-insight (async)
+UI -> App : 4. GET /api/admin/analytics/ai-insight (async)
 App -> AI : AnalyseFunnel(TrafficData)
-AI --> App : FunnelInsight (HTML bullets)
-App --> UI : AIInsightResponse
-UI --> Admin : Displays AI Funnel Advisor Panel
+alt Step 4: AI Insight Returned
+  AI --> App : FunnelInsight (HTML bullets)
+  App --> UI : AIInsightResponse
+  UI --> Admin : 5. Displays AI Funnel Advisor Panel
+else Step 4 fails -> AF2: AI Service Unavailable
+  AI --> App : Error / Empty Response
+  App --> UI : AF2. FallbackMessageResponse
+  UI --> Admin : Displays "AI Insight Temporarily Unavailable"
+end
 @enduml
 ```
 
@@ -1066,32 +1156,39 @@ _Figure 2.22: Sequence Diagram for View Traffic Analytics_
 |**Description**|This use case allows a Visitor, typically after making a booking inquiry and arranging an offline payment (e.g., local bank transfer), to upload a proof of payment (e.g., screenshot of transfer receipt) to the portal.|
 |**Actor(s)**|Visitor|
 |**Pre-condition(s)**|Visitor has made a booking inquiry (UC005).<br><br>Visitor has been instructed by the Administrator to submit payment proof, or a booking has reached a stage where payment proof is expected.<br><br>Visitor has an image file of the payment proof.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to the payment proof upload page from their inquiry status page.<br><br>2. System presents a file upload form pre-linked to the visitor's inquiry.<br><br>3. Visitor selects the payment proof image file (JPG/PNG, within size limit).<br><br>4. Visitor clicks "Upload Proof".<br><br>5. System validates the file and uploads it to secure storage.<br><br>6. System records the proof metadata (filename, path, timestamp, inquiry link) in the database.<br><br>7. System displays a success message and notifies the Administrator.|
-|**Alternative Flow(s) - AF**|AF1: Invalid File Type/Size:<br><br>1. If file validation fails, the system displays an error message specifying the issue. Visitor remains on the form to select a valid file.|
-|**Exception Flow(s) - EF**|EF1: File Upload Failure:<br><br>1. If the system fails to upload the file to storage due to a server-side error, it displays a general error message.<br><br>EF2: Database Save Failure:<br><br>1. If the system fails to save the payment proof metadata, it displays an error message.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the payment proof upload page from their booking status page.<br><br>2. System presents a file upload form pre-linked to the visitor's booking.<br><br>3. Visitor selects the payment proof image file (JPG/PNG, within size limit).<br><br>4. Visitor clicks "Upload Proof".<br><br>5. System validates the file and uploads it to secure storage. **[If validation fails → AF1; if the upload to storage fails → EF1]**<br><br>6. System records the proof metadata (filename, path, timestamp, booking link) in the database. **[If the save fails → EF2]**<br><br>7. System displays a success message and notifies the Administrator.|
+|**Alternative Flow(s) - AF**|**AF1: Invalid File Type/Size (triggered at NF step 5):**<br><br>AF1.1. File validation fails; the system displays an error message specifying the issue.<br><br>AF1.2. Visitor remains on the form and selects a valid file.<br><br>AF1.3. Flow resumes at NF step 4.|
+|**Exception Flow(s) - EF**|**EF1: File Upload Failure (triggered at NF step 5):**<br><br>EF1.1. The system fails to upload the file to storage due to a server-side error and displays a general error message.<br><br>EF1.2. Visitor may retry (flow resumes at NF step 4) or abandon. Use case ends.<br><br>**EF2: Database Save Failure (triggered at NF step 6):**<br><br>EF2.1. The system fails to save the payment proof metadata and displays an error message.<br><br>EF2.2. Use case ends.|
 |**Post-condition(s)**|Payment proof file is uploaded and its metadata is stored, linked to the relevant booking inquiry.<br><br>Administrator is notified of the new submission.<br><br>Visitor receives confirmation of submission.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Payment Proof Upload Page;
+:1-2. Visitor Navigates to Payment Proof Upload Page;
 repeat
-  :Visitor Selects Payment Proof File;
-  :Visitor Clicks "Upload Proof";
-  if (Validate File (Type, Size)) then (Valid)
-    :System Uploads File to Storage;
-    :System Saves Proof Metadata to DB;
-    if (Save Successful?) then (Yes)
-      :Notify Administrator;
-      :Display "Proof Submitted Successfully" Message;
-      stop
-    else (No - Save Error)
-      :Display "Error Saving Proof Information" Message;
+  :3. Visitor Selects Payment Proof File;
+  :4. Visitor Clicks "Upload Proof";
+  if (5. Validate File (Type, Size)?) then (Valid)
+    :5. System Uploads File to Storage;
+    if (5. Upload Successful?) then (Yes)
+      :6. System Saves Proof Metadata to DB;
+      if (6. Save Successful?) then (Yes)
+        :7. Notify Administrator and Display
+        "Proof Submitted Successfully" Message;
+        stop
+      else (No - Save Error -> EF2)
+        :EF2. Display "Error Saving Proof Information" Message;
+        stop
+      endif
+    else (No - Storage Error -> EF1)
+      :EF1. Display General Upload Error Message;
     endif
-  else (Invalid File)
-    :Display File Validation Error Message;
+  else (Invalid File -> AF1)
+    :AF1. Display File Validation Error Message
+    (resume at step 4);
   endif
-repeat while
+repeat while (Visitor retries?) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -1106,19 +1203,29 @@ participant "FileStorageService" as Storage
 database "Database (DB)" as DB
 participant "NotificationService" as NS
 
-Visitor -> UI : Accesses Upload Form, Selects File, Enters InquiryID (optional), Clicks Submit
-UI -> App : POST /api/payment-proof/upload (File, InquiryID, otherData)
-App -> App : ValidateFile(File)
-alt File Valid and InquiryID Valid (if needed)
-  App -> Storage : StoreProofFile(File)
-  Storage --> App : FilePath
-  App -> DB : SavePaymentProofMetadata(FilePath, InquiryID)
-  DB --> App : SaveSuccess (ProofID)
-  App -> NS : SendNewPaymentProofNotification(Admin, ProofID)
-  NS --> App : NotificationSentStatus
-  App --> UI : UploadSuccessResponse
-else File or InquiryID Invalid
-  App --> UI : ValidationErrorResponse
+Visitor -> UI : 1-4. Accesses Upload Form, Selects File, Clicks "Upload Proof"
+UI -> App : POST /api/payment-proof/upload (File, BookingRef, otherData)
+App -> App : 5. ValidateFile(File)
+alt Step 5: File Valid
+  App -> Storage : 5. StoreProofFile(File)
+  alt Step 5: Storage Successful
+    Storage --> App : FilePath
+    App -> DB : 6. SavePaymentProofMetadata(FilePath, BookingRef)
+    alt Step 6: Save Successful
+      DB --> App : SaveSuccess (ProofID)
+      App -> NS : 7. SendNewPaymentProofNotification(Admin, ProofID)
+      NS --> App : NotificationSentStatus
+      App --> UI : 7. UploadSuccessResponse
+    else Step 6 fails -> EF2: DB Save Failure
+      DB --> App : SaveError
+      App --> UI : EF2. MetadataSaveErrorResponse
+    end
+  else Step 5 fails -> EF1: Storage Error
+    Storage --> App : StorageError
+    App --> UI : EF1. UploadFailedResponse
+  end
+else Step 5 fails -> AF1: File Invalid
+  App --> UI : AF1. ValidationErrorResponse (resume at step 4)
 end
 UI --> Visitor : Displays Success or Error Message
 @enduml
@@ -1138,33 +1245,36 @@ _Figure 2.24: Sequence Diagram for Submit Payment Proof_
 |**Description**|This use case allows a Visitor or client to submit feedback about their experience with Al-Muneer Hall or the online portal itself.|
 |**Actor(s)**|Visitor (can be anonymous or provide contact details)|
 |**Pre-condition(s)**|Visitor has accessed the Al-Muneer Online Portal.|
-|**Normal Flow(s)- NF**|1. Visitor navigates to the "Feedback" or "Contact Us" section that includes a feedback form.<br><br>2. Visitor optionally enters their name and contact details (email/phone).<br><br>3. Visitor types their feedback message in a text area.<br><br>4. Visitor optionally selects a rating (e.g., star rating) if provided.<br><br>5. Visitor clicks the "Submit Feedback" button.<br><br>6. System validates input (e.g., checks if feedback text is provided, validates contact format if entered).<br><br>7. System saves the feedback (including timestamp, contact details if provided, rating) to the database.<br><br>8. System displays a success message to the Visitor (e.g., "Thank you for your feedback!").<br><br>9. System may trigger a notification to the Administrator about the new feedback.|
-|**Alternative Flow(s) - AF**|AF1: Anonymous Feedback:<br><br>1. Visitor chooses not to enter name or contact details (Step 2). System proceeds with saving anonymous feedback.<br><br>  <br><br>AF2: Input Validation Error:<br><br>1. If validation fails (e.g., feedback text is empty, Step 6), the system displays an error message. Visitor remains on the form to correct.|
-|**Exception Flow(s) - EF**|EF1: System Failure to Save Feedback:<br><br>1. If the system encounters an error while saving feedback to the database (Step 7), it displays a general error message to the Visitor.|
+|**Normal Flow(s)- NF**|1. Visitor navigates to the "Feedback" or "Contact Us" section that includes a feedback form.<br><br>2. Visitor optionally enters their name and contact details (email/phone). **[If the Visitor omits name and contact details → AF1]**<br><br>3. Visitor types their feedback message in a text area.<br><br>4. Visitor optionally selects a rating (e.g., star rating) if provided.<br><br>5. Visitor clicks the "Submit Feedback" button.<br><br>6. System validates input (e.g., checks if feedback text is provided, validates contact format if entered). **[If validation fails → AF2]**<br><br>7. System saves the feedback (including timestamp, contact details if provided, rating) to the database. **[If the save fails → EF1]**<br><br>8. System displays a success message to the Visitor (e.g., "Thank you for your feedback!").<br><br>9. System may trigger a notification to the Administrator about the new feedback.|
+|**Alternative Flow(s) - AF**|**AF1: Anonymous Feedback (triggered at NF step 2):**<br><br>AF1.1. Visitor chooses not to enter name or contact details; the system will save the feedback as anonymous.<br><br>AF1.2. Flow resumes at NF step 3.<br><br>  <br><br>**AF2: Input Validation Error (triggered at NF step 6):**<br><br>AF2.1. Validation fails (e.g., feedback text is empty); the system displays an error message.<br><br>AF2.2. Visitor remains on the form and corrects the input.<br><br>AF2.3. Flow resumes at NF step 5.|
+|**Exception Flow(s) - EF**|**EF1: System Failure to Save Feedback (triggered at NF step 7):**<br><br>EF1.1. The system encounters an error while saving feedback to the database and displays a general error message to the Visitor.<br><br>EF1.2. Visitor may retry (flow resumes at NF step 5) or abandon. Use case ends.|
 |**Post-condition(s)**|Feedback is successfully recorded in the system.<br><br>Administrator may be notified.|
 
 ```plantuml
 @startuml
 start
-:Visitor Navigates to Feedback Form;
+:1. Visitor Navigates to Feedback Form;
 repeat
-  :Visitor Optionally Enters Name/Contact;
-  :Visitor Enters Feedback Message;
-  :Visitor Optionally Selects Rating;
-  :Visitor Clicks "Submit Feedback";
-  if (Validate Input (e.g., Feedback Text not empty)?) then (Valid)
-    :System Saves Feedback to Database;
-    if (Save Successful?) then (Yes)
-      :[Optional] System Triggers Notification to Admin;
-      :Display "Feedback Submitted Successfully" Message;
+  :2. Visitor Optionally Enters Name/Contact
+  (anonymous if omitted, AF1);
+  :3. Visitor Enters Feedback Message;
+  :4. Visitor Optionally Selects Rating;
+  :5. Visitor Clicks "Submit Feedback";
+  if (6. Validate Input (e.g., Feedback Text not empty)?) then (Valid)
+    :7. System Saves Feedback to Database;
+    if (7. Save Successful?) then (Yes)
+      :8. Display "Feedback Submitted Successfully" Message;
+      :9. [Optional] Trigger Notification to Admin;
       stop
-    else (No - DB Save Error)
-      :Display "Error Submitting Feedback" Message;
+    else (No - DB Save Error -> EF1)
+      :EF1. Display "Error Submitting Feedback" Message;
     endif
-  else (Invalid)
-    :Display Validation Error Message;
+  else (Invalid -> AF2)
+    :AF2. Display Validation Error Message
+    (resume at step 5);
   endif
-repeat while
+repeat while (Visitor retries?) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -1178,17 +1288,22 @@ participant "Backend (AppServer)" as App
 database "Database (DB)" as DB
 participant "NotificationService (Optional)" as NS
 
-Visitor -> UI : Fills Feedback Form & Clicks Submit
+Visitor -> UI : 1-5. Fills Feedback Form & Clicks "Submit Feedback"
 UI -> App : POST /api/feedback (FeedbackData)
-App -> App : Validate(FeedbackData)
-alt Input Valid
-  App -> DB : SaveFeedback(FeedbackData)
-  DB --> App : FeedbackSaved (Generated FeedbackID)
-  App -> NS : SendNewFeedbackNotification(Admin, FeedbackID)
-  NS --> App : NotificationSentStatus
-  App --> UI : FeedbackSubmissionSuccessResponse
-else Input Invalid
-  App --> UI : FeedbackValidationErrorResponse
+App -> App : 6. Validate(FeedbackData)
+alt Step 6: Input Valid
+  App -> DB : 7. SaveFeedback(FeedbackData)
+  alt Step 7: Save Successful
+    DB --> App : FeedbackSaved (Generated FeedbackID)
+    App -> NS : 9. SendNewFeedbackNotification(Admin, FeedbackID)
+    NS --> App : NotificationSentStatus
+    App --> UI : 8. FeedbackSubmissionSuccessResponse
+  else Step 7 fails -> EF1: DB Save Error
+    DB --> App : SaveError
+    App --> UI : EF1. FeedbackSaveErrorResponse
+  end
+else Step 6 fails -> AF2: Input Invalid
+  App --> UI : AF2. FeedbackValidationErrorResponse (resume at step 5)
 end
 UI --> Visitor : Displays Success or Error Message
 @enduml
@@ -1208,31 +1323,37 @@ _Figure 2.26: Sequence Diagram for Submit Feedback_
 |**Description**|This use case allows the Administrator to view submitted payment proofs and update the verification status of a payment, thereby confirming or rejecting a booking associated with it.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>One or more payment proofs have been submitted by visitors (UC011).|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Payment Proofs" section in the admin panel.<br><br>2. System retrieves and displays submitted payment proofs with status and inquiry link.<br><br>3. Administrator selects a proof to review; system displays the uploaded image.<br><br>4. Administrator verifies the payment offline and updates the status (Verified/Rejected), optionally adding notes.<br><br>5. Administrator saves the changes.<br><br>6. System updates the payment proof status, cascades the status to the linked booking inquiry and availability slot, and displays a success message.<br><br>7. System notifies the Visitor of the verification outcome.|
-|**Alternative Flow(s) - AF**|AF1: No Payment Proofs Submitted:<br><br>1. If no payment proofs are pending review, the system displays "No new payment proofs to verify."|
-|**Exception Flow(s) - EF**|EF1: Error Viewing Image File:<br><br>1. If the uploaded image cannot be accessed, the system displays an error.<br><br>EF2: Database Update Failure:<br><br>1. If the system fails to save the updated status, it displays an error message.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Payment Proofs" section in the admin panel.<br><br>2. System retrieves and displays submitted payment proofs with status and booking link. **[If no proofs are pending review → AF1]**<br><br>3. Administrator selects a proof to review; system displays the uploaded image. **[If the image cannot be accessed → EF1]**<br><br>4. Administrator verifies the payment offline and updates the status (Verified/Rejected), optionally adding notes.<br><br>5. Administrator saves the changes.<br><br>6. System updates the payment proof status, cascades the status to the linked booking and availability slot, and displays a success message. **[If the update fails → EF2]**<br><br>7. System notifies the Visitor of the verification outcome.|
+|**Alternative Flow(s) - AF**|**AF1: No Payment Proofs Submitted (triggered at NF step 2):**<br><br>AF1.1. No payment proofs are pending review; the system displays "No new payment proofs to verify."<br><br>AF1.2. Use case ends.|
+|**Exception Flow(s) - EF**|**EF1: Error Viewing Image File (triggered at NF step 3):**<br><br>EF1.1. The uploaded image cannot be accessed; the system displays an error.<br><br>EF1.2. Flow resumes at NF step 2 (Administrator may select another proof). Use case may end.<br><br>**EF2: Database Update Failure (triggered at NF step 6):**<br><br>EF2.1. The system fails to save the updated status and displays an error message.<br><br>EF2.2. Administrator may retry (flow resumes at NF step 5) or abandon. Use case ends.|
 |**Post-condition(s)**|The verification status of the payment proof is updated.<br><br>The linked booking inquiry and availability slot statuses are cascaded accordingly.<br><br>Visitor is notified of the outcome.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Payment Proofs Section;
-:System Displays List of Submitted Payment Proofs;
-if (Payment Proofs Exist?) then (Yes)
-  :Admin Selects a Payment Proof;
-  :System Displays Proof Image;
-  :Admin Verifies Payment Offline;
-  :Admin Updates Status (Verified/Rejected) and Adds Notes;
-  :Admin Clicks "Save Status";
-  :System Updates Proof, Inquiry, and Slot Statuses;
-  if (Save Successful?) then (Yes)
-    :Notify Visitor;
-    :Display "Status Updated Successfully" Message;
-  else (No - DB Error)
-    :Display "Error Updating Status" Message;
+:1. Admin Navigates to Payment Proofs Section;
+:2. System Displays List of Submitted Payment Proofs;
+if (2. Payment Proofs Exist?) then (Yes)
+  :3. Admin Selects a Payment Proof;
+  if (3. Proof Image Accessible?) then (Yes)
+    :3. System Displays Proof Image;
+    :4. Admin Verifies Payment Offline and
+    Updates Status (Verified/Rejected) with Notes;
+    :5. Admin Clicks "Save Status";
+    :6. System Updates Proof, Booking, and Slot Statuses;
+    if (6. Save Successful?) then (Yes)
+      :6. Display "Status Updated Successfully" Message;
+      :7. Notify Visitor;
+    else (No - DB Error -> EF2)
+      :EF2. Display "Error Updating Status" Message
+      (Admin may retry at step 5);
+    endif
+  else (No -> EF1)
+    :EF1. Display Image Access Error
+    (Admin may select another proof, step 2);
   endif
-else (No Proofs)
-  :Display "No New Payment Proofs" Message;
+else (No Proofs -> AF1)
+  :AF1. Display "No New Payment Proofs" Message;
 endif
 stop
 @enduml
@@ -1248,18 +1369,24 @@ participant "Backend (AppServer - PaymentController)" as App
 database "Database (DB)" as DB
 participant "NotificationService" as NS
 
-Admin -> UI : Navigates to Payment Proofs, Selects a Proof
-UI --> Admin : Displays Proof Details and Image
-Admin -> UI : Updates Status (Verified/Rejected) & Clicks Save
+Admin -> UI : 1-3. Navigates to Payment Proofs, Selects a Proof
+UI --> Admin : 3. Displays Proof Details and Image
+Admin -> UI : 4-5. Updates Status (Verified/Rejected) & Clicks Save
 UI -> App : PUT /api/admin/payment-proofs/{proofId}/status
-App -> DB : UpdatePaymentProofStatus(ProofID, NewStatus)
-App -> DB : UpdateBookingInquiryStatus(AssociatedInquiryID)
-App -> DB : UpdateAvailabilitySlotStatus(AssociatedSlotID)
-DB --> App : UpdateSuccess
-App -> NS : SendPaymentStatusNotification(Visitor, ProofID, NewStatus)
-NS --> App : NotificationSentStatus
-App --> UI : StatusUpdateSuccessResponse
-UI --> Admin : Displays Success Message
+App -> DB : 6. UpdatePaymentProofStatus(ProofID, NewStatus)
+App -> DB : 6. UpdateBookingStatus(AssociatedBookingID)
+App -> DB : 6. UpdateAvailabilitySlotStatus(AssociatedSlotID)
+alt Step 6: Update Successful
+  DB --> App : UpdateSuccess
+  App -> NS : 7. SendPaymentStatusNotification(Visitor, ProofID, NewStatus)
+  NS --> App : NotificationSentStatus
+  App --> UI : 6. StatusUpdateSuccessResponse
+  UI --> Admin : Displays Success Message
+else Step 6 fails -> EF2: DB Update Failure
+  DB --> App : UpdateError
+  App --> UI : EF2. StatusUpdateErrorResponse
+  UI --> Admin : Displays Error Message (may retry at step 5)
+end
 @enduml
 ```
 
@@ -1277,32 +1404,33 @@ _Figure 2.28: Sequence Diagram for Manage Payment Status_
 |**Description**|This use case allows the Administrator to view operational reports with interactive visual charts and to receive an AI-generated business advisor that computes conversion and cancellation rates and suggests number-backed action bullets.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>Data (inquiries, payment proofs, feedback) exists in the system.|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Reports" section in the admin panel.<br><br>2. System displays available report types and a date-range filter.<br><br>3. Administrator selects a report type and optionally specifies a date range.<br><br>4. System retrieves the relevant data from the database.<br><br>5. System displays the report using visual charts (e.g., pie charts for inquiry/payment status, bar chart for feedback ratings).<br><br>6. System asynchronously requests an AI business insight based on the report data.<br><br>7. System displays the AI-generated action bullets when available.|
-|**Alternative Flow(s) - AF**|AF1: No Data for Report:<br><br>1. If no data matches the selected report type or date range, the system displays "No data available for this report."<br><br>AF2: AI Service Unavailable:<br><br>1. If the AI advisor request fails, the system displays a graceful fallback message without blocking the report view.|
-|**Exception Flow(s) - EF**|EF1: Error Generating Report:<br><br>1. If the system encounters an error while retrieving data or generating the report, it displays a general error message.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Reports" section in the admin panel.<br><br>2. System displays available report types and a date-range filter.<br><br>3. Administrator selects a report type and optionally specifies a date range.<br><br>4. System retrieves the relevant data from the database. **[If no data matches the selection → AF1; if retrieval fails → EF1]**<br><br>5. System displays the report using visual charts (e.g., pie charts for inquiry/payment status, bar chart for feedback ratings).<br><br>6. System asynchronously requests an AI business insight based on the report data. **[If the AI service is unavailable → AF2]**<br><br>7. System displays the AI-generated action bullets when available.|
+|**Alternative Flow(s) - AF**|**AF1: No Data for Report (triggered at NF step 4):**<br><br>AF1.1. No data matches the selected report type or date range; the system displays "No data available for this report."<br><br>AF1.2. Flow resumes at NF step 3 (Administrator may adjust the selection). Use case may end.<br><br>**AF2: AI Service Unavailable (triggered at NF step 6):**<br><br>AF2.1. The AI advisor request fails; the system displays a graceful fallback message without blocking the report view.<br><br>AF2.2. Use case ends (charts from NF step 5 remain displayed).|
+|**Exception Flow(s) - EF**|**EF1: Error Generating Report (triggered at NF step 4):**<br><br>EF1.1. The system encounters an error while retrieving data or generating the report and displays a general error message.<br><br>EF1.2. Use case ends.|
 |**Post-condition(s)**|Administrator has viewed the generated report and any AI-generated insight.<br><br>System data remains unchanged by report generation.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Reports Section;
-:System Displays Report Types and Date Filter;
-:Admin Selects Report Type and Date Range;
-:System Retrieves Data from DB;
-if (Data Retrieval Successful?) then (Yes)
+:1. Admin Navigates to Reports Section;
+:2. System Displays Report Types and Date Filter;
+:3. Admin Selects Report Type and Date Range;
+:4. System Retrieves Data from DB;
+if (4. Data Retrieval Successful?) then (Yes)
   if (Data Exists?) then (Yes)
-    :Display Report with Visual Charts;
-    :Asynchronously Request AI Business Insight;
-    if (AI Insight Available?) then (Yes)
-      :Display AI Action Bullets;
-    else (No / Error)
-      :Display Graceful Fallback Message;
+    :5. Display Report with Visual Charts;
+    :6. Asynchronously Request AI Business Insight;
+    if (6. AI Insight Available?) then (Yes)
+      :7. Display AI Action Bullets;
+    else (No / Error -> AF2)
+      :AF2. Display Graceful Fallback Message;
     endif
-  else (No Data)
-    :Display "No Data Available for Report" Message;
+  else (No Data -> AF1)
+    :AF1. Display "No Data Available for Report" Message
+    (Admin may adjust selection, step 3);
   endif
-else (No - Retrieval Error)
-  :Display "Error Generating Report" Message;
+else (No - Retrieval Error -> EF1)
+  :EF1. Display "Error Generating Report" Message;
 endif
 stop
 @enduml
@@ -1318,18 +1446,30 @@ participant "Backend (AppServer - ReportController)" as App
 database "Database (DB)" as DB
 participant "GeminiService" as AI
 
-Admin -> UI : Navigates to Reports, Selects Type & Date Range
+Admin -> UI : 1-3. Navigates to Reports, Selects Type & Date Range
 UI -> App : GET /api/admin/reports/{reportType}?fromDate=...&toDate=...
-App -> DB : FetchReportData(ReportType, DateRange)
-DB --> App : ReportData
-App --> UI : ReportResponse (Charts Data)
-UI --> Admin : Displays Report with Charts
+App -> DB : 4. FetchReportData(ReportType, DateRange)
+alt Step 4: Retrieval Successful
+  DB --> App : ReportData
+  App --> UI : ReportResponse (Charts Data)
+  UI --> Admin : 5. Displays Report with Charts
+else Step 4 fails -> EF1: Retrieval Error
+  DB --> App : RetrievalError
+  App --> UI : EF1. ErrorResponse
+  UI --> Admin : Displays "Error Generating Report" Message
+end
 
-UI -> App : GET /api/admin/reports/ai-insight (async)
+UI -> App : 6. GET /api/admin/reports/ai-insight (async)
 App -> AI : GenerateBusinessInsight(ReportData)
-AI --> App : Insight (HTML bullets)
-App --> UI : AIInsightResponse
-UI --> Admin : Displays AI Business Advisor Panel
+alt Step 6: AI Insight Returned
+  AI --> App : Insight (HTML bullets)
+  App --> UI : AIInsightResponse
+  UI --> Admin : 7. Displays AI Business Advisor Panel
+else Step 6 fails -> AF2: AI Service Unavailable
+  AI --> App : Error / Empty Response
+  App --> UI : AF2. FallbackMessageResponse
+  UI --> Admin : Displays Graceful Fallback Message
+end
 @enduml
 ```
 
@@ -1347,31 +1487,33 @@ _Figure 2.30: Sequence Diagram for View/Generate Reports_
 |**Description**|This use case allows the Administrator to view submitted user feedback, mark it as reviewed, add internal notes, and receive an AI-generated feedback advisor that separates low-rating complaints from positive highlights and recommends what to address first.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>User feedback may have been submitted (UC012).|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Feedback Management" section in the admin panel.<br><br>2. System retrieves submitted feedback entries.<br><br>3. System asynchronously requests an AI feedback analysis based on the feedback data.<br><br>4. System displays the feedback list together with the AI advisor panel highlighting complaints and positives.<br><br>5. Administrator selects a feedback entry to view its full details.<br><br>6. Administrator marks the feedback as "Reviewed" or adds internal notes.<br><br>7. Administrator saves the changes.<br><br>8. System updates the feedback entry and displays a success message.|
-|**Alternative Flow(s) - AF**|AF1: No Feedback Submitted:<br><br>1. If no feedback entries exist, the system displays "No user feedback submitted yet."<br><br>AF2: AI Service Unavailable:<br><br>1. If the AI advisor request fails, the system displays a graceful fallback message while still showing the feedback list.|
-|**Exception Flow(s) - EF**|EF1: Database Update Failure:<br><br>1. If the system fails to save changes to a feedback entry, it displays an error message.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Feedback Management" section in the admin panel.<br><br>2. System retrieves submitted feedback entries. **[If no feedback entries exist → AF1]**<br><br>3. System asynchronously requests an AI feedback analysis based on the feedback data. **[If the AI service is unavailable → AF2]**<br><br>4. System displays the feedback list together with the AI advisor panel highlighting complaints and positives.<br><br>5. Administrator selects a feedback entry to view its full details.<br><br>6. Administrator marks the feedback as "Reviewed" or adds internal notes.<br><br>7. Administrator saves the changes.<br><br>8. System updates the feedback entry and displays a success message. **[If the update fails → EF1]**|
+|**Alternative Flow(s) - AF**|**AF1: No Feedback Submitted (triggered at NF step 2):**<br><br>AF1.1. No feedback entries exist; the system displays "No user feedback submitted yet."<br><br>AF1.2. Use case ends.<br><br>**AF2: AI Service Unavailable (triggered at NF step 3):**<br><br>AF2.1. The AI advisor request fails; the system displays a graceful fallback message while still showing the feedback list.<br><br>AF2.2. Flow resumes at NF step 4 (list is displayed without the AI panel).|
+|**Exception Flow(s) - EF**|**EF1: Database Update Failure (triggered at NF step 8):**<br><br>EF1.1. The system fails to save changes to a feedback entry and displays an error message.<br><br>EF1.2. Administrator may retry (flow resumes at NF step 7) or abandon. Use case ends.|
 |**Post-condition(s)**|Administrator has reviewed user feedback and any AI-generated insight.<br><br>Review status or notes for feedback entries may be updated in the system.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Feedback Management;
-:System Retrieves Feedback Entries;
-if (Feedback Entries Exist?) then (Yes)
-  :Asynchronously Request AI Feedback Analysis;
-  :Display Feedback List and AI Advisor Panel;
-  :Admin Selects a Feedback Entry;
-  :System Displays Full Feedback Details;
-  :Admin Marks as Reviewed or Adds Notes;
-  :Admin Clicks "Save Changes";
-  :System Updates Feedback Entry in DB;
-  if (Save Successful?) then (Yes)
-    :Display "Feedback Updated" Message;
-  else (No - DB Error)
-    :Display "Error Updating Feedback" Message;
+:1. Admin Navigates to Feedback Management;
+:2. System Retrieves Feedback Entries;
+if (2. Feedback Entries Exist?) then (Yes)
+  :3. Asynchronously Request AI Feedback Analysis
+  (graceful fallback if unavailable, AF2);
+  :4. Display Feedback List and AI Advisor Panel;
+  :5. Admin Selects a Feedback Entry;
+  :5. System Displays Full Feedback Details;
+  :6. Admin Marks as Reviewed or Adds Notes;
+  :7. Admin Clicks "Save Changes";
+  :8. System Updates Feedback Entry in DB;
+  if (8. Save Successful?) then (Yes)
+    :8. Display "Feedback Updated" Message;
+  else (No - DB Error -> EF1)
+    :EF1. Display "Error Updating Feedback" Message
+    (Admin may retry at step 7);
   endif
-else (No Feedback)
-  :Display "No Feedback Submitted Yet" Message;
+else (No Feedback -> AF1)
+  :AF1. Display "No Feedback Submitted Yet" Message;
 endif
 stop
 @enduml
@@ -1387,25 +1529,37 @@ participant "Backend (AppServer - FeedbackController)" as App
 database "Database (DB - Feedback)" as DB
 participant "GeminiService" as AI
 
-Admin -> UI : Navigates to Feedback Management
+Admin -> UI : 1. Navigates to Feedback Management
 UI -> App : GET /api/admin/feedback
-App -> DB : GetFeedbackList()
+App -> DB : 2. GetFeedbackList()
 DB --> App : FeedbackList
 App --> UI : FeedbackListResponse
-UI --> Admin : Displays Feedback List
+UI --> Admin : 4. Displays Feedback List
 
-UI -> App : GET /api/admin/feedback/ai-insight (async)
+UI -> App : 3. GET /api/admin/feedback/ai-insight (async)
 App -> AI : AnalyseFeedback(FeedbackList)
-AI --> App : FeedbackInsight (complaints / positives / priority)
-App --> UI : AIInsightResponse
-UI --> Admin : Displays AI Feedback Advisor Panel
+alt Step 3: AI Insight Returned
+  AI --> App : FeedbackInsight (complaints / positives / priority)
+  App --> UI : AIInsightResponse
+  UI --> Admin : 4. Displays AI Feedback Advisor Panel
+else Step 3 fails -> AF2: AI Service Unavailable
+  AI --> App : Error / Empty Response
+  App --> UI : AF2. FallbackMessageResponse
+  UI --> Admin : Displays Graceful Fallback Message
+end
 
-Admin -> UI : Selects Entry, Marks Reviewed, Clicks Save
+Admin -> UI : 5-7. Selects Entry, Marks Reviewed, Clicks Save
 UI -> App : PUT /api/admin/feedback/{feedbackId}/status
-App -> DB : UpdateFeedbackEntry(FeedbackID, NewStatus, Notes)
-DB --> App : UpdateSuccess
-App --> UI : FeedbackUpdateSuccessResponse
-UI --> Admin : Displays Success Message
+App -> DB : 8. UpdateFeedbackEntry(FeedbackID, NewStatus, Notes)
+alt Step 8: Update Successful
+  DB --> App : UpdateSuccess
+  App --> UI : 8. FeedbackUpdateSuccessResponse
+  UI --> Admin : Displays Success Message
+else Step 8 fails -> EF1: DB Update Failure
+  DB --> App : UpdateError
+  App --> UI : EF1. FeedbackUpdateErrorResponse
+  UI --> Admin : Displays Error Message (may retry at step 7)
+end
 @enduml
 ```
 
@@ -1423,28 +1577,33 @@ _Figure 2.32: Sequence Diagram for Manage Feedback_
 |**Description**|This use case allows the Administrator to create, read, update, and delete notification templates for dynamic WhatsApp messages. Templates include placeholders (e.g., [ClientName], [Date]) that are resolved client-side before generating a `wa.me` deep-link on the inquiry or payment detail pages.|
 |**Actor(s)**|Administrator|
 |**Pre-condition(s)**|Administrator is logged into the admin panel.|
-|**Normal Flow(s)- NF**|1. Administrator navigates to the "Message Templates" section.<br><br>2. System displays current WhatsApp message templates.<br><br>3. Administrator creates a new template, edits an existing template, or deletes a template.<br><br>4. System validates the template text and placeholders.<br><br>5. System saves the changes to the database and displays a success message.<br><br>6. When viewing an inquiry or payment proof, Administrator selects a template from a dropdown; system resolves placeholders and generates a pre-filled WhatsApp deep-link.|<br>|**Alternative Flow(s) - AF**|AF1: Template Validation Error:<br><br>1. If template content contains invalid syntax, the system displays an error and prevents saving until corrected.|<br>|**Exception Flow(s) - EF**|EF1: Error Saving Configuration:<br><br>1. If the system fails to save template changes, it displays an error message.|<br>|**Post-condition(s)**|Notification templates are updated and available for selection when sending WhatsApp messages to visitors.|
+|**Normal Flow(s)- NF**|1. Administrator navigates to the "Message Templates" section.<br><br>2. System displays current WhatsApp message templates.<br><br>3. Administrator creates a new template, edits an existing template, or deletes a template.<br><br>4. System validates the template text and placeholders. **[If validation fails → AF1]**<br><br>5. System saves the changes to the database and displays a success message. **[If the save fails → EF1]**<br><br>6. When viewing a booking or payment proof, Administrator selects a template from a dropdown; system resolves placeholders and generates a pre-filled WhatsApp deep-link.|
+|**Alternative Flow(s) - AF**|**AF1: Template Validation Error (triggered at NF step 4):**<br><br>AF1.1. Template content contains invalid syntax; the system displays an error and prevents saving until corrected.<br><br>AF1.2. Flow resumes at NF step 3.|
+|**Exception Flow(s) - EF**|**EF1: Error Saving Configuration (triggered at NF step 5):**<br><br>EF1.1. The system fails to save template changes and displays an error message.<br><br>EF1.2. Administrator may retry (flow resumes at NF step 3) or abandon. Use case ends.|
+|**Post-condition(s)**|Notification templates are updated and available for selection when sending WhatsApp messages to visitors.|
 
 ```plantuml
 @startuml
 start
-:Admin Navigates to Notification Templates;
-:System Displays Current WhatsApp Message Templates;
+:1. Admin Navigates to Notification Templates;
+:2. System Displays Current WhatsApp Message Templates;
 repeat
-  :Admin Modifies Templates (e.g., edits text, inserts placeholders);
-  :Admin Clicks "Save Templates";
-  if (Validate Template Syntax (e.g., valid placeholders)?) then (Valid)
-    :System Saves Updated Templates to DB;
-    if (Save Successful?) then (Yes)
-      :Display "Templates Updated Successfully" Message;
+  :3. Admin Modifies Templates (e.g., edits text, inserts placeholders);
+  :3. Admin Clicks "Save Templates";
+  if (4. Validate Template Syntax (e.g., valid placeholders)?) then (Valid)
+    :5. System Saves Updated Templates to DB;
+    if (5. Save Successful?) then (Yes)
+      :5. Display "Templates Updated Successfully" Message;
       stop
-    else (No - Save Error)
-      :Display "Error Saving Templates" Message;
+    else (No - Save Error -> EF1)
+      :EF1. Display "Error Saving Templates" Message;
     endif
-  else (Invalid Template)
-    :Display Template Validation Error Message;
+  else (Invalid Template -> AF1)
+    :AF1. Display Template Validation Error Message
+    (resume at step 3);
   endif
-repeat while
+repeat while (Admin retries?) is (Yes) not (No)
+stop
 @enduml
 ```
 
@@ -1457,29 +1616,113 @@ participant "Frontend (WebUI - AdminPanel)" as UI
 participant "Backend (AppServer - NotificationTemplateController)" as App
 database "Database (TemplateConfig)" as DB
 
-Admin -> UI : Navigates to Templates, Creates/Edits/Deletes Template, Clicks Save
+Admin -> UI : 1-3. Navigates to Templates, Creates/Edits/Deletes Template, Clicks Save
 UI -> App : POST /admin/templates (TemplateData)
-App -> App : Validate(TemplateData)
-alt Valid
-  App -> DB : SaveTemplate(TemplateData)
-  DB --> App : SaveSuccess
-  App --> UI : TemplateUpdateSuccessResponse
-  UI --> Admin : Displays Success Message
-else Invalid
-  App --> UI : TemplateValidationErrorResponse
+App -> App : 4. Validate(TemplateData)
+alt Step 4: Template Valid
+  App -> DB : 5. SaveTemplate(TemplateData)
+  alt Step 5: Save Successful
+    DB --> App : SaveSuccess
+    App --> UI : 5. TemplateUpdateSuccessResponse
+    UI --> Admin : Displays Success Message
+  else Step 5 fails -> EF1: Save Error
+    DB --> App : SaveError
+    App --> UI : EF1. TemplateSaveErrorResponse
+    UI --> Admin : Displays "Error Saving Templates" Message
+  end
+else Step 4 fails -> AF1: Template Invalid
+  App --> UI : AF1. TemplateValidationErrorResponse (resume at step 3)
   UI --> Admin : Displays Validation Error Message
 end
 
-Admin -> UI : Selects Template on Inquiry/Payment Detail Page
+Admin -> UI : 6. Selects Template on Booking/Payment Detail Page
 UI -> App : GET /admin/templates/{id}
-App -> DB : GetTemplate(TemplateID)
+App -> DB : 6. GetTemplate(TemplateID)
 DB --> App : TemplateData
 App --> UI : TemplateResponse
-UI --> Admin : Displays Resolved Message Preview and wa.me Deep-Link
+UI --> Admin : 6. Displays Resolved Message Preview and wa.me Deep-Link
 @enduml
 ```
 
 _Figure 2.34: Sequence Diagram for Configure/Manage Notifications_
+
+#### 2.3.17 UC017: Use Case <Generate AI Insights>
+
+**Table 2.18: Use Case Description for Generate AI Insights**
+
+|   |   |
+|---|---|
+|**Attribute**|**Description**|
+|**Use Case ID**|UC017|
+|**Use Case Name**|Generate AI Insights|
+|**Description**|This use case describes how the system produces AI-generated advisory insights for the Administrator on the Reports, Analytics, and Feedback Management pages. The system compiles the current operational metrics into a structured prompt, submits it to the external Gemini AI service, and displays the returned data-grounded recommendations in a non-blocking panel.|
+|**Actor(s)**|Administrator (primary), Gemini AI — external AI service (secondary)|
+|**Pre-condition(s)**|Administrator is logged into the admin panel.<br><br>A valid Gemini API key is configured in the application settings.<br><br>Operational data (bookings, page visits, or feedback) exists in the system.|
+|**Normal Flow(s)- NF**|1. Administrator opens an admin page that hosts an AI advisor panel (Reports, Analytics, or Feedback Management).<br><br>2. System renders the page immediately with its charts and lists; the AI panel shows a loading state.<br><br>3. The page asynchronously requests the AI insight endpoint.<br><br>4. System aggregates the current metrics (e.g., booking conversion and cancellation rates, traffic funnel counts, or feedback ratings) and composes a structured prompt. **[If no data is available to analyse → AF1]**<br><br>5. System submits the prompt to the Gemini AI service. **[If the service call fails or times out → EF1]**<br><br>6. Gemini AI returns the generated insight text.<br><br>7. System sanitises the response and displays the insight bullets in the AI advisor panel.|
+|**Alternative Flow(s) - AF**|**AF1: Insufficient Data (triggered at NF step 4):**<br><br>AF1.1. There is no meaningful data to analyse; the system displays a message indicating that insights will become available once sufficient data exists.<br><br>AF1.2. Use case ends (the rest of the page remains fully functional).|
+|**Exception Flow(s) - EF**|**EF1: AI Service Failure (triggered at NF step 5):**<br><br>EF1.1. The Gemini API call fails or times out; the system logs the error and displays a graceful fallback message (e.g., "AI insight temporarily unavailable") in the panel.<br><br>EF1.2. Use case ends (charts and lists rendered at NF step 2 remain displayed; no page functionality is blocked).|
+|**Post-condition(s)**|Administrator has viewed an AI-generated, data-grounded insight, or a graceful fallback message.<br><br>System data remains unchanged; the AI service receives only aggregated metrics, never personal visitor data.|
+
+```plantuml
+@startuml
+start
+:1. Admin Opens Reports / Analytics / Feedback Page;
+:2. System Renders Page with Charts
+(AI Panel Shows Loading State);
+:3. Page Asynchronously Requests AI Insight;
+if (4. Sufficient Data to Analyse?) then (Yes)
+  :4. System Aggregates Metrics and Composes Prompt;
+  :5. System Submits Prompt to Gemini AI;
+  if (5. Gemini Call Successful?) then (Yes)
+    :6. Gemini Returns Generated Insight;
+    :7. Display Insight Bullets in AI Advisor Panel;
+  else (No - Failure/Timeout -> EF1)
+    :EF1. Log Error and Display
+    "AI Insight Temporarily Unavailable";
+  endif
+else (No -> AF1)
+  :AF1. Display "Insights Available
+  Once Sufficient Data Exists";
+endif
+stop
+@enduml
+```
+
+_Figure 2.35: Activity Diagram for Generate AI Insights_
+
+```plantuml
+@startuml
+actor Administrator as Admin
+participant "Frontend (WebUI - AdminPanel)" as UI
+participant "Backend (AppServer - GeminiService)" as App
+database "Database (DB)" as DB
+actor "Gemini AI\n(External Service)" as Gemini
+
+Admin -> UI : 1. Opens Reports / Analytics / Feedback Page
+UI --> Admin : 2. Renders Page (AI Panel Loading)
+UI -> App : 3. GET /admin/.../ai-insight (async)
+App -> DB : 4. AggregateCurrentMetrics()
+DB --> App : MetricsData
+alt Step 4: Sufficient Data
+  App -> App : 4. ComposeStructuredPrompt(MetricsData)
+  App -> Gemini : 5. generateContent(Prompt)
+  alt Step 5: Call Successful
+    Gemini --> App : 6. GeneratedInsightText
+    App --> UI : 7. AIInsightResponse (Sanitised)
+    UI --> Admin : Displays Insight Bullets in Advisor Panel
+  else Step 5 fails -> EF1: API Failure/Timeout
+    Gemini --> App : Error / Timeout
+    App --> UI : EF1. FallbackMessageResponse
+    UI --> Admin : Displays "AI Insight Temporarily Unavailable"
+  end
+else Step 4: Insufficient Data -> AF1
+  App --> UI : AF1. InsufficientDataResponse
+  UI --> Admin : Displays "Insights Available Once Data Exists"
+end
+@enduml
+```
+
+_Figure 2.36: Sequence Diagram for Generate AI Insights_
 
 ### 2.4 Performance and Other Requirements
 

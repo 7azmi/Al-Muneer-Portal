@@ -148,17 +148,13 @@ The primary objective of this project is to design, develop, and assess the Al-M
 
 To achieve the project aim, the following objectives have been defined:
 
-1. **Requirements Elicitation and Analysis:** To thoroughly gather, document, and analyze the functional and non-functional requirements and expectations of the Al-Muneer Hall owner and potential clients, covering features such as availability calendar, pricing, FAQ, media gallery, inquiry submission, payment proof upload, feedback, basic reporting, and notification management via pre-filled WhatsApp messaging.
+1. To elicit and analyze the system requirements for the Al-Muneer Hall Online Portal, including hall booking, availability checking, inquiries, payment proof submission, feedback, reporting, and notification management.
 
-2. **System Architecture and Design:** To design the comprehensive system architecture, including the database schema (ERD), user interface/user experience (UI/UX) mockups, and detailed module specifications for both client and administrator interfaces, ensuring all gathered requirements are effectively translated into a robust, intuitive, and culturally sensitive design.
+2. To design the system architecture, database, and user interface of the portal based on the analyzed requirements.
 
-3. **Software Development and Implementation:** To construct a functional, monolithic web application using the Spring Boot (Java) framework and Model-View-Controller (MVC) design pattern, meticulously implementing all specified features for both client-side interactions and secure administrative controls (content management, inquiry handling, payment proof verification, feedback management, report generation, and notification configuration).
+3. To develop the Al-Muneer Hall Online Portal in accordance with the produced design.
 
-4. **Comprehensive System Testing and Validation:** To conduct thorough functional, usability, performance, and basic security testing on the developed Al-Muneer Online Portal, ensuring all modules operate reliably, efficiently, and according to specifications, with a particular focus on the accuracy of reports, the workflow for payment proofs, the submission and management of feedback, and the delivery of notifications.
-
-5. **System Deployment and Configuration:** To successfully deploy the developed Al-Muneer Online Portal to a production environment, ensuring proper configuration, accessibility via standard web browsers with responsive design, and operational readiness for both clients and administrators.
-
-6. **Documentation and Handover for Future Maintenance:** To prepare comprehensive system documentation, including user manuals and technical guides for the administrator, and to establish a framework for post-deployment monitoring and initial evaluation, thereby ensuring the portal's stability and readiness for future enhancements or necessary maintenance activities.
+4. To test and validate the developed portal against the specified functional and non-functional requirements.
 
 ## 1.5 Project Scope
 
@@ -275,16 +271,16 @@ The selection of technologies for the Al-Muneer Online Portal is based on their 
 
 |   |   |   |   |
 |---|---|---|---|
-|**Technology**|**Purpose**|**Alternatives Considered**|**Why Chosen/ Developer Justification**|
-|**Spring Boot (Java)/MVC**|Backend framework|Python (Django/Flask), Node.js (Express.js), PHP (Laravel)|Spring Boot provides a solid out-of-the-box MVC implementation, which makes it a good choice for a rapid start.|
-|**MySQL/ PostgreSQL**|Relational database|NoSQL (MongoDB, Cassandra), SQLite, MS SQL Server|There is no need for NoSQL database for this project because we're not dealing with unstructured type of data. Postgres sounds a good solid choice. Everyone loves it. It does the job perfectly and it's open source.|
-|**HTML5, CSS3, JS (Responsive)**|Frontend development|JavaScript Frameworks (React, Angular, Vue.js)|"An idiot admires complexity, a genius admires simplicity" - Terry Davis, Creator of TempleOS.|
-|**Waterfall Model methodology**|SDLC|Agile (Scrum, Kanban), Spiral Model|Sounds solid when having clear requirements of a moderate software that does not seem to be needing frequent and high-maintenance in post development.|
-|**Cloud Hosting (VPS)**|Deployment environment|AWS, serverless|VPS is the safest option against DDoS attacks that could cause massive cloud computing bills.|
-|**Admin Auth (Hashed Pass.)**|Secure admin login|Plain text storage (highly insecure), Reversible encryption|The encryption standard in web development.|
-|**Notification Mechanisms (e.g., WhatsApp Deep-linking, Email libraries, Manual WhatsApp Messaging)**|Manual WhatsApp message pre-filling.|In-app notifications (via web dashboard), Full WhatsApp Business API|The chosen notification method utilizing pre-filled WhatsApp deep links is simple to implement yet highly effective. This approach meets the stakeholder's primary communication needs without the unnecessary overhead and financial costs associated with complex API integrations, such as the Full WhatsApp Business API, which would offer diminishing returns for a business of this scale.|
+|**Technology**|**Purpose**|**Alternatives Considered**|**Justification**|
+|**Spring Boot (Java)/MVC**|Backend framework|Python (Django/Flask), Node.js (Express.js), PHP (Laravel)|Spring Boot offers a mature, convention-over-configuration implementation of the MVC pattern, embedded server deployment, and strongly typed compile-time checking through Java, which reduces runtime defects in form-driven transactional applications (Walls, 2016). Its integrated ecosystem (Spring Data JPA, Spring Security) covers persistence and authentication requirements without third-party dependencies, and the MVC separation of concerns improves maintainability and testability (Fowler, 2002).|
+|**PostgreSQL**|Relational database|NoSQL (MongoDB, Cassandra), SQLite, MySQL, MS SQL Server|The system's data — bookings, availability slots, pricing tiers, payment proofs — is highly structured, interrelated, and requires transactional integrity (e.g., a booking must atomically reserve its calendar slot). A relational DBMS providing full ACID guarantees and referential-integrity enforcement is therefore the appropriate model, whereas NoSQL stores target schema-flexible or horizontally partitioned workloads not present here (Garcia-Molina et al., 2008). PostgreSQL was selected over the alternatives for its standards-compliant SQL, proven reliability under concurrent writes, and open-source licence with no acquisition cost, which suits the stakeholder's budget constraints. SQLite was rejected for its limited concurrency, and MS SQL Server for its licensing cost.|
+|**HTML5, CSS3, JS (Responsive)**|Frontend development|JavaScript Frameworks (React, Angular, Vue.js)|The portal is a content-centric, server-rendered application with limited client-side state; a single-page-application framework would introduce a build toolchain, larger payloads, and framework upkeep without corresponding benefit. Server-side rendering with standards-based HTML5/CSS3 yields faster first-page loads on the low-bandwidth mobile connections typical of the target user base, better search-engine indexability, and accessibility conformance (W3C, 2018; Nielsen, 2000). Minimising the technology surface also reduces long-term maintenance effort for a system that will be maintained by a single administrator.|
+|**Waterfall Model methodology**|SDLC|Agile (Scrum, Kanban), Spiral Model|The requirements were fully elicited and signed off with the stakeholder before design began, the scope is fixed, and the project follows the sequential PSM1/PSM2 academic timeline with document-gated milestones (SRS, SDD, STD). Under these conditions of stable requirements and a fixed schedule, the sequential Waterfall model provides clear phase deliverables and traceability, whereas iterative methods are advantageous chiefly when requirements are volatile (Royce, 1970).|
+|**Cloud Hosting (VPS)**|Deployment environment|AWS, serverless|A fixed-specification VPS provides a predictable flat monthly cost, which the stakeholder's budget requires, in contrast to usage-metered cloud services whose costs vary with traffic (Armbrust et al., 2010). The portal's anticipated moderate traffic fits comfortably within a single VPS instance, and full root access simplifies deploying a self-contained Spring Boot artifact alongside its PostgreSQL database. Managed cloud and serverless offerings add elasticity the workload does not need, at the cost of pricing unpredictability and vendor lock-in (Kshetri, 2013).|
+|**Admin Auth (Hashed Pass.)**|Secure admin login|Plain text storage (highly insecure), Reversible encryption|Passwords are stored as salted one-way BCrypt hashes, the approach recommended by industry password-storage guidance, so that credentials cannot be recovered even if the database is compromised (Schneier, 1996). Plain-text storage offers no protection, and reversible encryption concentrates risk in the encryption key; a deliberately slow adaptive hash additionally resists offline brute-force attacks.|
+|**Notification Mechanisms (WhatsApp Deep-linking, pre-filled messages)**|Admin-to-client notifications|In-app notifications (via web dashboard), Full WhatsApp Business API|WhatsApp is the dominant communication channel among the target clientele, so notifications delivered there have far higher reach than an in-app dashboard that clients would need to revisit. Pre-filled deep links deliver templated messages through the admin's existing WhatsApp account at zero integration and subscription cost, whereas the WhatsApp Business API requires provider onboarding, per-conversation fees, and hosting of webhook infrastructure — recurring costs disproportionate to a single-venue business's notification volume. The deep-link approach satisfies the stakeholder's requirement of admin-initiated, personally reviewed messages while remaining upgradeable to the full API if volume grows.|
 
-The Model-View-Controller (MVC) architecture, enabled by Spring Boot, guarantees a clear separation of concerns, thereby simplifying the management and scalability of the application (Fowler, 2002). Relational database systems such as MySQL or PostgreSQL ensure data integrity, which is essential for the effective management of bookings and venue details (Garcia-Molina et al., 2008). Implementing responsive design through HTML5, CSS3, and JavaScript is imperative for contemporary web applications to accommodate a variety of user devices (W3C, 2018). Although Agile methodologies are widely embraced, the structured approach of the Waterfall model can be beneficial for projects with well-defined initial requirements, as described in the proposal phase (Royce, 1970). Ensuring security through HTTPS and appropriate password hashing is critical for maintaining user trust and safeguarding data (Rescorla, 2001; Schneier, 1996). Cloud hosting provides both flexibility and reliability for application deployment (Armbrust et al., 2010).
+The Model-View-Controller (MVC) architecture, enabled by Spring Boot, guarantees a clear separation of concerns, thereby simplifying the management and scalability of the application (Fowler, 2002). Relational database systems such as PostgreSQL ensure data integrity, which is essential for the effective management of bookings and venue details (Garcia-Molina et al., 2008). Implementing responsive design through HTML5, CSS3, and JavaScript is imperative for contemporary web applications to accommodate a variety of user devices (W3C, 2018). Although Agile methodologies are widely embraced, the structured approach of the Waterfall model can be beneficial for projects with well-defined initial requirements, as described in the proposal phase (Royce, 1970). Ensuring security through HTTPS and appropriate password hashing is critical for maintaining user trust and safeguarding data (Rescorla, 2001; Schneier, 1996). Cloud hosting provides both flexibility and reliability for application deployment (Armbrust et al., 2010).
 
 ## 2.4 Chapter Summary
 
@@ -494,6 +490,8 @@ Functional requirements describe what the system should do. For the Al-Muneer On
 
 - **FR2.10 Manage Notifications:** The system shall allow the administrator to manage pre-defined message templates for notifications (e.g., inquiry received, payment proof acknowledged) and initiate communication via preferred channels—specifically WhatsApp through deep-link triggers, with email as a secondary option.
 
+- **FR2.11 Generate AI Insights:** The system shall generate concise, data-grounded advisory insights on the administrator's reports and analytics pages by submitting the current operational metrics to an external AI service (Google Gemini) and displaying the returned recommendations, with a graceful fallback message when the service is unavailable.
+
 **FR3: General System Functionalities**
 
 - **FR3.1 Responsive Design:** The system shall be responsive and accessible on common web browsers across various devices (desktops, tablets, smartphones).
@@ -531,6 +529,7 @@ Non-functional requirements define the quality attributes of the system.
 left to right direction
 actor Visitor
 actor Admin
+actor "Gemini AI\n(External AI Service)" as Gemini
 
 rectangle "Al-Muneer Online Portal" {
   usecase "UC001: View Venue Information" as UC1
@@ -550,6 +549,7 @@ rectangle "Al-Muneer Online Portal" {
   usecase "UC010: View Traffic (Analytics)" as UC10
   usecase "UC014: View / Generate Reports" as UC14
   usecase "UC016: Configure / Manage Notifications" as UC16
+  usecase "UC017: Generate AI Insights" as UC17
 }
 
 Visitor --> UC1
@@ -569,8 +569,11 @@ Admin --> UC15
 Admin --> UC10
 Admin --> UC16
 Admin --> UC14
+Admin --> UC17
 
 UC14 ..> UC10 : <<includes>>
+UC17 ..> UC14 : <<extends>>
+UC17 --> Gemini
 
 @enduml
 ```
@@ -587,10 +590,11 @@ _Figure 4.1: Use Case Diagram for the Al-Muneer Online Portal_
 |**Use Case ID**|UC005|
 |**Use Case Name**|Submit Booking Inquiry|
 |**Actor(s)**|Visitor|
-|**Pre-condition(s)**|Visitor is on the Al-Muneer Online Portal and has navigated to the inquiry section/form.|
-|**Normal Flow**|1. Visitor accesses the booking inquiry form.<br><br>2. Visitor fills in required fields (e.g., name, contact, desired date, event type, number of guests, specific requests).<br><br>3. Visitor submits the form.<br><br>4. System validates the input data.<br><br>5. System saves the inquiry details to the database.<br><br>6. System displays a success message to the Visitor.<br><br>7. System triggers a notification to the Administrator about the new inquiry.|
-|**Alternative Flow**|**4a. Invalid Input Data:**<br><br>4a1. System displays an error message indicating the fields with invalid data.<br><br>4a2. Visitor corrects the data and re-submits (back to step 3).<br><br>**7a. Notification Failure:**<br><br>7a1. System logs the notification failure but still saves the inquiry and shows success to the visitor. Admin will see the inquiry upon login.|
-|**Post-condition(s)**|Booking inquiry is successfully recorded in the system. Administrator is notified of the new inquiry. Visitor receives confirmation that their inquiry has been submitted.|
+|**Pre-condition(s)**|Visitor is on the Al-Muneer Online Portal and has navigated to the booking section/form.|
+|**Normal Flow**|1. Visitor accesses the booking form.<br><br>2. Visitor fills in required fields (e.g., name, contact, desired date, event type, number of guests, specific requests).<br><br>3. Visitor clicks the "Submit Booking" button.<br><br>4. System validates the input data. **[If validation fails → AF1]**<br><br>5. System saves the booking details to the database. **[If the save operation fails → EF1]**<br><br>6. System displays a success message with the booking reference code to the Visitor.<br><br>7. System triggers a notification to the Administrator about the new booking. **[If notification delivery fails → AF2]**|
+|**Alternative Flow**|**AF1 — Invalid Input Data (triggered at Normal Flow step 4):**<br><br>AF1.1. System displays an error message indicating the fields with invalid data.<br><br>AF1.2. Visitor corrects the data.<br><br>AF1.3. Flow resumes at Normal Flow step 3.<br><br>**AF2 — Notification Failure (triggered at Normal Flow step 7):**<br><br>AF2.1. System logs the notification failure; the booking remains saved and the success message remains displayed.<br><br>AF2.2. Administrator sees the new booking upon next login. Use case ends.|
+|**Exception Flow**|**EF1 — Database Save Error (triggered at Normal Flow step 5):**<br><br>EF1.1. System displays an error message stating that the booking could not be submitted.<br><br>EF1.2. Visitor may retry submission (flow resumes at Normal Flow step 3) or abandon the use case. Use case ends.|
+|**Post-condition(s)**|Booking is successfully recorded in the system. Administrator is notified of the new booking. Visitor receives confirmation with a reference code.|
 
 #### 4.2.3.2 Sequence Diagram (Submit Booking Inquiry - UC005)
 
@@ -602,22 +606,33 @@ participant "Backend (AppServer)" as API
 database "Database (DB)" as DB
 participant "NotificationService" as NS
 
-Visitor -> UI: Accesses Inquiry Form
-UI --> Visitor: Displays Inquiry Form
-Visitor -> UI: Fills and Submits Inquiry Data
-UI -> API: POST /api/inquiries (InquiryData)
-API -> API: Validate(InquiryData)
+Visitor -> UI: 1. Accesses Booking Form
+UI --> Visitor: Displays Booking Form
+Visitor -> UI: 2-3. Fills Form & Clicks "Submit Booking"
+UI -> API: POST /inquiry/submit (BookingData)
+API -> API: 4. Validate(BookingData)
 
-alt Input Valid
-    API -> DB: SaveInquiry(InquiryData)
-    DB --> API: InquirySaved (InquiryID)
-    API -> NS: TriggerNewInquiryNotification(Admin, InquiryID)
-    NS --> API: NotificationQueued/Sent
-    API --> UI: InquirySuccessResponse
-    UI --> Visitor: Displays Success/Error Message
-else Input Invalid
-    API --> UI: InquiryValidationErrorResponse
-    UI --> Visitor: Displays Error Message
+alt Step 4: Input Valid
+    API -> DB: 5. SaveBooking(BookingData)
+    alt Step 5: Save Successful
+        DB --> API: BookingSaved (ReferenceCode)
+        API --> UI: 6. BookingSuccessResponse (ReferenceCode)
+        UI --> Visitor: Displays Success Message with Reference Code
+        API -> NS: 7. TriggerNewBookingNotification(Admin, ReferenceCode)
+        alt Step 7: Notification Delivered
+            NS --> API: NotificationSent
+        else Step 7 fails -> AF2: Notification Failure
+            NS --> API: DeliveryError
+            API -> API: AF2. Log Failure (booking remains saved)
+        end
+    else Step 5 fails -> EF1: Database Save Error
+        DB --> API: SaveError
+        API --> UI: EF1. BookingSubmissionErrorResponse
+        UI --> Visitor: Displays "Could Not Submit Booking" Message
+    end
+else Step 4 fails -> AF1: Invalid Input Data
+    API --> UI: AF1. ValidationErrorResponse
+    UI --> Visitor: Displays Field Error Messages (resume at step 3)
 end
 @enduml
 ```
@@ -629,14 +644,26 @@ _Figure 4.2: Sequence Diagram for 'Submit Booking Inquiry' (UC005)_
 ```plantuml
 @startuml
 start
-:Visitor Accesses Inquiry Form;
+:1. Visitor Accesses Booking Form;
 repeat
-  :Visitor Fills Inquiry Form;
-  :Visitor Submits Form;
-repeat while (Validate Input Data?) is (Invalid) not (Valid)
-:Save Inquiry to Database;
-:Trigger Notification to Admin;
-:Display Success Message to Visitor;
+  :2. Visitor Fills Booking Form;
+  :3. Visitor Clicks "Submit Booking";
+  if (4. Validate Input Data?) then (Valid)
+    if (5. Save Booking to Database?) then (Saved)
+      :6. Display Success Message\nwith Reference Code;
+      if (7. Notify Administrator?) then (Delivered)
+      else (Fails -> AF2)
+        :AF2. Log Notification Failure\n(Booking Remains Saved);
+      endif
+      stop
+    else (Fails -> EF1)
+      :EF1. Display "Could Not Submit
+      Booking" Message;
+    endif
+  else (Invalid -> AF1)
+    :AF1. Display Validation Errors;
+  endif
+repeat while (Visitor retries? (resume at step 3)) is (Yes) not (No)
 stop
 @enduml
 ```
@@ -869,9 +896,9 @@ _Figure 5.1: Code Snippet: Admin Login and JWT Cookie Issuance_
 
 ### 5.2.2 Visitor Booking Flow and Reference Code System
 
-A central achievement of the implementation is the unified visitor booking flow. The home page was converted into a single-page scrollable landing page with anchor navigation, consolidating the hero section, venue information, media gallery, availability calendar, and pricing packages. Visitors interact with an interactive calendar where future dates default to Available and past dates are dimmed. Tapping an available date reveals a single "Submit inquiry" call-to-action that passes the selected date to `/inquiry?date=YYYY-MM-DD`. Similarly, pricing package cards include "Book [package]" buttons that pre-select the tier via `/inquiry?pricingId=...`; if a date was already chosen, both parameters are combined.
+A central achievement of the implementation is the unified visitor booking flow. The home page was converted into a single-page scrollable landing page with anchor navigation, consolidating the hero section, venue information, media gallery, availability calendar, and pricing packages. Visitors interact with an interactive calendar where future dates default to Available and past dates are dimmed. Tapping an available date reveals a single "Submit Booking" call-to-action that passes the selected date to `/inquiry?date=YYYY-MM-DD`. Similarly, pricing package cards include "Book [package]" buttons that pre-select the tier via `/inquiry?pricingId=...`; if a date was already chosen, both parameters are combined.
 
-The inquiry landing page unifies two capabilities: submitting a new inquiry and looking up an existing inquiry by a visitor-facing reference code. Each inquiry is assigned a random 9-digit `referenceCode` stored in a 150-day HTTP-only cookie named `inq_ref`. Visitors can also cancel their own inquiry directly from the confirmation page, provided no payment proof has been attached, which frees the associated availability slot.
+The booking landing page unifies two capabilities: submitting a new booking and retrieving existing bookings. Retrieval is designed so that visitors do not need to memorise any system-generated value: they simply enter the same WhatsApp number used at submission, and the system lists all of their bookings with current status. Each booking is additionally assigned a random 9-digit `referenceCode`, which serves as a secondary lookup key and is stored in a 150-day HTTP-only cookie named `inq_ref`, so returning visitors on the same device see their saved booking automatically. Visitors can also cancel their own booking directly from the confirmation page, provided no payment proof has been attached, which frees the associated availability slot.
 
 ![Figure 5.2: Code Snippet: Booking Inquiry Submission Flow](report-figures/fig-5.2.2-reference-code.png)
 
@@ -911,7 +938,7 @@ This section describes the key interfaces that demonstrate the functional result
 
 ### 5.3.1 Visitor Home Page and Booking Calendar
 
-The visitor home page presents a single-page scroll experience. The hero section is followed by venue information with an embedded Google Maps iframe, a masonry media gallery with label-based filters, an interactive availability calendar, and pricing packages. Anchor navigation and scroll-spy highlight the active section. The calendar supports month navigation, visually distinguishes available and booked dates, and reveals a contextual "Submit inquiry" action when a visitor selects an available day.
+The visitor home page presents a single-page scroll experience. The hero section is followed by venue information with an embedded Google Maps iframe, a masonry media gallery with label-based filters, an interactive availability calendar, and pricing packages. Anchor navigation and scroll-spy highlight the active section. The calendar supports month navigation, visually distinguishes available and booked dates, and reveals a contextual "Submit Booking" action when a visitor selects an available day.
 
 _[Image: Screenshot of the visitor home page showing the single-page scroll layout]_ _Figure 5.5: Visitor Home Page with Single-Page Scroll Layout_
 
@@ -987,11 +1014,11 @@ This chapter concludes the report on the Al-Muneer Online Portal project. The pr
 
 ## 6.2 Achievement of Project Objectives
 
-The original project objectives have been addressed throughout the project lifecycle. Requirements elicitation and analysis were completed in PSM1 through stakeholder engagement with Mr. Ahmed Almunajid, producing a comprehensive Software Requirements Specification (SRS). System architecture and design were documented in the Software Design Description (SDD), including the MVC architecture, database schema, and UI/UX wireframes.
+The four project objectives defined in Section 1.4 have been addressed throughout the project lifecycle. The first objective, requirements elicitation and analysis, was completed in PSM1 through stakeholder engagement with Mr. Ahmed Almunajid, producing a comprehensive Software Requirements Specification (SRS). The second objective, system design, was fulfilled and documented in the Software Design Description (SDD), including the MVC architecture, database schema, and UI/UX wireframes.
 
-During PSM2, the software development and implementation objective was realised by building the portal with Spring Boot, PostgreSQL, Thymeleaf, and JavaScript. All core modules were implemented: visitor information browsing, media gallery with label filters, interactive availability calendar, dynamic pricing display, booking inquiry submission with 9-digit reference codes, payment proof upload, feedback submission, JWT-secured administrator authentication, content management, inquiry and payment management, WhatsApp notification templates, calendar management, dashboard analytics, reports with charts, and Gemini AI advisors.
+During PSM2, the third objective, system development, was realised by building the portal with Spring Boot, PostgreSQL, Thymeleaf, and JavaScript. All core modules were implemented: visitor information browsing, media gallery with label filters, interactive availability calendar, dynamic pricing display, booking submission with 9-digit reference codes, payment proof upload, feedback submission, JWT-secured administrator authentication, content management, booking and payment management, WhatsApp notification templates, calendar management, dashboard analytics, reports with charts, and Gemini AI advisors.
 
-Comprehensive system testing and validation were performed through black box, white box, and user testing, as detailed in Chapter 5 and the Software Test Documentation (STD). The system was found to operate reliably and to meet the functional and non-functional requirements. Deployment to a Cloud VPS was completed, making the portal accessible via standard web browsers. Finally, technical documentation, user guidance, and maintenance considerations were prepared to support future upkeep.
+The fourth objective, testing and validation, was achieved through black box, white box, and user testing, as detailed in Chapter 5 and the Software Test Documentation (STD). The system was found to operate reliably and to meet the functional and non-functional requirements. In addition to the defined objectives, the portal was deployed to a Cloud VPS, making it accessible via standard web browsers, and technical documentation, user guidance, and maintenance considerations were prepared to support future upkeep.
 
 ## 6.3 Future Improvements
 

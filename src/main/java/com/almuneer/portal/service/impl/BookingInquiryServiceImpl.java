@@ -45,6 +45,11 @@ public class BookingInquiryServiceImpl implements BookingInquiryService {
     }
 
     @Override
+    public List<BookingInquiry> findByVisitorWhatsApp(String whatsApp) {
+        return inquiryRepository.findByVisitorWhatsAppOrderBySubmissionDateDesc(whatsApp);
+    }
+
+    @Override
     public List<BookingInquiry> getAll() {
         return inquiryRepository.findAllByOrderBySubmissionDateDesc();
     }
@@ -90,13 +95,13 @@ public class BookingInquiryServiceImpl implements BookingInquiryService {
         if (inquiry.getStatus() == InquiryStatus.CANCELLED_BY_VISITOR
                 || inquiry.getStatus() == InquiryStatus.CANCELLED_BY_ADMIN
                 || inquiry.getStatus() == InquiryStatus.COMPLETED) {
-            throw new IllegalStateException("This inquiry cannot be cancelled.");
+            throw new IllegalStateException("This booking cannot be cancelled.");
         }
 
         // Block cancellation if a payment proof is attached — admin must handle it
         if (inquiryRepository.hasPaymentProof(inquiry.getInquiryId())) {
             throw new IllegalStateException(
-                    "Your inquiry has a payment proof attached. Please contact us via WhatsApp to cancel.");
+                    "Your booking has a payment proof attached. Please contact us via WhatsApp to cancel.");
         }
 
         // Free the slot back to AVAILABLE

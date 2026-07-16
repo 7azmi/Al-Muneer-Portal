@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-    <title>Inquiry Confirmed</title>
+    <title>Booking Confirmed</title>
 </head>
 <body>
 <main layout:fragment="content">
@@ -16,9 +16,9 @@
                            (${inquiry.status.name() == 'CONFIRMED'} ? '🎉' : '✅')">✅</div>
 
             <h1 class="section-title"
-                th:text="${inquiry.status.name() == 'CANCELLED_BY_VISITOR'} ? 'Inquiry Cancelled' :
-                          (${inquiry.status.name() == 'CONFIRMED'} ? 'Booking Confirmed!' : 'Inquiry Submitted')">
-                Inquiry Submitted!
+                th:text="${inquiry.status.name() == 'CANCELLED_BY_VISITOR'} ? 'Booking Cancelled' :
+                          (${inquiry.status.name() == 'CONFIRMED'} ? 'Booking Confirmed!' : 'Booking Submitted')">
+                Booking Submitted!
             </h1>
 
             <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
@@ -35,7 +35,7 @@
                      th:text="${inquiry.referenceCode}">000000000</div>
                 <p style="margin:0.75rem 0 0; opacity:0.85; font-size:0.85rem; line-height:1.5;">
                     📸 <strong>Screenshot or note this number.</strong><br>
-                    You need it to upload your payment proof or look up this inquiry later.
+                    You can also find this booking anytime using your WhatsApp number.
                 </p>
                 <button onclick="copyRefCode()" id="copy-btn"
                         style="margin-top:1rem; background:rgba(255,255,255,0.2);
@@ -97,7 +97,7 @@
                     <button onclick="toggleCancelForm()" id="toggle-cancel-btn"
                             class="btn btn-outline"
                             style="width:100%; color: var(--color-danger, #ef4444); border-color: var(--color-danger, #ef4444);">
-                        Cancel This Inquiry
+                        Cancel This Booking
                     </button>
                     <div id="cancel-form-panel"
                          style="display:none; margin-top:0.75rem; padding:1rem;
@@ -111,20 +111,20 @@
                             <button type="submit" class="btn btn-sm"
                                     style="background:#ef4444; color:#fff; border:none; width:100%;"
                                     id="confirm-cancel-btn">
-                                Yes, Cancel My Inquiry
+                                Yes, Cancel My Booking
                             </button>
                         </form>
                     </div>
                 </div>
 
-                <a href="/inquiry" class="btn btn-outline" id="back-to-inquiry-btn">← Back to Inquiry Page</a>
+                <a href="/inquiry" class="btn btn-outline" id="back-to-inquiry-btn">← Back to Booking Page</a>
             </div>
 
             <!-- Cancelled state actions -->
             <div th:if="${inquiry.status.name() == 'CANCELLED_BY_VISITOR' or inquiry.status.name() == 'CANCELLED_BY_ADMIN'}"
                  style="margin-bottom:1.5rem;">
                 <a href="/inquiry" class="btn btn-primary" style="display:block; text-align:center;">
-                    Make a New Inquiry
+                    Make a New Booking
                 </a>
             </div>
         </div>
