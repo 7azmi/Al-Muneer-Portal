@@ -8,7 +8,7 @@
 
 **Al-Muneer Online Portal**
 
-**Version 1.2**
+**Version 1.3**
 
 **Prepared by:** Ahmed Ghaleb
 
@@ -38,6 +38,7 @@ The target audience for this SRS document includes:
 |1.0|Ahmed Hani Ahmed Ghaleb|Initial complete draft of SRS document for FYP1 Progress 2.|30/05/2025|
 |1.1|Ahmed Hani Ahmed Ghaleb|Use case 6 "Admin Login" removed as instructed|06/08/2025|
 |1.2|Ahmed Hani Ahmed Ghaleb|AI advisor features integrated into UC010, UC014, and UC015; redundant steps removed; diagrams synced with implementation.|18/06/2026|
+|1.3|Ahmed Hani Ahmed Ghaleb|Incorporated examiner feedback: explicit flow-trigger cross-references added to all use case Normal/Alternative/Exception flows; new UC017 Generate AI Insights use case added (description table, activity diagram, sequence diagram); Gemini AI actor added to the use case diagram; all diagrams re-synced with implementation.|17/07/2026|
 
 _(Note: This Software Requirements Specification (SRS) template is adapted from IEEE Recommended Practice for Software Requirements Specification (SRS) (IEEE Std. 830-1998) that is simplified and customized to meet the need of SECJ3203 FYP1 SE course at Faculty of Computing, UTM. Examples of models are from Arlow and Neustadt (2002) and other sources stated accordingly. This template is tailored for SRS in a plan-driven software development approach.)_
 
