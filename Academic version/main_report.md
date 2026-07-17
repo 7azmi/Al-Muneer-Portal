@@ -529,7 +529,6 @@ Non-functional requirements define the quality attributes of the system.
 left to right direction
 actor Visitor
 actor Admin
-actor "Gemini AI\n(External AI Service)" as Gemini
 
 rectangle "Al-Muneer Online Portal" {
   usecase "UC001: View Venue Information" as UC1
@@ -552,6 +551,8 @@ rectangle "Al-Muneer Online Portal" {
   usecase "UC017: Generate AI Insights" as UC17
 }
 
+actor "Gemini AI\n(External AI Service)" as Gemini
+
 Visitor --> UC1
 Visitor --> UC2
 Visitor --> UC3
@@ -571,8 +572,8 @@ Admin --> UC16
 Admin --> UC14
 Admin --> UC17
 
-UC14 ..> UC10 : <<includes>>
-UC17 ..> UC14 : <<extends>>
+UC14 .[norank].> UC10 : <<includes>>
+UC17 .[norank].> UC14 : <<extends>>
 UC17 --> Gemini
 
 @enduml
