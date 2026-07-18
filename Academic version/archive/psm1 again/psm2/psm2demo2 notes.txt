@@ -1,0 +1,12 @@
+- Feedback to be shown to those who completed their enquiry experience only, not for everyone
+- add graphs to analytics. Illustrate the numbers. Same thing with reports
+- fix `/inquiry` page to be responsive to mobiles 
+- add date filtering to reporting
+- you can use ai on reports and feedback summurizition to ensure that this project is complex enough // use gemini llm key and a simple prompt to achieve the task.
+- There is an error appeared during testing submitting a feedback:
+
+```
+Internal Server Error
+
+could not execute statement [ERROR: null value in column "visitor_name" of relation "feedbacks" violates not-null constraint Detail: Failing row contains (4, null, Hi. Dr Luqman, f, 5, 2026-05-26 16:32:47.870521, null, null).] [insert into feedbacks (admin_notes,feedback_text,is_reviewed,rating,submission_date,visitor_name,visitor_whats_app) values (?,?,?,?,?,?,?)]; SQL [insert into feedbacks (admin_notes,feedback_text,is_reviewed,rating,submission_date,visitor_name,visitor_whats_app) values (?,?,?,?,?,?,?)]; constraint [visitor_name" of relation "feedbacks]
+```

@@ -1,0 +1,340 @@
+@startuml
+!theme plain
+skinparam backgroundColor #ffffff
+skinparam linetype ortho
+
+' ============================================================
+' REFERENCE / LOOKUP TABLES
+' ============================================================
+
+entity study_levels {
+  *id : serial PK
+  code : text UK
+  name_en : text
+  name_ar : text
+}
+
+entity study_modes {
+  *id : serial PK
+  code : text UK
+  name_en : text
+  name_ar : text
+}
+
+entity study_level_modes {
+  *study_level_id : int FK
+  *study_mode_id : int FK
+}
+
+entity study_fields {
+  *id : serial PK
+  code : text UK
+  name_en : text
+  name_ar : text
+}
+
+entity study_durations {
+  *id : serial PK
+  label_en : text
+  label_ar : text
+  duration_number : numeric
+  duration_unit : text
+}
+
+entity payment_plan_types {
+  *id : serial PK
+  code : text UK
+  name : text
+  description : text
+  billing_period : text
+}
+
+entity currencies {
+  *code : text PK
+  name : text
+  myr_rate : numeric
+}
+
+entity countries {
+  *id : serial PK
+  name : text
+  iso_code : text UK
+  phone_code : text
+  accreditor_name : text
+  accreditor_source_url : text
+  accreditation_rules : text
+  notes : text
+}
+
+entity locations {
+  *id : serial PK
+  state : text
+}
+
+entity certificate_types {
+  *id : serial PK
+  name_en : text
+  name_ar : text
+  awarding_country_id : int FK
+  entry_levels : text[]
+  requires_foundation_year : boolean
+  exempt_from_english_requirement : boolean
+  active : boolean
+  notes : text
+  source_url : text
+  last_verified : date
+}
+
+entity english_qualifications {
+  *id : serial PK
+  ielts_band : text UK
+  equivalents : jsonb
+}
+
+' ============================================================
+' CORE ENTITIES
+' ============================================================
+
+entity university_types {
+  *id : serial PK
+  name : text
+  image_url : text
+}
+
+entity universities {
+  *id : serial PK
+  name : text
+  acronym : text
+  image_url : text
+  is_partnership : boolean
+  active_to_recruit : boolean
+  type_id : int FK
+  official_url : text
+  advantages_en : text
+  advantages_ar : text
+  notes_penalties : text
+  offer_letter_fee_applies : boolean
+  default_payment_plan_type_id : int FK
+  tax_applied : boolean
+  tax_rate : numeric
+  tax_code : text
+  english_exempt_country_ids : int[]
+  pec_fee_treatment : text
+  pec_source_url : text
+  notes : text
+}
+
+entity university_campuses {
+  *university_id : int FK
+  *location_id : int FK
+}
+
+entity university_pec_options {
+  *id : serial PK
+  university_id : int FK
+  name : text
+  pricing_unit : text
+  price_per_unit : numeric
+  currency_code : text FK
+  min_units_at_registration : int
+  fee_catalog_item_ids : int[]
+  pros_en : text
+  pros_ar : text
+  cons_en : text
+  cons_ar : text
+  active : boolean
+}
+
+entity programs {
+  *id : serial PK
+  name : text
+  university_id : int FK
+  currently_offered : boolean
+  study_level_id : int FK
+  study_mode_id : int FK
+  study_field_id : int FK
+  research_fields : text
+  study_duration_id : int FK
+  ielts_requirement_id : int FK
+  currency_code : text FK
+  primary_payment_plan_id : int FK
+  can_enroll_via_pec : boolean
+  override_cert_nationality_exemption : boolean
+  accreditation_country_id : int FK
+  university_program_page_url : text
+  mize_ranking : int
+  is_twin_program : boolean
+  bundle : jsonb
+  notes : text
+}
+
+entity program_campuses {
+  *program_id : int FK
+  *location_id : int FK
+}
+
+' ============================================================
+' INTAKE CALENDAR
+' ============================================================
+
+entity intakes {
+  *id : serial PK
+  university_id : int FK
+  month : text
+  open_month : smallint
+  open_day : smallint
+  close_month : smallint
+  close_day : smallint
+}
+
+entity program_intakes {
+  *program_id : int FK
+  *intake_id : int FK
+}
+
+' ============================================================
+' PRICING CLUSTER
+' ============================================================
+
+entity fees {
+  *id : serial PK
+  university_id : int FK
+  name_en : text
+  name_ar : text
+  amount : numeric
+  currency_code : text FK
+  tax_override : text
+  payable_with : text
+  payable_to : text
+  payable_to_other : text
+  charge_frequency : text
+  refundable : boolean
+  refundability_conditions : text
+  mandatory : boolean
+  payment_method_notes : text
+  eligibility : jsonb
+  nationality_overrides : jsonb
+  bundle_phase : text
+  anchored_to_semester_index : boolean
+  semester_indices_triggered : int[]
+  source_url : text
+  last_verified : date
+  active : boolean
+  notes : text
+}
+
+entity tuition_lines {
+  *id : serial PK
+  program_id : int FK
+  intake_id : int FK
+  period_type : text
+  academic_year_number : int
+  semester_in_year : int
+  number_of_periods : int
+  amount : numeric
+  currency_code : text FK
+  payment_plan_type_id : int FK
+  tax_override : text
+  bundle_phase : text
+  active : boolean
+  notes : text
+}
+
+entity discounts {
+  *id : serial PK
+  university_id : int FK
+  name_en : text
+  name_ar : text
+  type : text
+  conditional : boolean
+  triggered_by_payment_choice : boolean
+  value_type : text
+  value : numeric
+  value_min : numeric
+  value_max : numeric
+  currency_code : text FK
+  applies_to_fee_type : text
+  applies_to_specific_fee_ids : int[]
+  affects_payment_to : text
+  application_timing : text
+  eligibility : jsonb
+  academic_conditions : text
+  other_conditions : text
+  bot_note_en : text
+  bot_note_ar : text
+  stackable : boolean
+  priority : int
+  valid_from : date
+  valid_until : date
+  active : boolean
+  source_url : text
+  last_verified : date
+}
+
+' ============================================================
+' LANGUAGE PROGRAMS DOMAIN
+' ============================================================
+
+entity language_institutes {
+  *id : serial PK
+  name : text
+  url_en : text
+  url_ar : text
+}
+
+entity language_courses {
+  *id : serial PK
+  language_institute_id : int FK
+  name : text
+}
+
+entity language_course_fees {
+  *id : serial PK
+  language_course_id : int FK
+  amount : numeric
+  notes : text
+}
+
+' Reference layer relationships
+study_levels ||--o{ study_level_modes : "links to"
+study_modes ||--o{ study_level_modes : "links to"
+countries ||--o{ certificate_types : "awards"
+
+' Core entity relationships
+university_types ||--o{ universities : "categorizes"
+payment_plan_types ||--o{ universities : "default plan for"
+universities ||--o{ university_campuses : "has"
+locations ||--o{ university_campuses : "in"
+universities ||--o{ university_pec_options : "offers"
+currencies ||--o{ university_pec_options : "prices in"
+universities ||--o{ programs : "offers"
+universities ||--o{ intakes : "has"
+universities ||--o{ fees : "charges"
+universities ||--o{ discounts : "offers"
+study_levels ||--o{ programs : "required for"
+study_modes ||--o{ programs : "taught as"
+study_fields ||--o{ programs : "in field of"
+study_durations ||--o{ programs : "duration"
+english_qualifications ||--o{ programs : "requires"
+currencies ||--o{ programs : "charged in"
+payment_plan_types ||--o{ programs : "payment option"
+countries ||--o{ programs : "accredited by"
+programs ||--o{ program_campuses : "offered at"
+locations ||--o{ program_campuses : "location"
+
+' Intake relationships
+intakes ||--o{ program_intakes : "calendar for"
+programs ||--o{ program_intakes : "enrolled via"
+
+' Pricing relationships
+currencies ||--o{ tuition_lines : "priced in"
+currencies ||--o{ discounts : "valued in"
+programs ||--o{ tuition_lines : "schedules tuition for"
+intakes ||--o{ tuition_lines : "specific to"
+payment_plan_types ||--o{ tuition_lines : "payment structure"
+
+' Language domain relationships
+language_institutes ||--o{ language_courses : "offers"
+language_courses ||--o{ language_course_fees : "has"
+
+@enduml

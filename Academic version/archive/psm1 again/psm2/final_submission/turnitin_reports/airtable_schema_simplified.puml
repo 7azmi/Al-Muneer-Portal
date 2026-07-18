@@ -1,0 +1,603 @@
+@startuml airtable_schema_simplified
+!theme plain
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+title Airtable base schema — simplified target (32 -> 29 tables, ~640 -> ~360 fields)
+
+' ============================================================
+' DESIGN RULES applied throughout:
+'  1. Airtable stores FACTS. The bot/backend computes sums,
+'     display strings, and localized text at quote time.
+'  2. One representation per relationship. No parallel
+'     junction table + scope-links for the same question.
+'  3. Every table keeps the same 4-field audit tail:
+'     Validation Status, Last Modified Time, Entry Source,
+'     Verified By  — shown once here as <<audit>> to reduce noise.
+'  4. Ephemeral/derived data (health matrices, resolved fee
+'     projections, per-plan tuition sums) is dropped or
+'     restructured to long format.
+'
+' DROPPED TABLES (9):
+'  - Website Programs (Legacy)  -> export to CSV archive; keep
+'    plain-text legacy_wp_id on Programs during cutover only
+'  - Program Fees               -> Fee Catalog scope links are the
+'    single source of truth for applicability
+'  - Sequence Counters          -> WP-ID issuance moves to the
+'    backend/automation that already assigns them
+'  - DB Health Snapshots        -> replaced by long-format
+'    Health Snapshots (6 cols instead of 27)
+'  - University Type            -> single-select on University
+'  - language_course_fee dedup  -> table kept but 5 "Form English
+'    copy" clones and denormalized institute_name/id removed
+' ============================================================
+
+' ---------- REFERENCE DATA ----------
+
+entity "Countries" as countries {
+  * **id** : record_id <<PK>>
+  --
+  + "Country Name" : text
+  + "Country Acronym" : text
+  + "Phone Code" : text
+  + "Notes" : text
+  ' accreditation-monitoring fields (Monitoring Enabled, Last
+  ' Checked, Checking Frequency, Priority, Accreditor, Rules)
+  ' moved to Data Updating Schedule with Scope = Country —
+  ' one verification-cadence system instead of two
+}
+
+entity "Currencies" as currencies {
+  * **id** : record_id <<PK>>
+  --
+  + "Currency Code" : text
+  + "Currency Name" : text
+  + "Rate to MYR" : number
+  + "Rate As Of" : datetime
+  ' WARNING: single mutable rate = quotes are not reproducible.
+  ' The bot must snapshot rate + amounts into its own quote log.
+}
+
+entity "Study Levels" as study_levels {
+  * **id** : record_id <<PK>>
+  --
+  + "Level" : text
+  + "Level (Ar)" : text
+  + "Study Level Code" : text
+  + "Study Modes Applicable" : link -> Study Modes
+}
+
+entity "Study Fields" as study_fields {
+  * **id** : record_id <<PK>>
+  --
+  + "Field" : text
+  + "Study Field Code" : text
+}
+
+entity "Study Modes" as study_modes {
+  * **id** : record_id <<PK>>
+  --
+  + "Mode" : text
+  + "Mode (Ar)" : text
+}
+
+entity "Study Durations" as study_durations {
+  * **id** : record_id <<PK>>
+  --
+  + "Duration" : text
+  + "Duration (Ar)" : text
+  + "Duration Number" : number
+  + "Duration Unit" : select
+}
+
+entity "Locations" as locations {
+  * **id** : record_id <<PK>>
+  --
+  + "State" : text
+  + "Payment Plan Rules" : text
+}
+
+entity "Certificate Types" as certificate_types {
+  * **id** : record_id <<PK>>
+  --
+  + "Cert Name EN" : text
+  + "Cert Name AR" : text
+  + "Awarding Country" : link -> Countries
+  + "Entry Level" : link -> Study Levels
+  + "Requires Foundation Year?" : formula <<computed>>
+  + "Exempt from English Qualification?" : bool
+  + "Active" : bool
+  + "Source" : text
+  + "Notes" : text
+  <<audit>>
+}
+
+entity "English Qualifications" as english_qualifications {
+  * **id** : record_id <<PK>>
+  --
+  ' KEPT WIDE deliberately: each row is one equivalence band
+  ' across test providers — wide is the honest shape here.
+  + "CEFR Level" : select
+  + "IELTS" : text
+  + "MUET" : select
+  + "TOEFL iBT" : select
+  + "TOEFL Essentials" : select
+  + "PTE Academic" : select
+  + "Cambridge Exams" : select
+  + "Linguaskill" : select
+  + "OET" : select
+  + "GCSE / IGCSE / A-Level English" : select
+  + "ELS CIEP" : select
+  + "SPM CEFR / 1119" : select
+  ' dropped: TOEFL CBT & PBT (exams discontinued)
+}
+
+' ---------- CORE ACADEMIC MODEL ----------
+
+entity "University" as university {
+  * **id** : record_id <<PK>>
+  --
+  + "name" : text
+  + "acronym" : text
+  + "image" : attachments
+  + "Type" : select
+  + "Partnership" : bool
+  + "Active to Recruit?" : bool
+  + "Campuses" : link -> Locations
+  + "University Official URL" : text
+  + "uni_link_EN / uni_link_AR" : text
+  + "uni_advantages_en / _ar" : text
+  + "Notes/Penalties" : text
+  + "Default Payment Plan Type" : link -> Payment Plan Types
+  + "Tax-Applied Institution?" : bool
+  + "Tax Rate" : number
+  + "Tax Code" : text
+  + "English Exempt Nationalities" : link -> Countries
+  + "PEC Fee Treatment" : select
+  + "PEC Source" : text
+  + "Representative Name" : text
+  + "Representative Channel" : select
+  + "Representative Contact" : text
+  <<audit>>
+  ' dropped: PEC Notes EN/AR formulas, 4 lookup mirrors of
+  ' program attributes, Count(Programs) — bot/views derive these
+}
+
+entity "Programs" as programs {
+  * **id** : record_id <<PK>>
+  --
+  + "Program Name" : text
+  + "University" : link -> University
+  + "Currently Offered" : bool
+  + "Campuses" : link -> Locations
+  + "Study Level" : link -> Study Levels
+  + "Study Mode" : link -> Study Modes
+  + "Study Field" : link -> Study Fields
+  + "Study Duration" : link -> Study Durations
+  + "Intakes" : link -> Intakes
+  + "English Qualification" : link -> English Qualifications
+  + "Accreditation" : link -> Countries
+  + "Program Page URL" : text
+  + "Currency" : link -> Currencies
+  + "MYR Rate (Helper)" : lookup <<computed>>
+  + "Primary Payment Plan" : link -> Payment Plan Types
+  + "Full Tuition (Best Advertised)" : number
+  + "Mize Ranking" : number
+  + "Can Enroll Uni Eng Course?" : bool
+  + "Override Cert/Nationality Exemption?" : bool
+  + "Twin Program (Multi-Currency)?" : bool
+  + "Data Confidence Verified?" : bool
+  + "Website Programs" : link -> Website Programs
+  + "Nearest Upcoming Intake" : rollup <<computed>>
+  + "Program Intake Status" : formula <<computed>>
+  <<audit>>
+  ' 96 -> ~27 fields. Dropped:
+  '  - 10 "Tuition Sum (<plan>)" rollups  -> bot sums Tuition
+  '    Schedule rows for the ONE effective plan at quote time
+  '  - ~14 EN/AR display formulas (tax statements, intake
+  '    displays, per-year breakdowns) -> bot templates
+  '  - 8 bundle fields -> Program Bundles table
+  '  - legacy full_cost / Cost in MYR / legacy WP link
+  '  - helper cycle counts, key rollups, signature formulas
+  '    (validator computes these server-side)
+}
+
+entity "Intakes" as intakes {
+  * **id** : record_id <<PK>>
+  --
+  + "University" : link -> University
+  + "Month" : select
+  + "Use Manual Open?" : bool
+  + "Manual Opens (Annually)" : date
+  + "Application Closes (Annually)" : date
+  + "Intake Display / (AR)" : formula <<computed>>
+  <<audit>>
+  ' dropped: duplicate "Program Intake Cycles (View Only)" link,
+  ' Is TTY helper, acronym lookup, order helper
+}
+
+entity "Program Intake Cycles" as program_intake_cycles {
+  * **id** : record_id <<PK>>
+  --
+  ' KEPT as a materialization: Airtable formulas cannot compute
+  ' "currently open cycle" across links, and the bot reads this
+  ' constantly. Alternative (drop it, compute in backend) is
+  ' better long-term — see notes.
+  + "Program" : link -> Programs
+  + "Intake" : link -> Intakes
+  + "Computed Open Date" : date
+  + "Final Open Date" : date
+  + "Next Close Date" : date
+  + "Status" : select
+  + "Last Recalculated At" : datetime
+  <<audit>>
+  ' dropped: 6 helper key/date formulas + 4 lookup mirrors
+}
+
+entity "Program Bundles" as program_bundles {
+  * **id** : record_id <<PK>>
+  --
+  ' NEW — extracted from 8 self-link/formula fields on Programs.
+  ' A bundle (Foundation + Bachelor package) is its own fact.
+  + "Foundation Program" : link -> Programs
+  + "Bachelor Program" : link -> Programs
+  + "Phase-1 Campus" : link -> Locations
+  + "Phase-2 Campus" : link -> Locations
+  + "Visa Notes (EN)" : text
+  + "Visa Notes (AR)" : text
+  + "Active" : bool
+  <<audit>>
+}
+
+' ---------- MONEY ----------
+
+entity "Payment Plan Types" as payment_plan_types {
+  * **id** : record_id <<PK>>
+  --
+  + "Name" : text
+  + "Code" : text
+  + "Description" : text
+  + "Billing Period" : select
+  + "Notes" : text
+  <<audit>>
+}
+
+entity "Tuition Schedule" as tuition_schedule {
+  * **id** : record_id <<PK>>
+  --
+  ' TWO-TIER ADDRESSING, formalized:
+  '   EITHER Program is set (explicit row, wins)
+  '   OR University+Level(+Mode) pattern is set (fallback)
+  ' Partial mixes are forbidden; the validator enforces
+  ' non-overlap. Precedence ambiguity in money data was the
+  ' single biggest correctness risk in the old schema.
+  + "Program" : link -> Programs
+  + "University (Pattern)" : link -> University
+  + "Study Level (Pattern)" : link -> Study Levels
+  + "Study Mode (Pattern)" : link -> Study Modes
+  + "Intake" : link -> Intakes
+  + "Payment Plan Type" : link -> Payment Plan Types
+  + "Period Type" : select
+  + "Academic Year Number" : number
+  + "Semester in Year" : number
+  + "Number of Periods" : number
+  + "Amount" : number
+  + "Currency" : link -> Currencies
+  + "MYR Rate (Helper)" : lookup <<computed>>
+  + "MYR Converted" : formula <<computed>>
+  + "Tax Applies (Override)" : select
+  + "Bundle Phase" : select
+  + "Active" : bool
+  + "Notes" : text
+  + "Entry Batch" : text
+  <<audit>>
+  ' 38 -> ~23. Dropped: Study Field/Campus filter dims (never
+  ' needed at finer grain than Level+Mode per audit), tax-amount
+  ' formula chain (bot computes from University tax fields),
+  ' 6 intake-signature lookup/rollup helpers
+}
+
+entity "Fee Catalog" as fee_catalog {
+  * **id** : record_id <<PK>>
+  --
+  + "Fee Name EN" : text
+  + "Fee Name AR" : text
+  + "University" : link -> University
+  + "Amount" : number
+  + "Currency" : link -> Currencies
+  + "MYR Rate (Helper)" : lookup <<computed>>
+  + "MYR Converted" : formula <<computed>>
+  + "Tax Applies (Override)" : select
+  + "Payable With" : select
+  + "Payable To" : select
+  + "Payable To (Other)" : text
+  + "Charge Frequency" : select
+  + "Refundable" : bool
+  + "Refundability Conditions" : text
+  + "Mandatory" : bool
+  + "Payment Method Notes" : text
+  + "Applies To Scope" : select
+  + "Applicable Study Levels" : link -> Study Levels
+  + "Applicable Study Modes" : link -> Study Modes
+  + "Applicable Study Durations" : link -> Study Durations
+  + "Applicable Campuses" : link -> Locations
+  + "Applicable Programs" : link -> Programs
+  + "Applicable Intakes" : link -> Intakes
+  + "Applicable Payment Plans" : link -> Payment Plan Types
+  + "University PEC" : link -> University PEC
+  + "Has Nationality Variants?" : bool
+  + "Anchored to Semester Index?" : bool
+  + "Semester Indices Triggered" : text
+  + "Bundle Phase" : select
+  + "Source Brochure Reference" : text
+  + "Active" : bool
+  + "Notes" : text
+  + "Entry Batch" : text
+  <<audit>>
+  ' 49 -> ~33. The scope-link model is KEPT (it is a pragmatic
+  ' rules table). Dropped: the parallel Program Fees junction,
+  ' tax formula chain + 2 tax rollups, Sort by.., Eligible
+  ' Nationalities direct link (overrides table owns nationality),
+  ' Study Level lookup mirror
+}
+
+entity "Fee Nationality Overrides" as fee_nationality_overrides {
+  * **id** : record_id <<PK>>
+  --
+  ' KEPT as-is minus mirrors — this is a clean exception table.
+  + "Fee Catalog Entry" : link -> Fee Catalog
+  + "Nationalities" : link -> Countries
+  + "Override Amount" : number
+  + "Override Currency" : link -> Currencies
+  + "MYR Rate (Helper)" : lookup <<computed>>
+  + "Source" : text
+  + "Active" : bool
+  + "Notes" : text
+  <<audit>>
+}
+
+entity "Discounts & Scholarships" as discounts {
+  * **id** : record_id <<PK>>
+  --
+  + "Name EN" : text
+  + "Name AR" : text
+  + "University" : link -> University
+  + "Type" : select
+  + "Conditional?" : bool
+  + "Triggered By Payment Choice?" : bool
+  + "Value Type" : select
+  + "Value" : number
+  + "Value Min" : number
+  + "Value Max" : number
+  + "Currency" : link -> Currencies
+  + "MYR Rate (Helper)" : lookup <<computed>>
+  + "Applies To Fee Type" : select
+  + "Applies To Specific Fees" : link -> Fee Catalog
+  + "Affects Payment To" : select
+  + "Application Timing" : select
+  + "Eligible Nationalities" : link -> Countries
+  + "Eligible Study Levels" : link -> Study Levels
+  + "Eligible Study Modes" : link -> Study Modes
+  + "Eligible Programs" : link -> Programs
+  + "Eligible Intakes" : link -> Intakes
+  + "Eligible Campuses" : link -> Locations
+  + "Applicable Payment Plans" : link -> Payment Plan Types
+  + "Academic Conditions" : text
+  + "Other Conditions" : text
+  + "Bot Note EN / AR" : text
+  + "Stackable?" : bool
+  + "Priority" : number
+  + "Valid From / Until" : date
+  + "Active" : bool
+  + "Source" : text
+  <<audit>>
+  ' 40 -> ~34. Dropped: 3 "Value in MYR" formula variants
+  ' (bot converts at quote time with a snapshotted rate)
+}
+
+entity "University PEC" as university_pec {
+  * **id** : record_id <<PK>>
+  --
+  + "Name" : text
+  + "University" : link -> University
+  + "Pricing Unit" : select
+  + "Price Per Unit" : number
+  + "Currency" : link -> Currencies
+  + "Min Units at Registration" : number
+  + "Pros" : text
+  + "Cons" : text
+  + "Active" : bool
+  <<audit>>
+}
+
+' ---------- WEBSITE / PUBLISHING ----------
+
+entity "Website Programs" as website_programs {
+  * **id** : record_id <<PK>>
+  --
+  + "Website Program Name (EN)" : text
+  + "Website Program Name (AR)" : text
+  + "Study Level" : link -> Study Levels
+  + "Study Field" : link -> Study Fields
+  + "WP-ID" : text
+  + "WP-ID Issued At" : datetime
+  + "Slug" : text
+  + "SEO Name" : text
+  + "SEO Keywords" : text
+  + "WP Profile Body (EN)" : text
+  + "WP Profile Body (AR)" : text
+  + "Requires Website Update" : select
+  + "Review Status" : select
+  + "Created Automatically?" : bool
+  + "Archived?" : bool
+  + "AI Proposed Name" : text
+  + "AI Match Confidence" : number
+  + "Grouping Signature" : text
+  <<audit>>
+  ' 31 -> ~22. Dropped: Sequence Number machinery (Previous
+  ' Sequence No, Change Reason, Changed At — WP-ID issuance
+  ' moves to backend along with Sequence Counters), code
+  ' lookup mirrors, count field
+}
+
+entity "WP Synonyms" as wp_synonyms {
+  * **id** : record_id <<PK>>
+  --
+  + "Canonical Form" : text
+  + "Synonyms" : text
+  + "Study Level Scope" : link -> Study Levels
+  + "Study Field Scope" : link -> Study Fields
+  + "Active" : bool
+  + "Notes" : text
+}
+
+' ---------- LANGUAGE COURSES (cleaned legacy island) ----------
+
+entity "Language Institutes" as language_institute {
+  * **id** : record_id <<PK>>
+  --
+  + "Name" : text
+  + "Location" : text
+  + "Mize Ranking" : number
+  + "Offers" : text
+  + "Link EN / AR" : text
+  ' dropped: 2x "Form English copy" fields
+}
+
+entity "Language Courses" as language_course {
+  * **id** : record_id <<PK>>
+  --
+  + "Name" : text
+  + "Institute" : link -> Language Institutes
+  ' dropped: denormalized institute_name text, numeric id,
+  ' 2x "Form English copy" fields
+}
+
+entity "Language Course Fees" as language_course_fee {
+  * **id** : record_id <<PK>>
+  --
+  + "Course" : link -> Language Courses
+  + "Duration" : number
+  + "Original Tuition Fee" : number
+  + "Discounted Tuition Fee" : number
+  + "Edumize Discount Rate" : number
+  + "Registration Fees" : number
+  + "Placement Test" : number
+  + "Visa & Medical Insurance" : number
+  + "Books & Materials" : number
+  + "Immigration Clearance & Pickup" : number
+  + "Total Price" : formula <<computed>>
+  + "Offer" : text
+  ' 24 -> ~12. Dropped: institute_name/institute_id/course_id
+  ' denormalized copies (link resolves them), 5x "Form English
+  ' copy" clones — including a literal duplicate field name
+}
+
+' ---------- OPERATIONS ----------
+
+entity "Data Updating Schedule" as data_updating_schedule {
+  * **id** : record_id <<PK>>
+  --
+  ' Now the SINGLE verification-cadence system. Absorbs the
+  ' country accreditation-monitoring fields via Scope=Country.
+  + "Scope" : select
+  + "University" : link -> University
+  + "Country" : link -> Countries
+  + "Study Level" : link -> Study Levels
+  + "Intake" : link -> Intakes
+  + "Next Verification Due" : date
+  + "Recurrence Interval" : select
+  + "Custom Interval (Days)" : number
+  + "Per Semester Months (CSV)" : text
+  + "Data Source Type" : select
+  + "Data Source URL" : text
+  + "Data Source Attachments" : attachments
+  + "Data Fields to Update" : multi_select
+  + "Send Email To" : select
+  + "Data Verified" : bool
+  + "Last Verified At" : datetime
+  + "Last Reminder Sent At" : datetime
+  + "Days Until Due" : formula <<computed>>
+  + "Status" : formula <<computed>>
+  + "Active" : bool
+  + "Notes" : text
+  <<audit>>
+  ' dropped: 4 representative-contact lookups (open University
+  ' record instead), Scope Key / Row Label formulas
+}
+
+entity "Validation Findings" as validation_findings {
+  * **id** : record_id <<PK>>
+  --
+  ' KEPT unchanged — this is the right pattern: an external
+  ' validator writing findings, instead of per-row formulas.
+  + "Finding Key" : text
+  + "Rule ID" : text
+  + "Severity" : select
+  + "Source Table" : text
+  + "Source Record ID" : text
+  + "Message" : text
+  + "First Detected" : date
+  + "Last Seen" : date
+  + "Resolved" : bool
+  + "Resolved Date" : date
+  + "Run Count" : number
+}
+
+entity "Health Snapshots" as health_snapshots {
+  * **id** : record_id <<PK>>
+  --
+  ' REPLACES the 27-column matrix. Long format: one row per
+  ' (date x table x severity x escalation). Trends become a
+  ' grouped view instead of 24 hardcoded columns, and adding
+  ' a 5th monitored table costs zero schema changes.
+  + "Snapshot Date" : date
+  + "Source Table" : text
+  + "Severity" : select
+  + "Escalated?" : bool
+  + "Count" : number
+}
+
+entity "AI Grouping Queue" as ai_grouping_queue {
+  * **id** : record_id <<PK>>
+  --
+  + "Program" : link -> Programs
+  + "Study Field" : link -> Study Fields
+  + "Computed Signature" : text
+  + "Stage" : select
+  + "Stage Status" : select
+  + "Last Run At" : datetime
+  + "AI Cost (USD)" : number
+  ' dropped: AI Raw Response blob (log it in the backend, not
+  ' in Airtable cells), per-stage column pairs collapsed into
+  ' Stage + Status
+}
+
+' ---------- KEY RELATIONSHIPS ----------
+university ||--o{ programs
+university ||--o{ intakes
+university ||--o{ fee_catalog
+university ||--o{ discounts
+university ||--o{ university_pec
+programs }o--o{ intakes
+programs ||--o{ program_intake_cycles
+intakes ||--o{ program_intake_cycles
+programs ||--o{ tuition_schedule
+fee_catalog ||--o{ fee_nationality_overrides
+fee_catalog }o--o{ programs
+discounts }o--o{ programs
+programs }o--o{ website_programs
+program_bundles }o--|| programs
+language_institute ||--o{ language_course
+language_course ||--o{ language_course_fee
+certificate_types }o--|| countries
+certificate_types }o--o{ study_levels
+programs }o--|| study_levels
+programs }o--|| study_fields
+programs }o--|| study_modes
+programs }o--|| currencies
+tuition_schedule }o--|| currencies
+fee_catalog }o--|| currencies
+
+@enduml

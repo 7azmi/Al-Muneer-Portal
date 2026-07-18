@@ -1,0 +1,93 @@
+@startuml discount_scope_core
+!theme plain
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+title Discount Eligibility — Core Redesign (6 axes normalized)
+
+entity "Discounts & Scholarships" as discounts {
+  * **id** : record_id <<PK>>
+  --
+  + "Name EN" : text
+  + "University" : link -> University
+  + "Value Type" : select
+  + "Value" : number
+  + "Stackable?" : bool
+  + "Priority" : number
+  + "Scope Count (Helper)" ![[Count of linked Discount Scope rows.
+Zero = universal / unrestricted discount.
+Nonzero = check Discount Scope for the actual conditions.]] : count <<computed>>
+  + "Active" : bool
+}
+
+entity "Discount Scope" as discount_scope {
+  * **id** : record_id <<PK>>
+  --
+  + "Discount" ![[The discount this scope row restricts.
+One row per axis-condition, not one row per discount.]] : link -> Discounts & Scholarships
+  + "Axis Type" ![[Which of the 6 axes this row constrains.
+Determines which single link field below is populated.
+Options: Nationality | Study Level | Study Mode | Program | Intake | Campus]] : select
+  + "Country" ![[Populated only when Axis Type = Nationality.]] : link -> Countries
+  + "Study Level" ![[Populated only when Axis Type = Study Level.]] : link -> Study Levels
+  + "Study Mode" ![[Populated only when Axis Type = Study Mode.]] : link -> Study Modes
+  + "Program" ![[Populated only when Axis Type = Program.]] : link -> Programs
+  + "Intake" ![[Populated only when Axis Type = Intake.]] : link -> Intakes X
+  + "Campus" ![[Populated only when Axis Type = Campus.]] : link -> Locations
+  + "Resolved Value (Display)" ![[Formula: returns whichever of the 6 link
+fields is populated, based on Axis Type.
+Staff-facing readability only.]] : formula <<computed>>
+  + "Include / Exclude" ![[Default Include (whitelist).
+Exclude reserved for the rare "eligible for everyone
+except X" case — confirm with designer whether this
+is ever actually needed before building it.]] : select
+  + "Active" : bool
+}
+
+entity "Countries" as countries {
+  * **id** : record_id <<PK>>
+  --
+  + "Country Name" : text
+}
+
+entity "Study Levels" as study_levels {
+  * **id** : record_id <<PK>>
+  --
+  + "Level" : text
+}
+
+entity "Study Modes" as study_modes {
+  * **id** : record_id <<PK>>
+  --
+  + "Mode" : text
+}
+
+entity "Programs" as programs {
+  * **id** : record_id <<PK>>
+  --
+  + "Program Name" : text
+}
+
+entity "Intakes X" as intakes_x {
+  * **id** : record_id <<PK>>
+  --
+  + "Label" : text
+}
+
+entity "Locations" as locations {
+  * **id** : record_id <<PK>>
+  --
+  + "State" : text
+}
+
+' Relationships
+discounts ||--o{ discount_scope : "Scope Rows"
+discount_scope }o--o| countries : "Country"
+discount_scope }o--o| study_levels : "Study Level"
+discount_scope }o--o| study_modes : "Study Mode"
+discount_scope }o--o| programs : "Program"
+discount_scope }o--o| intakes_x : "Intake"
+discount_scope }o--o| locations : "Campus"
+
+@enduml

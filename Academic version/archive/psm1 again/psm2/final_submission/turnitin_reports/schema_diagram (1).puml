@@ -1,0 +1,288 @@
+@startuml university_intake_schema
+skinparam backgroundColor transparent
+skinparam entityBackgroundColor white
+skinparam entityBorderColor black
+skinparam relationshipStyle ortho
+
+entity study_levels {
+  id: serial [PK]
+  code: text [unique]
+  name_en: text
+  name_ar: text
+}
+
+entity study_modes {
+  id: serial [PK]
+  code: text [unique]
+  name_en: text
+  name_ar: text
+}
+
+entity study_level_modes {
+  study_level_id: int [FK]
+  study_mode_id: int [FK]
+}
+
+entity study_fields {
+  id: serial [PK]
+  code: text [unique]
+  name_en: text
+  name_ar: text
+}
+
+entity study_durations {
+  id: serial [PK]
+  label_en: text
+  label_ar: text
+  duration_number: numeric
+  duration_unit: text
+}
+
+entity payment_plan_types {
+  id: serial [PK]
+  code: text [unique]
+  name: text
+  description: text
+  billing_period: text
+}
+
+entity currencies {
+  code: text [PK]
+  name: text
+  myr_rate: numeric
+}
+
+entity countries {
+  id: serial [PK]
+  name: text
+  iso_code: text [unique]
+  phone_code: text
+  accreditor_name: text
+  accreditor_source_url: text
+  accreditation_rules: text
+  notes: text
+}
+
+entity locations {
+  id: serial [PK]
+  state: text
+}
+
+entity certificate_types {
+  id: serial [PK]
+  name_en: text
+  name_ar: text
+  awarding_country_id: int [FK]
+  entry_levels: text[]
+  requires_foundation_year: boolean
+  exempt_from_english_requirement: boolean
+  active: boolean
+  notes: text
+  source_url: text
+  last_verified: date
+}
+
+entity english_qualifications {
+  id: serial [PK]
+  ielts_band: text [unique]
+  equivalents: jsonb
+}
+
+entity university_types {
+  id: serial [PK]
+  name: text
+  image_url: text
+}
+
+entity universities {
+  id: serial [PK]
+  name: text
+  acronym: text
+  image_url: text
+  is_partnership: boolean
+  active_to_recruit: boolean
+  type_id: int [FK]
+  official_url: text
+  advantages_en: text
+  advantages_ar: text
+  default_payment_plan_type_id: int [FK]
+  tax_applied: boolean
+  tax_rate: numeric
+  pec_fee_treatment: text
+  english_exempt_country_ids: int[]
+  notes: text
+}
+
+entity university_campuses {
+  university_id: int [FK]
+  location_id: int [FK]
+}
+
+entity university_pec_options {
+  id: serial [PK]
+  university_id: int [FK]
+  name: text
+  pricing_unit: text
+  price_per_unit: numeric
+  currency_code: text [FK]
+  min_units_at_registration: int
+  fee_catalog_item_ids: int[]
+  pros_en: text
+  cons_en: text
+  active: boolean
+}
+
+entity programs {
+  id: serial [PK]
+  name: text
+  university_id: int [FK]
+  currently_offered: boolean
+  study_level_id: int [FK]
+  study_mode_id: int [FK]
+  study_field_id: int [FK]
+  study_duration_id: int [FK]
+  ielts_requirement_id: int [FK]
+  currency_code: text [FK]
+  primary_payment_plan_id: int [FK]
+  accreditation_country_id: int [FK]
+  can_enroll_via_pec: boolean
+  is_twin_program: boolean
+  bundle: jsonb
+  notes: text
+}
+
+entity program_campuses {
+  program_id: int [FK]
+  location_id: int [FK]
+}
+
+entity intakes {
+  id: serial [PK]
+  university_id: int [FK]
+  month: text
+  open_month: smallint
+  open_day: smallint
+  close_month: smallint
+  close_day: smallint
+}
+
+entity program_intakes {
+  program_id: int [FK]
+  intake_id: int [FK]
+}
+
+entity fees {
+  id: serial [PK]
+  university_id: int [FK]
+  name_en: text
+  amount: numeric
+  currency_code: text [FK]
+  tax_override: text
+  payable_with: text
+  payable_to: text
+  charge_frequency: text
+  refundable: boolean
+  mandatory: boolean
+  eligibility: jsonb
+  nationality_overrides: jsonb
+  bundle_phase: text
+  anchored_to_semester_index: boolean
+  semester_indices_triggered: int[]
+  active: boolean
+  notes: text
+}
+
+entity tuition_lines {
+  id: serial [PK]
+  program_id: int [FK]
+  intake_id: int [FK]
+  period_type: text
+  academic_year_number: int
+  semester_in_year: int
+  number_of_periods: int
+  amount: numeric
+  currency_code: text [FK]
+  payment_plan_type_id: int [FK]
+  tax_override: text
+  bundle_phase: text
+  active: boolean
+  notes: text
+}
+
+entity discounts {
+  id: serial [PK]
+  university_id: int [FK]
+  name_en: text
+  type: text
+  conditional: boolean
+  triggered_by_payment_choice: boolean
+  value_type: text
+  value: numeric
+  value_min: numeric
+  value_max: numeric
+  currency_code: text [FK]
+  applies_to_fee_type: text
+  applies_to_specific_fee_ids: int[]
+  eligibility: jsonb
+  stackable: boolean
+  priority: int
+  valid_from: date
+  valid_until: date
+  active: boolean
+}
+
+entity language_institutes {
+  id: serial [PK]
+  name: text
+  url_en: text
+  url_ar: text
+}
+
+entity language_courses {
+  id: serial [PK]
+  language_institute_id: int [FK]
+  name: text
+}
+
+entity language_course_fees {
+  id: serial [PK]
+  language_course_id: int [FK]
+  amount: numeric
+  notes: text
+}
+
+study_level_modes }o--|| study_levels
+study_level_modes }o--|| study_modes
+certificate_types }o--|| countries
+university_campuses }o--|| universities
+university_campuses }o--|| locations
+university_pec_options }o--|| universities
+university_pec_options }o--|| currencies
+university_types ||--o{ universities
+payment_plan_types ||--o{ universities
+programs }o--|| universities
+programs }o--|| study_levels
+programs }o--|| study_modes
+programs }o--|| study_fields
+programs }o--|| study_durations
+programs }o--|| english_qualifications
+programs }o--|| currencies
+programs }o--|| payment_plan_types
+programs }o--|| countries
+program_campuses }o--|| programs
+program_campuses }o--|| locations
+intakes }o--|| universities
+program_intakes }o--|| programs
+program_intakes }o--|| intakes
+fees }o--|| universities
+fees }o--|| currencies
+tuition_lines }o--|| programs
+tuition_lines }o--|| intakes
+tuition_lines }o--|| currencies
+tuition_lines }o--|| payment_plan_types
+discounts }o--|| universities
+discounts }o--|| currencies
+language_courses }o--|| language_institutes
+language_course_fees }o--|| language_courses
+
+@enduml

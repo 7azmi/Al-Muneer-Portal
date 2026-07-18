@@ -1,0 +1,78 @@
+<mxfile host="app.diagrams.net" modified="2023-11-20T10:00:00.000Z" agent="Mozilla/5.0" etag="AB-CD-EF-GH" version="22.1.3" type="device">
+  <diagram id="domain_model_al_muneer" name="Page-1">
+    <mxGraphModel dx="1097" dy="687" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Classes -->
+        <mxCell id="AdminUser" value="&lt;div&gt;&lt;b&gt;AdminUser&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;userId&lt;br&gt;username&lt;br&gt;passwordHash&lt;br&gt;role&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="470" y="80" width="140" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="VenueInfo" value="&lt;div&gt;&lt;b&gt;VenueInfo&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;infoId&lt;br&gt;description&lt;br&gt;services&lt;br&gt;location&lt;br&gt;contactInfo&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="10" y="340" width="140" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="MediaItem" value="&lt;div&gt;&lt;b&gt;MediaItem&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;mediaId&lt;br&gt;fileName&lt;br&gt;filePath&lt;br&gt;mediaType&lt;br&gt;caption&lt;br&gt;uploadDate&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="160" y="340" width="140" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="AvailabilitySlot" value="&lt;div&gt;&lt;b&gt;AvailabilitySlot&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;slotId&lt;br&gt;date&lt;br&gt;status&lt;br&gt;notes&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="310" y="340" width="140" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="PricingTier" value="&lt;div&gt;&lt;b&gt;PricingTier&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;pricingId&lt;br&gt;tierName&lt;br&gt;basePrice&lt;br&gt;description&lt;br&gt;isActive&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="460" y="340" width="140" height="130" as="geometry" />
+        </mxCell>
+
+        <mxCell id="BookingInquiry" value="&lt;div&gt;&lt;b&gt;BookingInquiry&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;inquiryId&lt;br&gt;visitorName&lt;br&gt;visitorContact&lt;br&gt;inquiryDate&lt;br&gt;eventDate&lt;br&gt;status&lt;br&gt;notes&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="610" y="340" width="140" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="Feedback" value="&lt;div&gt;&lt;b&gt;Feedback&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;feedbackId&lt;br&gt;visitorName&lt;br&gt;visitorContact&lt;br&gt;feedbackText&lt;br&gt;submissionDate&lt;br&gt;rating&lt;br&gt;isReviewed&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="760" y="340" width="140" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="PaymentProof" value="&lt;div&gt;&lt;b&gt;PaymentProof&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;&lt;div&gt;proofId&lt;br&gt;fileName&lt;br&gt;filePath&lt;br&gt;uploadTimestamp&lt;br&gt;verificationStatus&lt;br&gt;adminNotes&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;spacingTop=0;spacing=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;container=1;dropTarget=0;recursiveResize=0;expand=0;width=140;fontColor=#000000;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="610" y="550" width="140" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Relationships -->
+        <mxCell id="edge_AdminUser_VenueInfo" value="Manages" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=1;" edge="1" parent="1" source="AdminUser" target="VenueInfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_AdminUser_MediaItem" value="Manages" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=0..*;" edge="1" parent="1" source="AdminUser" target="MediaItem">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_AdminUser_AvailabilitySlot" value="Manages" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=0..*;" edge="1" parent="1" source="AdminUser" target="AvailabilitySlot">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_AdminUser_PricingTier" value="Manages" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=0..*;" edge="1" parent="1" source="AdminUser" target="PricingTier">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_AdminUser_BookingInquiry" value="Manages" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=0..*;" edge="1" parent="1" source="AdminUser" target="BookingInquiry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_AdminUser_Feedback" value="Manages" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=0..*;" edge="1" parent="1" source="AdminUser" target="Feedback">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_BookingInquiry_PaymentProof" value="Has" style="edgeStyle=orthogonalEdgeStyle;endArrow=none;html=1;rounded=0;sourceLabel=1;targetLabel=0..1;" edge="1" parent="1" source="BookingInquiry" target="PaymentProof">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Title -->
+        <mxCell id="diagram_title" value="&lt;h2&gt;Figure 2.2: Domain Model for Al-Muneer Online Portal&lt;/h2&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;overflow=hidden;" vertex="1" parent="1">
+            <mxGeometry x="270" y="20" width="560" height="30" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
